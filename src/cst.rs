@@ -6,6 +6,7 @@ mod visit;
 
 use std::fmt::Debug;
 
+use smallvec::SmallVec;
 use wolfram_expr::{symbol::SymbolRef, Expr};
 
 use crate::{
@@ -37,7 +38,7 @@ pub type CstSeq<I = TokenString, S = Span> = NodeSeq<Cst<I, S>>;
 ///
 /// See also: [`TokenKind::isTrivia()`].
 #[derive(Debug)]
-pub struct TriviaSeq<I>(pub Vec<Token<I>>);
+pub struct TriviaSeq<I>(pub SmallVec<[Token<I>; 4]>);
 
 /// A concrete syntax tree (CST) node.
 ///

@@ -1,7 +1,7 @@
 //! Collection of utility functions for codepoints and long names
 
 use crate::{
-    generated::long_names_registration::{
+    generated::long_names::{
         ASCII_REPLACEMENTS_MAP, CODEPOINT_TO_LONGNAME_MAP,
         LONGNAME_TO_CODEPOINT_MAP, MB_NEWLINE_CODE_POINTS,
         MB_NOT_STRAGE_LETTERLIKE_CODE_POINTS, MB_PUNCTUATION_CODE_POINTS,
@@ -16,16 +16,6 @@ pub(crate) fn codepoint_has_longname(point: char) -> bool {
 }
 
 pub(crate) fn codepoint_to_longname(point: CodePoint) -> Option<&'static str> {
-    // NOTE: This assertion currently spuriously fails because the
-    //       StringMeta_DoubleQuote and StringMeta_Backslash codepoints are fake
-    //       codepoints with negative values.
-    /*
-    debug_assert!(utils::is_sorted_by(
-        &CODEPOINT_TO_LONGNAME_MAP,
-        |(point, _): &(CodePoint, &str)| *point
-    ));
-    */
-
     let index: usize = CODEPOINT_TO_LONGNAME_MAP
         .binary_search_by(|(cp, _)| cp.cmp(&point))
         .ok()?;
@@ -36,18 +26,7 @@ pub(crate) fn codepoint_to_longname(point: CodePoint) -> Option<&'static str> {
 }
 
 pub(crate) fn longname_to_codepoint(longname: &str) -> Option<CodePoint> {
-    debug_assert!(utils::is_sorted_by(
-        &LONGNAME_TO_CODEPOINT_MAP,
-        |(str, _): &(&str, CodePoint)| *str
-    ));
-
-    let index: usize = LONGNAME_TO_CODEPOINT_MAP
-        .binary_search_by(|&(str, _)| str.cmp(longname))
-        .ok()?;
-
-    let (_, point) = LONGNAME_TO_CODEPOINT_MAP[index];
-
-    Some(point)
+    LONGNAME_TO_CODEPOINT_MAP.get(longname).copied()
 }
 
 /// Is this \[Raw] something?

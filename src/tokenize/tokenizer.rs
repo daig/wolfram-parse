@@ -2,9 +2,12 @@
 
 use std::{collections::HashSet, os::raw::c_int};
 
+use smallvec::SmallVec;
+
 use crate::{
     feature,
     issue::{CodeAction, FormatIssue, IssueTag, Severity, SyntaxIssue},
+    safe_expect,
     read::{
         code_point::{
             CodePoint::{Char, *},
@@ -22,6 +25,12 @@ use crate::{
     FirstLineBehavior, ParseOptions,
 };
 
+#[cfg(feature = "string-interning")]
+use crate::{
+    string_interner::LocalInterner,
+    tokenize::token::InterningTokenInput,
+};
+
 use crate::source::NextPolicyBits::*;
 
 #[derive(Debug)]
@@ -30,9 +39,12 @@ pub(crate) struct Tokenizer<'i> {
 
     first_line_behavior: FirstLineBehavior,
 
-    pub(crate) GroupStack: Vec<Closer>,
+    pub(crate) GroupStack: SmallVec<[Closer; 4]>,
 
     pub(crate) tracked: TrackedSourceLocations,
+
+    #[cfg(feature = "string-interning")]
+    interner: LocalInterner,
 }
 
 #[doc(hidden)]
@@ -150,7 +162,7 @@ impl<'i> Tokenizer<'i> {
 
             first_line_behavior,
 
-            GroupStack: Vec::new(),
+            GroupStack: SmallVec::new(),
 
             tracked: TrackedSourceLocations {
                 simple_line_continuations: HashSet::new(),
@@ -158,6 +170,9 @@ impl<'i> Tokenizer<'i> {
                 embedded_newlines: HashSet::new(),
                 embedded_tabs: HashSet::new(),
             },
+
+            #[cfg(feature = "string-interning")]
+            interner: LocalInterner::new(),
         };
 
         tokenizer.handle_first_line();
@@ -401,6 +416,36 @@ impl<'i> Tokenizer<'i> {
         // return BufferAndLength::new(tokStartBuf, session.buffer - tokStartBuf);
 
         BufferAndLength::between(tok_start_buf, self.buffer())
+    }
+
+    /// Create a token with string interning support
+    #[cfg(feature = "string-interning")]
+    fn token_with_interning<T: Into<TokenKind>>(
+        &mut self,
+        tok: T,
+        start: &TokenStart<'i>,
+    ) -> Token<InterningTokenInput<'i>, Span> {
+        let tok = tok.into();
+        
+        let buf = self.get_token_buffer_and_length(start.buf);
+        let span = self.get_token_span(start.loc);
+        
+        // Convert buffer to string for interning check
+        let input_str = std::str::from_utf8(buf.as_bytes())
+            .unwrap_or("")
+            .to_string();
+
+        let input = if Token::should_intern(tok, &input_str) {
+            InterningTokenInput::interned(self.interner.intern(&input_str))
+        } else {
+            InterningTokenInput::owned(input_str)
+        };
+        
+        Token {
+            tok,
+            input,
+            src: span,
+        }
     }
 
     //==================================
@@ -1540,12 +1585,10 @@ fn Tokenizer_handleString<'i>(
     if feature::FAST_STRING_SCAN
         && !session.compute_oob
         && !session.check_issues
-        && !feature::COMPUTE_SOURCE
     {
         //
         // !CHECK_ISSUES (so do not need to warn about strange SourceCharacters)
         // !COMPUTE_OOB (so do not need to care about embedded newlines or tabs)
-        // !COMPUTE_SOURCE (so do not need to keep track of line and column information)
         //
         // FAST_STRING_SCAN (as a final check that skipping bad SourceCharacters and WLCharacters is ok)
         //
@@ -1606,7 +1649,7 @@ fn Tokenizer_handleString<'i>(
         //
 
         if terminated {
-            session.offset = quot_offset.unwrap() + 1;
+            session.offset = safe_expect!(quot_offset, "quot_offset should be set when terminated=true") + 1;
 
             return session.token(TokenKind::String, token_start);
         } else {
@@ -2028,7 +2071,7 @@ fn Tokenizer_handleNumber<'i>(
                     caret_1_mark = Some(session.mark());
 
                     assert!(utils::ifASCIIWLCharacter(
-                        caret1Buf.unwrap()[0],
+                        safe_expect!(caret1Buf, "caret1Buf should be set")[0],
                         b'^'
                     ));
                 } else if c.to_point() == '*' {
@@ -2093,7 +2136,7 @@ fn Tokenizer_handleNumber<'i>(
 
             Tokenizer_nextWLCharacter(session, token_start, policy);
 
-            if nonZeroStartBuf == caret1Buf.unwrap() {
+            if nonZeroStartBuf == safe_expect!(caret1Buf, "caret1Buf should be set in base parsing") {
                 //
                 // Something like  0^^2
                 //
@@ -2103,7 +2146,7 @@ fn Tokenizer_handleNumber<'i>(
                 // PRE_COMMIT: Compute string length differently
                 let baseStrLen = BufferAndLength::between(
                     nonZeroStartBuf,
-                    caret1Buf.unwrap(),
+                    safe_expect!(caret1Buf, "caret1Buf should be set in base parsing"),
                 )
                 .buf
                 .len();
@@ -2448,7 +2491,7 @@ fn Tokenizer_handleNumber<'i>(
                                         signBuf.as_str()
                                     ),
                                     Severity::Warning,
-                                    Span::at(sign_mark.unwrap().src_loc),
+                                    Span::at(safe_expect!(sign_mark, "sign_mark should be set when sign found").src_loc),
                                     0.95,
                                     vec![],
                                     vec!["This is usually unintentional.".into()],
@@ -2478,7 +2521,7 @@ fn Tokenizer_handleNumber<'i>(
                                         signBuf.as_str()
                                     ),
                                     Severity::Warning,
-                                    Span::at(sign_mark.unwrap().src_loc),
+                                    Span::at(safe_expect!(sign_mark, "sign_mark should be set when sign found").src_loc),
                                     0.95,
                                     vec![],
                                     vec!["This is usually unintentional.".into()],
@@ -2508,7 +2551,7 @@ fn Tokenizer_handleNumber<'i>(
                         //
                         // Must now do surgery and back up
                         //
-                        Tokenizer_backupAndWarn(session, sign_mark.unwrap());
+                        Tokenizer_backupAndWarn(session, safe_expect!(sign_mark, "sign_mark should be set when sign found"));
 
                         //
                         // Success!
@@ -2696,7 +2739,7 @@ fn Tokenizer_handleNumber<'i>(
 
                             Tokenizer_backupAndWarn(
                                 session,
-                                sign_mark.unwrap(),
+                                safe_expect!(sign_mark, "sign_mark should be set when sign found"),
                             );
 
                             //
@@ -4718,7 +4761,7 @@ fn Tokenizer_handleMBPunctuation<'i>(
         .expect("expected MBPunctuation to be char");
 
     let Operator =
-        crate::generated::long_names_registration::LongNameCodePointToOperator(
+        crate::generated::long_names::LongNameCodePointToOperator(
             char,
         );
 

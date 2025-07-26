@@ -229,7 +229,7 @@ pub(super) fn abstract_call_node<
                 // Now handle boxes
                 //
                 Cst::Box(BoxNode { ref kind, .. })
-                    if OK_CALL_BOX_KINDS.contains(&kind) =>
+                    if OK_CALL_BOX_KINDS.contains(kind) =>
                 {
                     // (* this is fine *)
                     // Null

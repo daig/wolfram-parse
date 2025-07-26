@@ -2855,7 +2855,7 @@ fn selectChildren(node: Ast) -> Vec<Ast> {
                 kind: TK::Symbol,
                 input,
                 data: _,
-            } = &**head
+            } = head.as_ref()
             {
                 if input.as_str() == "CodeParser`Comma" {
                     // TODO(optimization): Refactor to remove this clone()

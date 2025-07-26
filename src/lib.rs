@@ -61,7 +61,11 @@ macro_rules! Print {
 }
 
 mod utils;
+mod error_handling;
+pub mod newtypes;
 
+#[cfg(feature = "string-interning")]
+mod string_interner;
 
 mod byte_encoder;
 pub mod issue;
@@ -92,10 +96,7 @@ mod feature;
 
 /// Contains modules whose source code is generated dynamically at project build
 /// time.
-pub(crate) mod generated {
-    pub(crate) mod long_names_registration;
-    pub(crate) mod precedence_values;
-}
+pub(crate) mod generated;
 
 mod precedence;
 #[doc(hidden)]
@@ -113,7 +114,7 @@ mod parse_cst;
 // API
 //==========================================================
 
-use std::fmt::Debug;
+use std::fmt::{self, Debug};
 
 use wolfram_expr::{Expr, Number};
 
@@ -414,7 +415,7 @@ pub fn tokenize_bytes<'i>(
         NodeSeq(tokens) = crate::error::reparse_unterminated_tokens(
             NodeSeq(tokens),
             input,
-            usize::try_from(tokenizer.tab_width).unwrap(),
+            crate::safe_convert!(tokenizer.tab_width, usize, "tab_width conversion"),
         );
     }
 
@@ -824,6 +825,12 @@ fn create_parse_result<N>(tokenizer: &Tokenizer, nodes: N) -> ParseResult<N> {
 // Formatting Impls
 //======================================
 
+impl<N> From<Vec<N>> for NodeSeq<N> {
+    fn from(vec: Vec<N>) -> Self {
+        NodeSeq(vec)
+    }
+}
+
 impl<N: Debug> Debug for NodeSeq<N> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let NodeSeq(list) = self;
@@ -832,6 +839,432 @@ impl<N: Debug> Debug for NodeSeq<N> {
             write!(f, "NodeSeq(vec!{:#?})", list)
         } else {
             f.debug_tuple("NodeSeq").field(&self.0).finish()
+        }
+    }
+}
+
+//======================================
+// Standard trait implementations for NodeSeq
+//======================================
+
+use std::ops::{Deref, DerefMut, Index, IndexMut};
+
+impl<N> Deref for NodeSeq<N> {
+    type Target = Vec<N>;
+    
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl<N> DerefMut for NodeSeq<N> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
+impl<N> IntoIterator for NodeSeq<N> {
+    type Item = N;
+    type IntoIter = std::vec::IntoIter<N>;
+    
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
+    }
+}
+
+impl<'a, N> IntoIterator for &'a NodeSeq<N> {
+    type Item = &'a N;
+    type IntoIter = std::slice::Iter<'a, N>;
+    
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.iter()
+    }
+}
+
+impl<'a, N> IntoIterator for &'a mut NodeSeq<N> {
+    type Item = &'a mut N;
+    type IntoIter = std::slice::IterMut<'a, N>;
+    
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.iter_mut()
+    }
+}
+
+impl<N> FromIterator<N> for NodeSeq<N> {
+    fn from_iter<I: IntoIterator<Item = N>>(iter: I) -> Self {
+        NodeSeq(iter.into_iter().collect())
+    }
+}
+
+impl<N> Extend<N> for NodeSeq<N> {
+    fn extend<I: IntoIterator<Item = N>>(&mut self, iter: I) {
+        self.0.extend(iter)
+    }
+}
+
+impl<N> Index<usize> for NodeSeq<N> {
+    type Output = N;
+    
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.0[index]
+    }
+}
+
+impl<N> IndexMut<usize> for NodeSeq<N> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        &mut self.0[index]
+    }
+}
+
+impl<N> AsRef<[N]> for NodeSeq<N> {
+    fn as_ref(&self) -> &[N] {
+        &self.0
+    }
+}
+
+impl<N> AsMut<[N]> for NodeSeq<N> {
+    fn as_mut(&mut self) -> &mut [N] {
+        &mut self.0
+    }
+}
+
+//======================================
+// Debug and Display implementations for API types
+//======================================
+
+impl fmt::Debug for ParseOptions {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("ParseOptions")
+            .field("first_line_behavior", &self.first_line_behavior)
+            .field("src_convention", &self.src_convention)
+            .field("encoding_mode", &self.encoding_mode)
+            .field("tab_width", &self.tab_width)
+            .field("check_issues", &self.check_issues)
+            .field("compute_oob", &self.compute_oob)
+            .field("quirk_settings", &self.quirk_settings)
+            .finish()
+    }
+}
+
+impl fmt::Display for FirstLineBehavior {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::NotScript => write!(f, "not-script"),
+            Self::Check => write!(f, "check"),
+            Self::Script => write!(f, "script"),
+        }
+    }
+}
+
+impl fmt::Display for EncodingMode {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Normal => write!(f, "normal"),
+            Self::Box => write!(f, "box"),
+        }
+    }
+}
+
+impl fmt::Display for SourceConvention {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::LineColumn => write!(f, "line-column"),
+            Self::CharacterIndex => write!(f, "character-index"),
+        }
+    }
+}
+
+//======================================
+// Public type aliases for convenience
+//======================================
+
+/// Common alias for a sequence of tokens with string data.
+pub type TokenSeq<'i> = NodeSeq<Token<TokenStr<'i>>>;
+
+/// Common alias for a concrete syntax tree parsing result.
+pub type CstResult<'i> = ParseResult<Cst<TokenStr<'i>>>;
+
+/// Common alias for a sequence of concrete syntax trees parsing result.
+pub type CstSeqResult<'i> = ParseResult<CstSeq<TokenStr<'i>>>;
+
+/// Common alias for an abstract syntax tree parsing result.
+pub type AstResult = ParseResult<Ast>;
+
+/// Common alias for a sequence of abstract syntax trees parsing result.
+pub type AstSeqResult = ParseResult<NodeSeq<Ast>>;
+
+/// Internal alias for parser results.
+pub(crate) type ParserResult<T> = Result<T, crate::error_handling::ParseError>;
+
+//======================================
+// Error types for ergonomic APIs
+//======================================
+
+/// Error type for NodeSeq operations that expect specific sizes.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum NodeSeqError {
+    /// Expected a single item, but the sequence was empty.
+    Empty,
+    /// Expected a single item, but found multiple items.
+    Multiple(usize),
+}
+
+impl fmt::Display for NodeSeqError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            NodeSeqError::Empty => write!(f, "Expected single item, but sequence was empty"),
+            NodeSeqError::Multiple(count) => write!(f, "Expected single item, but found {} items", count),
+        }
+    }
+}
+
+impl std::error::Error for NodeSeqError {}
+
+//======================================
+// Additional NodeSeq methods with error handling
+//======================================
+
+impl<N> NodeSeq<N> {
+    /// Try to get a single item from the sequence, returning an error if not exactly one.
+    pub fn try_single(self) -> Result<N, NodeSeqError> {
+        match self.0.len() {
+            0 => Err(NodeSeqError::Empty),
+            1 => Ok(self.0.into_iter().next().unwrap()),
+            n => Err(NodeSeqError::Multiple(n)),
+        }
+    }
+    
+    /// Try to get a reference to the single item in the sequence.
+    pub fn try_single_ref(&self) -> Result<&N, NodeSeqError> {
+        match self.0.len() {
+            0 => Err(NodeSeqError::Empty),
+            1 => Ok(&self.0[0]),
+            n => Err(NodeSeqError::Multiple(n)),
+        }
+    }
+}
+
+//======================================
+// ParseResult ergonomic methods
+//======================================
+
+impl<T> ParseResult<T> {
+    /// Check if parsing succeeded without any fatal errors.
+    pub fn is_ok(&self) -> bool {
+        self.fatal_issues.is_empty()
+    }
+    
+    /// Check if parsing failed with fatal errors.
+    pub fn is_err(&self) -> bool {
+        !self.fatal_issues.is_empty()
+    }
+    
+    /// Check if there are any issues (fatal or non-fatal).
+    pub fn has_issues(&self) -> bool {
+        !self.fatal_issues.is_empty() || !self.non_fatal_issues.is_empty()
+    }
+    
+    /// Check if there are warnings (non-fatal issues).
+    pub fn has_warnings(&self) -> bool {
+        !self.non_fatal_issues.is_empty()
+    }
+    
+    /// Get all issues (fatal and non-fatal).
+    pub fn issues(&self) -> impl Iterator<Item = &Issue> {
+        self.fatal_issues.iter().chain(&self.non_fatal_issues)
+    }
+    
+    /// Get only fatal issues.
+    pub fn fatal_issues(&self) -> &[Issue] {
+        &self.fatal_issues
+    }
+    
+    /// Get only non-fatal issues (warnings).
+    pub fn warnings(&self) -> &[Issue] {
+        &self.non_fatal_issues
+    }
+    
+    /// Convert to Result, failing if there are fatal issues.
+    pub fn into_result(self) -> Result<T, Vec<Issue>> {
+        if self.fatal_issues.is_empty() {
+            Ok(self.syntax)
+        } else {
+            Err(self.fatal_issues)
+        }
+    }
+    
+    /// Get the syntax tree, regardless of issues.
+    pub fn syntax(&self) -> &T {
+        &self.syntax
+    }
+    
+    /// Take the syntax tree, consuming the ParseResult.
+    pub fn into_syntax(self) -> T {
+        self.syntax
+    }
+    
+    /// Map the syntax tree to a new type while preserving all metadata.
+    pub fn map<U, F>(self, f: F) -> ParseResult<U>
+    where
+        F: FnOnce(T) -> U,
+    {
+        ParseResult {
+            syntax: f(self.syntax),
+            unsafe_character_encoding: self.unsafe_character_encoding,
+            fatal_issues: self.fatal_issues,
+            non_fatal_issues: self.non_fatal_issues,
+            tracked: self.tracked,
+        }
+    }
+}
+
+//======================================
+// Tests for ergonomic features
+//======================================
+
+#[cfg(test)]
+mod ergonomic_tests {
+    use super::*;
+    use crate::newtypes::*;
+
+    #[test]
+    fn test_newtype_validation() {
+        // TabWidth tests
+        assert!(TabWidth::new(0).is_none());
+        assert!(TabWidth::new(1).is_some());
+        assert!(TabWidth::new(8).is_some());
+        assert_eq!(TabWidth::default().get(), 4);
+        assert_eq!(TabWidth::new(2).unwrap().get(), 2);
+
+        // ConfidenceLevel tests
+        assert!(ConfidenceLevel::new(-0.1).is_none());
+        assert!(ConfidenceLevel::new(0.0).is_some());
+        assert!(ConfidenceLevel::new(0.5).is_some());
+        assert!(ConfidenceLevel::new(1.0).is_some());
+        assert!(ConfidenceLevel::new(1.1).is_none());
+        assert_eq!(ConfidenceLevel::certain().get(), 1.0);
+        assert_eq!(ConfidenceLevel::none().get(), 0.0);
+
+        // LineNumber tests
+        assert!(LineNumber::new(0).is_none());
+        assert!(LineNumber::new(1).is_some());
+        assert_eq!(LineNumber::first().get(), 1);
+        assert_eq!(LineNumber::new(42).unwrap().get(), 42);
+
+        // ColumnNumber tests
+        assert!(ColumnNumber::new(0).is_none());
+        assert!(ColumnNumber::new(1).is_some());
+        assert_eq!(ColumnNumber::first().get(), 1);
+        assert_eq!(ColumnNumber::new(80).unwrap().get(), 80);
+    }
+
+    #[test]
+    fn test_nodeseq_traits() {
+        let seq: NodeSeq<i32> = vec![1, 2, 3].into_iter().collect();
+        
+        // Test basic operations
+        assert_eq!(seq.len(), 3);
+        assert_eq!(seq[1], 2);
+        
+        // Test iterator
+        let doubled: NodeSeq<i32> = seq.iter().map(|x| x * 2).collect();
+        assert_eq!(doubled[0], 2);
+        assert_eq!(doubled[1], 4);
+        assert_eq!(doubled[2], 6);
+        
+        // Test deref
+        assert_eq!(seq.first(), Some(&1));
+        assert_eq!(seq.last(), Some(&3));
+        
+        // Test into_iter
+        let mut sum = 0;
+        for item in seq {
+            sum += item;
+        }
+        assert_eq!(sum, 6);
+    }
+
+    #[test]
+    fn test_nodeseq_error_handling() {
+        let empty: NodeSeq<i32> = NodeSeq::from(vec![]);
+        let single: NodeSeq<i32> = NodeSeq::from(vec![42]);
+        let multiple: NodeSeq<i32> = NodeSeq::from(vec![1, 2, 3]);
+
+        // Test try_single
+        assert_eq!(empty.try_single_ref(), Err(NodeSeqError::Empty));
+        assert_eq!(single.try_single_ref(), Ok(&42));
+        assert_eq!(multiple.try_single_ref(), Err(NodeSeqError::Multiple(3)));
+
+        // Test try_single consuming
+        assert_eq!(single.try_single(), Ok(42));
+    }
+
+    #[test]
+    fn test_parse_result_ergonomics() {
+        use crate::tokenize::tokenizer::TrackedSourceLocations;
+        use std::collections::HashSet;
+
+        // Create a mock ParseResult for testing
+        let result_ok = ParseResult {
+            syntax: "test".to_string(),
+            unsafe_character_encoding: None,
+            fatal_issues: vec![],
+            non_fatal_issues: vec![],
+            tracked: TrackedSourceLocations {
+                simple_line_continuations: HashSet::new(),
+                complex_line_continuations: HashSet::new(),
+                embedded_newlines: HashSet::new(),
+                embedded_tabs: HashSet::new(),
+            },
+        };
+
+        // Test is_ok/is_err
+        assert!(result_ok.is_ok());
+        assert!(!result_ok.is_err());
+        
+        // Test has_issues/has_warnings
+        assert!(!result_ok.has_issues());
+        assert!(!result_ok.has_warnings());
+        
+        // Test syntax access
+        assert_eq!(result_ok.syntax(), "test");
+        assert_eq!(result_ok.into_syntax(), "test");
+    }
+
+    #[test]
+    fn test_source_ergonomics() {
+        use crate::source::{Location, Span};
+        
+        // Test Location::start
+        let start = Location::start();
+        
+        // Test Span::point
+        let point_span = Span::point(start);
+        assert_eq!(point_span.start(), start);
+        assert_eq!(point_span.end(), start);
+        
+        // Test advance (behavior depends on COMPUTE_SOURCE feature)
+        let advanced = start.advance(5);
+        
+        // Test next_line (behavior depends on COMPUTE_SOURCE feature)
+        let _next_line = start.next_line();
+        
+        // Test from_locations - only test when we can actually advance
+        // When COMPUTE_SOURCE is disabled, both locations will be CharacterIndex(0)
+        if advanced >= start {
+            let _span = Span::from_locations(start, advanced);
+        }
+    }
+
+    #[test]
+    fn test_type_aliases() {
+        // Just verify that the type aliases compile
+        fn _test_aliases() {
+            let _: Option<TokenSeq> = None;
+            let _: Option<CstResult> = None;
+            let _: Option<CstSeqResult> = None;
+            let _: Option<AstResult> = None;
+            let _: Option<AstSeqResult> = None;
         }
     }
 }

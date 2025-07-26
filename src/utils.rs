@@ -1,7 +1,7 @@
 use std::{fmt::Display, num::NonZeroU32};
 
 use crate::{
-    generated::long_names_registration::*,
+    generated::long_names::*,
     issue::CodeAction,
     read::{
         code_point::{CodePoint::Char, *},

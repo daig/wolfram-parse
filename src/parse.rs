@@ -59,9 +59,12 @@ mod parse_tests {
 
 use std::fmt::Debug;
 
+use smallvec::SmallVec;
+
 use crate::{
     create_parse_result,
     cst::TriviaSeq,
+    error_handling::{ParserError, perf_monitor},
     feature, panic_if_aborted,
     parse::parselet::PrefixToplevelCloserParselet,
     precedence::Precedence,
@@ -190,7 +193,7 @@ pub(crate) struct ParserSession<'i, B: ParseBuilder<'i> + 'i> {
 
     builder: B,
 
-    context_stack: Vec<Context<B::ContextData>>,
+    context_stack: SmallVec<[Context<B::ContextData>; 4]>,
 
     quirk_settings: QuirkSettings,
 }
@@ -969,7 +972,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> ParserSession<'i, B> {
         ParserSession {
             tokenizer: Tokenizer::new(input, opts),
             builder,
-            context_stack: Vec::new(),
+            context_stack: SmallVec::new(),
             quirk_settings,
         }
     }
@@ -1251,10 +1254,22 @@ impl<'i, B: ParseBuilder<'i> + 'i> ParserSession<'i, B> {
         trivia: B::TriviaHandle,
         operand: B::Node,
     ) -> B::Node {
-        let ctx_data = self.context_stack.pop().unwrap().builder_data;
+        let ctx_data = self.safe_pop_context_data("reduce_prefix");
 
         self.builder
             .reduce_prefix(ctx_data, op, op_token, trivia, operand)
+    }
+
+    /// Helper method for safe context popping with data extraction
+    fn safe_pop_context_data(&mut self, operation: &'static str) -> B::ContextData {
+        perf_monitor::increment_check();
+        match self.context_stack.pop() {
+            Some(ctx) => ctx.builder_data,
+            None => {
+                perf_monitor::increment_error();
+                panic!("Empty context stack during {}: This indicates a parser bug", operation)
+            }
+        }
     }
 
     // TODO(cleanup): Better name
@@ -1266,7 +1281,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> ParserSession<'i, B> {
         trivia: B::TriviaHandle,
         stringify_token: TokenRef<'i>,
     ) -> B::Node {
-        let ctx_data = self.context_stack.pop().unwrap().builder_data;
+        let ctx_data = self.safe_pop_context_data("reduce_prefix_get");
 
         self.builder.reduce_prefix_get(
             ctx_data,
@@ -1286,7 +1301,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> ParserSession<'i, B> {
     }
 
     fn reduce_infix(&mut self, state: B::InfixParseState) -> B::Node {
-        let ctx_data = self.context_stack.pop().unwrap().builder_data;
+        let ctx_data = self.safe_pop_context_data("reduce_infix");
 
         self.builder.reduce_infix(ctx_data, state)
     }
@@ -1298,7 +1313,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> ParserSession<'i, B> {
         trivia: B::TriviaHandle,
         op_token: B::SyntaxTokenNode,
     ) -> B::Node {
-        let ctx_data = self.context_stack.pop().unwrap().builder_data;
+        let ctx_data = self.safe_pop_context_data("reduce_postfix");
 
         self.builder
             .reduce_postfix(ctx_data, op, operand, trivia, op_token)
@@ -1313,7 +1328,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> ParserSession<'i, B> {
         trivia2: B::TriviaHandle,
         rhs_node: B::Node,
     ) -> B::Node {
-        let ctx_data = self.context_stack.pop().unwrap().builder_data;
+        let ctx_data = self.safe_pop_context_data("reduce_binary");
 
         self.builder.reduce_binary(
             ctx_data, op, lhs_node, trivia1, op_token, trivia2, rhs_node,
@@ -1332,7 +1347,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> ParserSession<'i, B> {
         debug_assert_eq!(op, BinaryOperator::Unset);
         // debug_assert_eq!(dot_token.tok, TokenKind::Dot);
 
-        let ctx_data = self.context_stack.pop().unwrap().builder_data;
+        let ctx_data = self.safe_pop_context_data("reduce_binary_unset");
 
         self.builder.reduce_binary_unset(
             ctx_data, op, lhs_node, trivia1, op_token, trivia2, dot_token,
@@ -1353,7 +1368,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> ParserSession<'i, B> {
         trivia4: B::TriviaHandle,
         rhs_node: B::Node,
     ) -> B::Node {
-        let ctx_data = self.context_stack.pop().unwrap().builder_data;
+        let ctx_data = self.safe_pop_context_data("reduce_ternary");
 
         self.builder.reduce_ternary(
             ctx_data,
@@ -1383,7 +1398,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> ParserSession<'i, B> {
         trivia4: B::TriviaHandle,
         dot_token: B::SyntaxTokenNode,
     ) -> B::Node {
-        let ctx_data = self.context_stack.pop().unwrap().builder_data;
+        let ctx_data = self.safe_pop_context_data("reduce_ternary_tag_unset");
 
         debug_assert_eq!(op, TernaryOperator::TagUnset);
 
@@ -1411,7 +1426,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> ParserSession<'i, B> {
         trivia2: B::TriviaHandle,
         rhs_node: B::Node,
     ) -> B::Node {
-        let ctx_data = self.context_stack.pop().unwrap().builder_data;
+        let ctx_data = self.safe_pop_context_data("reduce_prefix_binary");
 
         self.builder.reduce_prefix_binary(
             ctx_data,
@@ -1431,7 +1446,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> ParserSession<'i, B> {
         trailing_trivia: B::TriviaHandle,
         closer_tok: B::SyntaxTokenNode,
     ) -> B::Node {
-        let ctx_data = self.context_stack.pop().unwrap().builder_data;
+        let ctx_data = self.safe_pop_context_data("reduce_group");
 
         self.pop_group();
 
@@ -1450,7 +1465,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> ParserSession<'i, B> {
         head_trivia: B::TriviaHandle,
         group: B::Node,
     ) -> B::Node {
-        let ctx_data = self.context_stack.pop().unwrap().builder_data;
+        let ctx_data = self.safe_pop_context_data("reduce_call");
 
         self.builder.reduce_call(ctx_data, head, head_trivia, group)
     }
@@ -1463,7 +1478,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> ParserSession<'i, B> {
         &mut self,
         data: SyntaxErrorData<B::Node, B::TriviaHandle, B::SyntaxTokenNode>,
     ) -> B::Node {
-        let ctx_data = self.context_stack.pop().unwrap().builder_data;
+        let ctx_data = self.safe_pop_context_data("reduce_syntax_error");
 
         self.builder.reduce_syntax_error(ctx_data, data)
     }
@@ -1474,7 +1489,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> ParserSession<'i, B> {
         group_state: B::GroupParseState,
         trailing_trivia: B::TriviaHandle,
     ) -> B::Node {
-        let ctx_data = self.context_stack.pop().unwrap().builder_data;
+        let ctx_data = self.safe_pop_context_data("reduce_unterminated_group");
 
         self.pop_group();
 
@@ -1502,7 +1517,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> ParserSession<'i, B> {
         op: GroupOperator,
         group_state: B::GroupParseState,
     ) -> B::Node {
-        let ctx_data = self.context_stack.pop().unwrap().builder_data;
+        let ctx_data = self.safe_pop_context_data("reduce_group_missing_closer");
 
         self.pop_group();
 
@@ -1535,7 +1550,8 @@ impl<'i, B: ParseBuilder<'i> + 'i> ParserSession<'i, B> {
 
         self.context_stack.push(Context::new(prec, data));
 
-        return self.context_stack.last_mut().unwrap();
+        // Safe unwrap since we just pushed
+        return self.context_stack.last_mut().expect("last_mut after push: no contexts set");
     }
 
     fn top_context<'s>(&'s mut self) -> &'s mut Context<B::ContextData> {
@@ -1543,6 +1559,29 @@ impl<'i, B: ParseBuilder<'i> + 'i> ParserSession<'i, B> {
             .context_stack
             .last_mut()
             .expect("top_context: no contexts set");
+    }
+
+    /// Safe context stack operations
+    fn safe_pop_context(&mut self) -> Result<Context<B::ContextData>, ParserError> {
+        perf_monitor::increment_check();
+        self.context_stack.pop()
+            .ok_or_else(|| {
+                perf_monitor::increment_error();
+                ParserError::EmptyContextStack {
+                    operation: "safe_pop_context"
+                }
+            })
+    }
+
+    fn safe_top_context_mut(&mut self) -> Result<&mut Context<B::ContextData>, ParserError> {
+        perf_monitor::increment_check();
+        self.context_stack.last_mut()
+            .ok_or_else(|| {
+                perf_monitor::increment_error();
+                ParserError::EmptyContextStack {
+                    operation: "safe_top_context_mut"
+                }
+            })
     }
 
     //==================================

@@ -26,7 +26,6 @@
 use std::num::NonZeroU32;
 
 use crate::{
-    feature,
     issue::{CodeAction, EncodingIssue, IssueTag, Severity},
     read::{
         byte_buffer::{ByteBuffer_currentByte, ByteBuffer_nextByte},
@@ -76,9 +75,7 @@ pub(super) fn ByteDecoder_nextSourceCharacter(
 
         ByteBuffer_nextByte(session);
 
-        if feature::COMPUTE_SOURCE {
-            session.src().increment();
-        }
+        session.src().increment();
 
         return SourceCharacter::from_u8(firstByte);
     }
@@ -92,9 +89,7 @@ pub(super) fn ByteDecoder_nextSourceCharacter(
 
         ByteBuffer_nextByte(session);
 
-        if feature::COMPUTE_SOURCE {
-            session.src().newline();
-        }
+        session.src().newline();
 
         return SourceCharacter::from_u8(firstByte);
     }
@@ -117,9 +112,7 @@ fn ByteDecoder_nextSourceCharacter_uncommon(
 
             incr_diagnostic!(ByteDecoder_TabCount);
 
-            if feature::COMPUTE_SOURCE {
-                session.src().tab();
-            }
+            session.src().tab();
 
             return SourceCharacter::from_u8(firstByte);
 
@@ -135,16 +128,12 @@ fn ByteDecoder_nextSourceCharacter_uncommon(
 
                 ByteBuffer_nextByte(session);
 
-                if feature::COMPUTE_SOURCE {
-                    session.src().windowsNewline();
-                }
+                session.src().windowsNewline();
 
                 return SourceCharacter::from(CodePoint::CRLF);
             }
 
-            if feature::COMPUTE_SOURCE {
-                session.src().newline();
-            }
+            session.src().newline();
 
             if session.check_issues && policy.contains(ENABLE_CHARACTER_DECODING_ISSUES) {
 
@@ -930,9 +919,7 @@ fn ByteDecoder_validStrange(
     decoded: CodePoint,
     policy: NextPolicy,
 ) -> SourceCharacter {
-    if feature::COMPUTE_SOURCE {
-        session.src().increment();
-    }
+    session.src().increment();
 
     if session.check_issues {
         let currentSourceCharacterStartLoc = session.SrcLoc.previous();
@@ -953,9 +940,7 @@ fn ByteDecoder_validMB(
     decoded: CodePoint,
     policy: NextPolicy,
 ) -> SourceCharacter {
-    if feature::COMPUTE_SOURCE {
-        session.src().increment();
-    }
+    session.src().increment();
 
     if session.check_issues {
         let currentSourceCharacterStartLoc = session.SrcLoc.previous();
@@ -1020,9 +1005,7 @@ fn ByteDecoder_incompleteByteSequence(
     errSrcLoc: Location,
     errChar: SourceCharacter,
 ) -> SourceCharacter {
-    if feature::COMPUTE_SOURCE {
-        session.src().increment();
-    }
+    session.src().increment();
 
     if session.check_issues {
         //
@@ -1064,9 +1047,7 @@ fn ByteDecoder_straySurrogate(
     errSrcLoc: Location,
     _policy: NextPolicy,
 ) -> SourceCharacter {
-    if feature::COMPUTE_SOURCE {
-        session.src().increment();
-    }
+    session.src().increment();
 
     if session.check_issues {
         //
@@ -1105,9 +1086,7 @@ fn ByteDecoder_bom(
     errSrcLoc: Location,
     _policy: NextPolicy,
 ) -> SourceCharacter {
-    if feature::COMPUTE_SOURCE {
-        session.src().increment();
-    }
+    session.src().increment();
 
     if session.check_issues {
         //

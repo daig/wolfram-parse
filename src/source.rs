@@ -7,7 +7,6 @@ use std::{
 };
 
 use crate::{
-    feature,
     long_names::{self as LongNames, codepoint_has_longname},
     read::{
         code_point::{
@@ -619,44 +618,75 @@ impl Display for BoxPosition {
 //======================================
 
 impl Location {
+    /// Create a location at the start of a file.
+    pub fn start() -> Self {
+        Location::LineColumn(LineColumn(
+            NonZeroU32::new(1).unwrap(),
+            NonZeroU32::new(1).unwrap(),
+        ))
+    }
+
+    /// Advance by a number of characters in the same line.
+    pub fn advance(self, chars: u32) -> Self {
+        match self {
+            Location::LineColumn(LineColumn(line, column)) => {
+                let new_column = column.get() + chars;
+                Location::LineColumn(LineColumn(
+                    line,
+                    NonZeroU32::new(new_column).expect("column overflow"),
+                ))
+            },
+            Location::CharacterIndex(index) => {
+                Location::CharacterIndex(index + chars)
+            },
+        }
+    }
+
+    /// Move to the next line.
+    pub fn next_line(self) -> Self {
+        match self {
+            Location::LineColumn(LineColumn(line, _)) => {
+                Location::LineColumn(LineColumn(
+                    non_zero_u32_incr(line),
+                    NonZeroU32::new(1).unwrap(),
+                ))
+            },
+            Location::CharacterIndex(index) => {
+                Location::CharacterIndex(index + 1)
+            },
+        }
+    }
+
     pub(crate) fn next(self) -> Self {
-        if feature::COMPUTE_SOURCE {
-            match self {
-                Location::LineColumn(LineColumn(line, column)) => {
-                    Location::LineColumn(LineColumn(
-                        line,
-                        // column + 1
-                        non_zero_u32_incr(column),
-                    ))
-                },
-                Location::CharacterIndex(index) => {
-                    Location::CharacterIndex(index + 1)
-                },
-            }
-        } else {
-            Location::CharacterIndex(0)
+        match self {
+            Location::LineColumn(LineColumn(line, column)) => {
+                Location::LineColumn(LineColumn(
+                    line,
+                    // column + 1
+                    non_zero_u32_incr(column),
+                ))
+            },
+            Location::CharacterIndex(index) => {
+                Location::CharacterIndex(index + 1)
+            },
         }
     }
 
     pub(crate) fn previous(self) -> Self {
-        if feature::COMPUTE_SOURCE {
-            // TODO: What should this do if `second` is equal to 0? Can `second`
-            //       even validly be equal to zero?
-            match self {
-                Location::LineColumn(LineColumn(line, column)) => {
-                    let previous = column.get() - 1;
-                    let previous = NonZeroU32::new(previous)
-                        .expect("previous column is 0");
-                    Location::LineColumn(LineColumn(line, previous))
-                },
-                Location::CharacterIndex(index) => {
-                    debug_assert!(index >= 1);
+        // TODO: What should this do if `second` is equal to 0? Can `second`
+        //       even validly be equal to zero?
+        match self {
+            Location::LineColumn(LineColumn(line, column)) => {
+                let previous = column.get() - 1;
+                let previous = NonZeroU32::new(previous)
+                    .expect("previous column is 0");
+                Location::LineColumn(LineColumn(line, previous))
+            },
+            Location::CharacterIndex(index) => {
+                debug_assert!(index >= 1);
 
-                    Location::CharacterIndex(index - 1)
-                },
-            }
-        } else {
-            Location::CharacterIndex(0)
+                Location::CharacterIndex(index - 1)
+            },
         }
     }
 }
@@ -723,6 +753,22 @@ impl Span {
             start: Location::LineColumn(start),
             end: Location::LineColumn(end),
         }
+    }
+
+    /// Create a span at a single point.
+    pub fn point(loc: Location) -> Self {
+        Span::at(loc)
+    }
+
+    /// Create a span between two locations.
+    pub fn from_locations(start: Location, end: Location) -> Self {
+        assert!(start <= end);
+        Span { start, end }
+    }
+
+    /// Check if this span contains a location.
+    pub fn contains(&self, loc: Location) -> bool {
+        self.start <= loc && loc <= self.end
     }
 
     pub(crate) fn new(start: Location, end: Location) -> Self {

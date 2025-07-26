@@ -1,4 +1,5 @@
 use std::cmp::Ordering;
+use phf_shared::{PhfHash, PhfBorrow};
 
 
 // Validate that Rust is doing enum size optimization, by recognizing that the
@@ -206,6 +207,19 @@ impl PartialEq<char> for CodePoint {
             // can't be equal.
             None => false,
         }
+    }
+}
+
+// PHF trait implementations for CodePoint
+impl PhfHash for CodePoint {
+    fn phf_hash<H: std::hash::Hasher>(&self, hasher: &mut H) {
+        std::hash::Hash::hash(self, hasher);
+    }
+}
+
+impl PhfBorrow<CodePoint> for CodePoint {
+    fn borrow(&self) -> &CodePoint {
+        self
     }
 }
 

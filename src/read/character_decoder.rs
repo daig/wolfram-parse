@@ -1,5 +1,5 @@
 use crate::{
-    generated::long_names_registration::CODEPOINT_TO_LONGNAME_MAP,
+    generated::long_names::CODEPOINT_TO_LONGNAME_MAP,
     issue::{CodeAction, IssueTag, Severity, SyntaxIssue},
     long_names::{self as LongNames, self},
     read::{

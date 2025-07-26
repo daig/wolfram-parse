@@ -1,7 +1,7 @@
 use std::fmt::{self, Debug, Display};
 
 use crate::{
-    generated::long_names_registration::*,
+    generated::long_names::*,
     long_names::{self as LongNames, codepoint_to_longname},
     read::code_point::{
         CodePoint::{self, Char, *},

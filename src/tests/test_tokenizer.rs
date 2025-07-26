@@ -353,7 +353,7 @@ fn test_tokenizing_escaped_chars() {
 fn test_tokenize_jpeg_string() {
     assert_eq!(
         tokenize_bytes(
-            include_bytes!("../../../../Tests/files/jpeg-string.txt"),
+            include_bytes!("../../Tests/files/jpeg-string.txt"),
             &ParseOptions::default()
         )
         .unwrap(),

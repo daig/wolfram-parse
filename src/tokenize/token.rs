@@ -5,6 +5,9 @@ use crate::{
     tokenize::{TokenKind, Tokenizer},
 };
 
+#[cfg(feature = "string-interning")]
+use crate::string_interner::{InternedString, resolve_interned};
+
 pub(crate) type TokenRef<'i> = Token<TokenStr<'i>>;
 
 /// Minimal syntactically-meaningful piece of Wolfram Language input.
@@ -34,10 +37,11 @@ pub struct Token<I = TokenString, S = Span> {
 /// Trait implemented for types that can store the piece of input associated
 /// with a [`Token`].
 ///
-/// This trait is implemented for two types:
+/// This trait is implemented for:
 ///
 /// * [`TokenStr`] — the [`Token`] input is borrowed from a buffer
 /// * [`TokenString`] — the [`Token`] input is its own owned allocation
+/// * [`InterningTokenInput`] — the [`Token`] input can be borrowed, owned, or interned (when string-interning feature is enabled)
 pub trait TokenInput: Clone {
     fn as_bytes(&self) -> &[u8];
 
@@ -47,6 +51,56 @@ pub trait TokenInput: Clone {
     }
 
     fn into_owned(self) -> TokenString;
+}
+
+/// Flexible input type that supports borrowed, owned, and optionally interned strings
+/// When string interning is enabled, interned strings are converted to owned TokenString
+/// to maintain compatibility with the existing TokenInput trait.
+#[derive(Clone, PartialEq)]
+pub enum InterningTokenInput<'i> {
+    Borrowed(TokenStr<'i>),
+    Owned(TokenString),
+}
+
+impl<'i> TokenInput for InterningTokenInput<'i> {
+    fn as_bytes(&self) -> &[u8] {
+        match self {
+            InterningTokenInput::Borrowed(ts) => ts.as_bytes(),
+            InterningTokenInput::Owned(ts) => ts.as_bytes(),
+        }
+    }
+
+    fn as_str(&self) -> &str {
+        match self {
+            InterningTokenInput::Borrowed(ts) => ts.as_str(),
+            InterningTokenInput::Owned(ts) => ts.to_str(),
+        }
+    }
+
+    fn into_owned(self) -> TokenString {
+        match self {
+            InterningTokenInput::Borrowed(ts) => ts.into_owned(),
+            InterningTokenInput::Owned(ts) => ts,
+        }
+    }
+}
+
+impl<'i> InterningTokenInput<'i> {
+    /// Create from borrowed string
+    pub fn borrowed(s: &'i str) -> Self {
+        InterningTokenInput::Borrowed(TokenStr::new(s.as_bytes()))
+    }
+
+    /// Create from owned string
+    pub fn owned(s: String) -> Self {
+        InterningTokenInput::Owned(TokenString::from_string(s))
+    }
+
+    /// Create from interned string (converts to owned)
+    #[cfg(feature = "string-interning")]
+    pub fn interned(symbol: InternedString) -> Self {
+        InterningTokenInput::Owned(TokenString::from_string(resolve_interned(symbol)))
+    }
 }
 
 pub trait TokenSource: Clone {
@@ -263,7 +317,7 @@ impl<'i> TokenRef<'i> {
             // And other newlines like \[IndentingNewLine] have size > 1
             //
             TokenKind::ToplevelNewline | TokenKind::InternalNewline => {},
-            _ if crate::feature::COMPUTE_SOURCE => {
+            _ => {
                 use crate::source::{
                     LineColumn, LineColumnSpan, SourceCharacter, SpanKind,
                 };
@@ -319,7 +373,6 @@ impl<'i> TokenRef<'i> {
                     }
                 }
             },
-            _ => (),
         }
 
         token
@@ -369,6 +422,58 @@ impl<'i> TokenRef<'i> {
             tok: kind,
             src,
             input,
+        }
+    }
+
+    /// Check if a token should be interned based on its kind and content
+    #[cfg(feature = "string-interning")]
+    pub(crate) fn should_intern(kind: TokenKind, s: &str) -> bool {
+        use TokenKind::*;
+        
+        match kind {
+            // Always intern single-char operators
+            Plus | Minus | Star | Slash | Equal | Caret |
+            OpenParen | CloseParen | OpenSquare | CloseSquare |
+            OpenCurly | CloseCurly => true,
+            
+            // Intern multi-char operators
+            ColonEqual | MinusGreater | EqualEqual | BangEqual |
+            LessEqual | GreaterEqual | AmpAmp | BarBar |
+            LessGreater | TildeTilde | ColonGreater | SlashAt |
+            SlashSlash | AtAtAt | AtAt | At => true,
+            
+            // Intern common function names if short
+            Symbol if s.len() <= 10 => {
+                matches!(s, "Plus" | "Times" | "Power" | "List" | "Set" | 
+                           "Rule" | "If" | "While" | "Module" | "Block" |
+                           "Function" | "Apply" | "Map")
+            }
+            
+            _ => false,
+        }
+    }
+
+    /// Create a new token with interning support
+    #[cfg(feature = "string-interning")]
+    pub fn new_with_interning<S>(
+        kind: TokenKind, 
+        input: &'i str, 
+        src: S,
+        interner: &mut crate::string_interner::LocalInterner,
+    ) -> Token<InterningTokenInput<'i>, Span>
+    where
+        S: Into<Span>,
+    {
+        let input = if Self::should_intern(kind, input) {
+            InterningTokenInput::interned(interner.intern(input))
+        } else {
+            InterningTokenInput::borrowed(input)
+        };
+        
+        Token {
+            tok: kind,
+            input,
+            src: src.into(),
         }
     }
 }
@@ -528,6 +633,27 @@ impl Display for TokenString {
                 write!(f, "{str:?}")
             },
             Err(_) => f.debug_struct("TokenString").field("buf", buf).finish(),
+        }
+    }
+}
+
+impl<'i> Debug for InterningTokenInput<'i> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            InterningTokenInput::Borrowed(ts) => {
+                if f.alternate() {
+                    write!(f, "{:#?}", ts.as_str())
+                } else {
+                    Debug::fmt(ts, f)
+                }
+            },
+            InterningTokenInput::Owned(ts) => {
+                if cfg!(test) {
+                    Display::fmt(ts, f)
+                } else {
+                    Debug::fmt(ts, f)
+                }
+            },
         }
     }
 }

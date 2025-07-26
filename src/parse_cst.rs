@@ -1,3 +1,5 @@
+use smallvec::SmallVec;
+
 use crate::{
     cst::{
         BinaryNode, CallBody, CallNode, CompoundNode, Cst, CstSeq,
@@ -60,13 +62,13 @@ impl<'i> ParseBuilder<'i> for ParseCst<'i> {
     // Trivia handling
     //==================================
 
-    type ResettableTriviaAccumulator = Vec<TokenRef<'i>>;
+    type ResettableTriviaAccumulator = SmallVec<[TokenRef<'i>; 4]>;
     type ResettableTriviaHandle = TriviaSeqRef<'i>;
 
     type TriviaHandle = ();
 
     fn resettable_trivia_begin(&mut self) -> Self::ResettableTriviaAccumulator {
-        Vec::new()
+        SmallVec::new()
     }
 
     fn resettable_trivia_push(
@@ -181,7 +183,7 @@ impl<'i> ParseBuilder<'i> for ParseCst<'i> {
             exprs = crate::error::reparse_unterminated(
                 exprs,
                 input,
-                usize::try_from(opts.tab_width).unwrap(),
+                crate::safe_convert!(opts.tab_width, usize, "tab_width conversion"),
             );
         }
 

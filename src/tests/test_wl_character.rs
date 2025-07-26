@@ -1,5 +1,5 @@
 use crate::{
-    generated::long_names_registration::*,
+    generated::long_names::*,
     read::{Escape, WLCharacter},
 };
 

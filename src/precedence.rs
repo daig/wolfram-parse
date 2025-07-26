@@ -48,3 +48,7 @@ impl PartialEq<Precedence> for Option<Precedence> {
         }
     }
 }
+
+// Include the generated precedence constant values
+// This adds the impl block with all the precedence constants
+include!("generated/precedence/values.rs");

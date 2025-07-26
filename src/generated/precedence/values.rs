@@ -13,9 +13,8 @@
 // Wolfram Language is required.
 //
 
-#![allow(dead_code)]
-
-use crate::precedence::Precedence;
+// Note: This file is included into precedence.rs via include!() macro
+// so it doesn't need its own imports or attributes
 
 impl Precedence {
 	pub const COMMA: Precedence = Precedence::new(2); // prec: 1, assoc: Associativity`NonRight
