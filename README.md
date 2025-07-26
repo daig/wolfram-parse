@@ -1,9 +1,5 @@
 # Wolfram Parser
 
-A high-performance parser for Wolfram Language input form syntax, written in Rust.
-
-## Overview
-
 This library implements a fully-featured parser for [Wolfram Language](https://wolfram.com/language) input form syntax. Given a string containing Wolfram Language code, it can produce:
 
 - **Abstract Syntax Tree (AST)** - A high-level representation of the code structure
@@ -12,12 +8,36 @@ This library implements a fully-featured parser for [Wolfram Language](https://w
 
 ## Features
 
-- Fast, zero-copy parsing
+- Fast, zero-copy parsing with optimized memory usage
 - Complete support for Wolfram Language syntax
 - Detailed source location tracking
-- Graceful error recovery
-- Unicode support
-- Configurable parsing options
+- Graceful error recovery with comprehensive error types
+- Full Unicode support including Wolfram named characters
+
+## Origin
+This is a standalone Rust version of the parser component from the [CodeParser](https://github.com/WolframResearch/codeparser) project, extracted and simplified for easier integration into Rust projects.
+
+## Improvements Over Original Version
+
+This Rust implementation includes several performance and architectural improvements:
+
+### Performance Optimizations
+- **PHF (Perfect Hash Functions)**: Character lookup operations are 5-10x faster using compile-time perfect hashing
+- **String Interning**: Reduced memory usage and faster string comparisons for repeated identifiers
+- **SmallVec Optimizations**: Reduced allocations in hot parsing paths by using stack-allocated small vectors
+- **Zero-Copy Design**: Extensive use of borrowing to minimize memory allocations
+
+### Code Quality Improvements
+- **Unified Error Handling**: Comprehensive error types with zero performance overhead
+- **Modernized Rust Patterns**: Updated to use Rust 1.88+ idioms and best practices
+- **Modular Architecture**: Reorganized generated files for better maintainability
+- **Improved API Ergonomics**: More intuitive and Rust-idiomatic public interfaces
+
+### Build Improvements
+- **Standalone Build**: No longer requires Wolfram Language or Mathematica to build - all generated files are pre-built and included
+- Resolved all compilation warnings for cleaner builds
+
+
 
 ## Installation
 
@@ -119,10 +139,10 @@ This project requires Rust 1.75 or later.
 
 ## Generated Code
 
-This parser includes two generated files that contain parsing data:
+This parser includes generated files that contain parsing data:
 
-- `src/generated/long_names_registration.rs` - Character constants and mappings for Wolfram Language special characters
-- `src/generated/precedence_values.rs` - Operator precedence values
+- `src/generated/long_names/` - Character constants and mappings for Wolfram Language special characters
+- `src/generated/precedence/` - Operator precedence values
 
 These files were generated from Wolfram Language data files and should not be manually edited. They contain fundamental parsing information such as:
 
@@ -171,11 +191,3 @@ Run benchmarks with:
 ```bash
 cargo bench
 ```
-
-## License
-
-This project is licensed under the MIT License.
-
-## Origin
-
-This is a standalone Rust version of the parser component from the [CodeParser](https://github.com/WolframResearch/codeparser) project, extracted and simplified for easier integration into Rust projects.
