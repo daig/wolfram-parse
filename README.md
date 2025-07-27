@@ -118,6 +118,30 @@ For parsing raw bytes (with encoding detection):
 - `parse_bytes_ast_seq()`
 - `parse_bytes_cst_seq()`
 
+### File Parsing with Paclet Support
+
+The library can parse files directly and automatically handles paclet-encoded files:
+
+```rust
+use wolfram_parser::{parse_file_cst, parse_file_ast, tokenize_file, ParseOptions};
+
+// Automatically detects and decodes paclets
+let result = parse_file_cst("MyFile.m", &ParseOptions::default())?;
+```
+
+A CLI utility is also available for paclet operations:
+
+```bash
+# Check if a file is a paclet
+cargo run --bin paclet -- check MyFile.m
+
+# Decode a paclet file  
+cargo run --bin paclet -- decode MyPaclet.m -o MyFile.m
+
+# Encode a file as a paclet
+cargo run --bin paclet -- encode MyFile.m -o MyPaclet.m
+```
+
 ## Building from Source
 
 This is a standalone Rust project that can be built with standard Cargo commands:

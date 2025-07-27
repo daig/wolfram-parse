@@ -6,16 +6,119 @@
 //!
 //! [WL]: https://wolfram.com/language
 //!
+//! # Features
+//!
+//! - **Complete Wolfram Language support**: Parses all input form syntax
+//! - **Multiple output formats**: AST, CST, or token sequences
+//! - **Automatic paclet decoding**: Transparent handling of compressed files
+//! - **High performance**: Zero-copy parsing with efficient memory usage
+//! - **Comprehensive error handling**: Detailed error reporting with source locations
+//! - **CLI tools**: Standalone utilities for paclet encoding/decoding
 //!
 //! # API
 //!
-//! Operation                   | Result             | Input: `&str`       | Input: `&[u8]`
-//! ----------------------------|--------------------|---------------------|----------------------
-//! Tokenization                | [`NodeSeq<Token>`] | [`tokenize()`]      | [`tokenize_bytes()`]
-//! Parse concrete syntax       | [`Cst`]            | [`parse_cst()`]     | [`parse_bytes_cst()`]
-//! Parse abstract syntax       | [`Ast`]            | [`parse_ast()`]     | [`parse_bytes_ast()`]
-//! Sequence of concrete syntax | [`NodeSeq<Cst>`]   | [`parse_cst_seq()`] | [`parse_bytes_cst_seq()`]
-//! Sequence of abstract syntax | [`NodeSeq<Ast>`]   | [`parse_ast_seq()`] | [`parse_bytes_ast_seq()`]
+//! Operation                   | Result             | Input: `&str`       | Input: `&[u8]`        | Input: File Path
+//! ----------------------------|--------------------|---------------------|----------------------|--------------------
+//! Tokenization                | [`NodeSeq<Token>`] | [`tokenize()`]      | [`tokenize_bytes()`] | [`tokenize_file()`]
+//! Parse concrete syntax       | [`Cst`]            | [`parse_cst()`]     | [`parse_bytes_cst()`]| [`parse_file_cst()`]
+//! Parse abstract syntax       | [`Ast`]            | [`parse_ast()`]     | [`parse_bytes_ast()`]| [`parse_file_ast()`]
+//! Sequence of concrete syntax | [`NodeSeq<Cst>`]   | [`parse_cst_seq()`] | [`parse_bytes_cst_seq()`]| (use `parse_file_cst`)
+//! Sequence of abstract syntax | [`NodeSeq<Ast>`]   | [`parse_ast_seq()`] | [`parse_bytes_ast_seq()`]| (use `parse_file_ast`)
+//!
+//! # Basic Usage
+//!
+//! ```rust
+//! use wolfram_parser::{parse_ast, parse_cst, tokenize, ParseOptions};
+//!
+//! let input = "f[x_] := x + 1";
+//! let opts = ParseOptions::default();
+//!
+//! // Parse to Abstract Syntax Tree
+//! let ast_result = parse_ast(input, &opts);
+//!
+//! // Parse to Concrete Syntax Tree (preserves all tokens)
+//! let cst_result = parse_cst(input, &opts);
+//!
+//! // Tokenize only
+//! let tokens = tokenize(input, &opts);
+//! ```
+//!
+//! # File Parsing
+//!
+//! File-level functions automatically handle both regular and paclet-encoded files:
+//!
+//! ```rust
+//! use wolfram_parser::{parse_file_cst, ParseOptions};
+//!
+//! let opts = ParseOptions::default();
+//!
+//! // Automatically detects and decodes paclets
+//! let result = parse_file_cst("QuantityUnits.m", &opts)?;
+//! println!("Parsed {} expressions", result.syntax.0.len());
+//! # Ok::<(), Box<dyn std::error::Error>>(())
+//! ```
+//!
+//! # Paclet Support
+//!
+//! Paclets are compressed Wolfram Language files using Huffman + base-95 encoding.
+//! They are identified by headers like `(*!1N!*)mcm` and are commonly used in
+//! Wolfram products for distributing compressed source code.
+//!
+//! ## Automatic Detection
+//!
+//! The file-level functions ([`parse_file_cst()`], [`parse_file_ast()`], [`tokenize_file()`])
+//! automatically detect and decode paclet files transparently:
+//!
+//! ```rust
+//! use wolfram_parser::{parse_file_cst, ParseOptions};
+//!
+//! // Works with both regular .m files and paclet files
+//! let regular_result = parse_file_cst("Regular.m", &ParseOptions::default())?;
+//! let paclet_result = parse_file_cst("Paclet.m", &ParseOptions::default()))?;
+//! # Ok::<(), Box<dyn std::error::Error>>(())
+//! ```
+//!
+//! ## Manual Paclet Operations
+//!
+//! For direct paclet manipulation, use the [`paclet`] module:
+//!
+//! ```rust
+//! use wolfram_parser::paclet;
+//!
+//! let content = std::fs::read_to_string("file.m")?;
+//!
+//! // Check if file is a paclet
+//! if let Some(header) = paclet::detect_paclet_header(&content) {
+//!     if header.is_supported() {
+//!         // Decode the paclet
+//!         let decoded = paclet::decode_paclet(&content)?;
+//!         println!("Decoded {} bytes", decoded.len());
+//!     }
+//! }
+//! # Ok::<(), Box<dyn std::error::Error>>(())
+//! ```
+//!
+//! ## Supported Packlet Versions
+//!
+//! - **Version 1N**: Standard paclet encoding (Huffman + base-95)
+//! - Future versions will support additional paclet variants as needed
+//!
+//! ## CLI Tools
+//!
+//! The library includes a standalone CLI utility for paclet operations:
+//!
+//! ```bash
+//! # Check if a file is a paclet
+//! cargo run --bin paclet -- check file.m
+//!
+//! # Decode a paclet to readable form
+//! cargo run --bin paclet -- decode paclet.m -o readable.m
+//!
+//! # Encode a file as a paclet
+//! cargo run --bin paclet -- encode source.m -o compressed.m
+//! ```
+//!
+//! See `README-paclet.md` for detailed CLI documentation.
 //!
 
 //
@@ -62,6 +165,7 @@ macro_rules! Print {
 
 mod utils;
 mod error_handling;
+pub mod paclet;
 pub mod newtypes;
 
 #[cfg(feature = "string-interning")]
@@ -614,6 +718,49 @@ pub fn parse_bytes_ast_seq<'i>(
         non_fatal_issues,
         tracked,
     }
+}
+
+//==========================================================
+// File-level parsing with automatic paclet decoding
+//==========================================================
+
+/// Parse a file containing Wolfram Language input into a concrete syntax tree.
+/// 
+/// This function automatically detects and decodes paclet-encoded files before parsing.
+pub fn parse_file_cst(
+    file_path: &str,
+    opts: &ParseOptions,
+) -> Result<ParseResult<CstSeq<TokenStr<'static>>>, Box<dyn std::error::Error>> {
+    let content = std::fs::read_to_string(file_path)?;
+    let final_content = crate::paclet::maybe_decode_paclet(&content)?;
+    let leaked_content = Box::leak(final_content.into_boxed_str());
+    Ok(parse_cst_seq(leaked_content, opts))
+}
+
+/// Parse a file containing Wolfram Language input into an abstract syntax tree.
+/// 
+/// This function automatically detects and decodes paclet-encoded files before parsing.
+pub fn parse_file_ast(
+    file_path: &str,
+    opts: &ParseOptions,
+) -> Result<ParseResult<NodeSeq<Ast>>, Box<dyn std::error::Error>> {
+    let content = std::fs::read_to_string(file_path)?;
+    let final_content = crate::paclet::maybe_decode_paclet(&content)?;
+    let leaked_content = Box::leak(final_content.into_boxed_str());
+    Ok(parse_ast_seq(leaked_content, opts))
+}
+
+/// Tokenize a file containing Wolfram Language input.
+/// 
+/// This function automatically detects and decodes paclet-encoded files before tokenizing.
+pub fn tokenize_file(
+    file_path: &str,
+    opts: &ParseOptions,
+) -> Result<NodeSeq<Token<TokenStr<'static>>>, Box<dyn std::error::Error>> {
+    let content = std::fs::read_to_string(file_path)?;
+    let final_content = crate::paclet::maybe_decode_paclet(&content)?;
+    let leaked_content = Box::leak(final_content.into_boxed_str());
+    Ok(tokenize(leaked_content, opts))
 }
 
 //==========================================================

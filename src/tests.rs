@@ -11,6 +11,10 @@ mod test_wl_character;
 mod test_abstract;
 mod test_token_errors;
 mod test_parse_cst;
+mod test_paclet_decoder;
+mod test_roundtrip_compatibility;
+mod test_file_parsing;
+mod test_sll_files;
 
 use pretty_assertions::assert_eq;
 
