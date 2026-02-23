@@ -51,6 +51,10 @@ required-features = ["FAST_STRING_SCAN"]
 name = "string_interning"
 harness = false
 
+[[bench]]
+name = "bench_dispatch"
+harness = false
+
 # CLI utilities
 [[bin]]
 name = "paclet"
