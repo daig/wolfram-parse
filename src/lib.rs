@@ -47,13 +47,13 @@
 //!
 //! File-level functions automatically handle both regular and paclet-encoded files:
 //!
-//! ```rust
+//! ```rust,no_run
 //! use wolfram_parser::{parse_file_cst, ParseOptions};
 //!
 //! let opts = ParseOptions::default();
 //!
-//! // Automatically detects and decodes paclets
-//! let result = parse_file_cst("QuantityUnits.m", &opts)?;
+//! // Automatically detects and decodes paclet-encoded files
+//! let result = parse_file_cst("path/to/File.m", &opts)?;
 //! println!("Parsed {} expressions", result.syntax.0.len());
 //! # Ok::<(), Box<dyn std::error::Error>>(())
 //! ```
@@ -69,12 +69,11 @@
 //! The file-level functions ([`parse_file_cst()`], [`parse_file_ast()`], [`tokenize_file()`])
 //! automatically detect and decode paclet files transparently:
 //!
-//! ```rust
+//! ```rust,no_run
 //! use wolfram_parser::{parse_file_cst, ParseOptions};
 //!
-//! // Works with both regular .m files and paclet files
-//! let regular_result = parse_file_cst("Regular.m", &ParseOptions::default())?;
-//! let paclet_result = parse_file_cst("Paclet.m", &ParseOptions::default()))?;
+//! // Works with both regular .m files and paclet-encoded files
+//! let result = parse_file_cst("path/to/File.m", &ParseOptions::default())?;
 //! # Ok::<(), Box<dyn std::error::Error>>(())
 //! ```
 //!
@@ -82,7 +81,7 @@
 //!
 //! For direct paclet manipulation, use the [`paclet`] module:
 //!
-//! ```rust
+//! ```rust,no_run
 //! use wolfram_parser::paclet;
 //!
 //! let content = std::fs::read_to_string("file.m")?;
