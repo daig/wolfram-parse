@@ -31,7 +31,6 @@ impl<'i, B: ParseBuilder<'i> + 'i> PrefixParselet<'i, B> for UnderParselet {
 
         let node = session.builder.push_compound_blank(node);
 
-        // MUSTTAIL
         return session.parse_climb(node);
     }
 }
@@ -134,7 +133,6 @@ impl<'i, B: ParseBuilder<'i> + 'i> PrefixParselet<'i, B> for UnderDotParselet {
 
         let node = session.push_leaf_and_next(tok_in);
 
-        // MUSTTAIL
         return session.parse_climb(node);
     }
 }

@@ -218,13 +218,13 @@ impl<'i> ParseBuilder<'i> for ParseCst<'i> {
     //==================================
 
     fn push_leaf(&mut self, token: TokenRef<'i>) -> Self::Node {
-        debug_assert!(!token.tok.isTrivia());
+        debug_assert!(!token.tok.is_trivia());
 
         self.push_node(Cst::Token(token))
     }
 
     fn push_syntax(&mut self, token: TokenRef<'i>) -> Self::Node {
-        debug_assert!(!token.tok.isTrivia());
+        debug_assert!(!token.tok.is_trivia());
 
         self.push_node(Cst::Token(token))
     }
@@ -651,7 +651,7 @@ impl<'i> ParseBuilder<'i> for ParseCst<'i> {
     //==================================
 
     fn finish_top_level_trivia(&mut self, token: TokenRef<'i>) {
-        debug_assert!(token.tok.isTrivia());
+        debug_assert!(token.tok.is_trivia());
 
         self.finished.push(Cst::Token(token));
     }
@@ -680,7 +680,7 @@ impl<'i> ParseBuilder<'i> for ParseCst<'i> {
             .iter()
             .rev()
             .find(
-                |cst| !matches!(cst, Cst::Token(token) if token.tok.isTrivia()),
+                |cst| !matches!(cst, Cst::Token(token) if token.tok.is_trivia()),
             )
             .expect(
                 "unable to check colon LHS: no non-trivia token in top context",
@@ -746,7 +746,7 @@ impl<'i> ParseBuilder<'i> for ParseCst<'i> {
                     _ => (),
                 }
 
-                if tok.tok.isError() {
+                if tok.tok.is_error() {
                     //
                     // allow errors to be on LHS of :
                     //
@@ -769,7 +769,7 @@ impl<'i> ParseBuilder<'i> for ParseCst<'i> {
             .iter()
             .rev()
             .find(
-                |cst| !matches!(cst, Cst::Token(token) if token.tok.isTrivia()),
+                |cst| !matches!(cst, Cst::Token(token) if token.tok.is_trivia()),
             )
             .expect(
                 "unable to check colon LHS: no non-trivia token in top context",
@@ -779,7 +779,7 @@ impl<'i> ParseBuilder<'i> for ParseCst<'i> {
         //       which itself should only be called after non-newline trivia has
         //       been eaten.
         debug_assert!(
-            !matches!(top_node, Cst::Token(tok) if tok.tok.isTriviaButNotToplevelNewline())
+            !matches!(top_node, Cst::Token(tok) if tok.tok.is_trivia_but_not_toplevel_newline())
         );
 
         match top_node {

@@ -40,11 +40,11 @@ impl<'i, B: ParseBuilder<'i> + 'i> InfixParselet<'i, B> for TimesParselet {
         return TimesParselet::parse_loop(session, infix_state);
     }
 
-    fn getOp(&self) -> InfixParseletOperator {
+    fn get_op(&self) -> InfixParseletOperator {
         return InfixOperator::Times.into();
     }
 
-    fn getPrecedence(&self, _: &ParserSession<'i, B>) -> Option<Precedence> {
+    fn get_precedence(&self, _: &ParserSession<'i, B>) -> Option<Precedence> {
         return Some(Precedence::STAR);
     }
 }
@@ -86,10 +86,10 @@ impl TimesParselet {
             //
 
             let tok1_op =
-                B::with_infix_parselet(tok1.tok, |parselet| parselet.getOp());
+                B::with_infix_parselet(tok1.tok, |parselet| parselet.get_op());
 
             if tok1_op
-                != <TimesParselet as InfixParselet<B>>::getOp(&TimesParselet {})
+                != <TimesParselet as InfixParselet<B>>::get_op(&TimesParselet {})
             {
                 //
                 // Tok.tok != tok_in.tok, so break
@@ -99,7 +99,6 @@ impl TimesParselet {
 
                 let node = session.reduce_infix(infix_state);
 
-                // MUSTTAIL
                 return session.parse_climb(node);
             }
 

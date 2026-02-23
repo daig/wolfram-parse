@@ -36,7 +36,7 @@ pub type CstSeq<I = TokenString, S = Span> = NodeSeq<Cst<I, S>>;
 /// Sequence of non-semantically-meaningful tokens in the input, i.e. Whitespace
 /// and Comment.
 ///
-/// See also: [`TokenKind::isTrivia()`].
+/// See also: [`TokenKind::is_trivia()`].
 #[derive(Debug)]
 pub struct TriviaSeq<I>(pub SmallVec<[Token<I>; 4]>);
 
@@ -432,7 +432,7 @@ impl<I: TokenInput, S> Cst<I, S> {
 
 
 impl<I, S: TokenSource> Cst<I, S> {
-    // TODO(cleanup): Combine with getSource()
+    // TODO(cleanup): Combine with get_source()
     pub(crate) fn source(&self) -> S {
         self.get_source()
     }
@@ -442,19 +442,19 @@ impl<I, S: TokenSource> Cst<I, S> {
             Cst::Token(token) => token.src.clone(),
             Cst::Call(node) => node.get_source(),
             Cst::SyntaxError(node) => node.get_source(),
-            Cst::Prefix(PrefixNode(op)) => op.getSource(),
-            Cst::Infix(InfixNode(op)) => op.getSource(),
-            Cst::Postfix(PostfixNode(op)) => op.getSource(),
-            Cst::Binary(BinaryNode(op)) => op.getSource(),
-            Cst::PrefixBinary(PrefixBinaryNode(op)) => op.getSource(),
-            Cst::Ternary(TernaryNode(op)) => op.getSource(),
-            Cst::Compound(CompoundNode(op)) => op.getSource(),
-            Cst::Group(GroupNode(op)) => op.getSource(),
+            Cst::Prefix(PrefixNode(op)) => op.get_source(),
+            Cst::Infix(InfixNode(op)) => op.get_source(),
+            Cst::Postfix(PostfixNode(op)) => op.get_source(),
+            Cst::Binary(BinaryNode(op)) => op.get_source(),
+            Cst::PrefixBinary(PrefixBinaryNode(op)) => op.get_source(),
+            Cst::Ternary(TernaryNode(op)) => op.get_source(),
+            Cst::Compound(CompoundNode(op)) => op.get_source(),
+            Cst::Group(GroupNode(op)) => op.get_source(),
             Cst::GroupMissingCloser(GroupMissingCloserNode(op)) => {
-                op.getSource()
+                op.get_source()
             },
             Cst::GroupMissingOpener(GroupMissingOpenerNode(op)) => {
-                op.getSource()
+                op.get_source()
             },
             Cst::Box(BoxNode { src, .. }) => src.clone(),
             Cst::Code(node) => node.src.clone(),
@@ -492,10 +492,6 @@ impl<I, S: TokenSource, O> OperatorNode<I, S, O> {
         let OperatorNode { op: _, children } = self;
 
         children.get_source()
-    }
-
-    pub(crate) fn getSource(&self) -> S {
-        self.get_source()
     }
 }
 
@@ -743,7 +739,7 @@ impl<I, S: TokenSource> CallNode<I, S> {
             CallHead::Aggregate(head_cst) => head_cst.source(),
         };
 
-        let src = S::between(start, body.as_op().getSource());
+        let src = S::between(start, body.as_op().get_source());
 
         return src;
     }

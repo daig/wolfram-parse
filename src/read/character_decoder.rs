@@ -1,6 +1,6 @@
 use crate::{
     generated::long_names::CODEPOINT_TO_LONGNAME_MAP,
-    issue::{CodeAction, IssueTag, Severity, SyntaxIssue},
+    issue::{CodeAction, IssueTag, Severity, syntax_issue},
     long_names::{self as LongNames, self},
     read::{
         code_point::{CodePoint::*, *},
@@ -14,7 +14,7 @@ use crate::{
         },
         SourceCharacter, Span, STRING_OR_COMMENT,
     },
-    utils::{self, from_fn},
+    utils,
 };
 
 use super::InputMark;
@@ -23,43 +23,6 @@ use super::InputMark;
 // CharacterDecoder is given a stream of integers that represent Unicode code points and decodes
 // sequences of Source Characters such as \[Alpha] into a single WL character
 //
-
-type HandlerFunction = for<'i, 's> fn(
-    session: &'s mut Reader<'i>,
-    start: InputMark,
-    policy: NextPolicy,
-) -> WLCharacter;
-
-/// Lookup table for handling ASCII byte values preceeded by a backslash.
-///
-/// This lookup table is equivalent to the match statement used in this
-/// `const` definition to populate the table.
-///
-/// However, the lookup table-based implementation performs ~10-15% better than
-/// the `match` statement version on some of the large benchmarks.
-#[rustfmt::skip]
-const CHARACTER_DECODER_HANDLER_TABLE: [HandlerFunction; 128] = from_fn!(
-    [HandlerFunction, 128],
-    |index: usize| {
-        let index = index as u8;
-
-        match index {
-            00..=31 => CharacterDecoder_handleUncommon,
-            32 => CharacterDecoder_handleUncommon,              // SPACE
-            33 => CharacterDecoder_handleUncommon,              // !
-            34 => CharacterDecoder_handleStringMetaDoubleQuote, // "
-            35..=59 => CharacterDecoder_handleUncommon,
-            60 => CharacterDecoder_handleStringMetaOpen,        // <
-            61 => CharacterDecoder_handleUncommon,              // =
-            62 => CharacterDecoder_handleStringMetaClose,       // >
-            63..=91 => CharacterDecoder_handleUncommon,
-            92 => CharacterDecoder_handleStringMetaBackslash,   // \
-            93..=127 => CharacterDecoder_handleUncommon,
-            // "invalid ASCII byte value: {i}"
-            128..=255 => panic!(),
-        }
-    }
-);
 
 
 /// Precondition: buffer is pointing to current WLCharacter
@@ -76,11 +39,12 @@ const CHARACTER_DECODER_HANDLER_TABLE: [HandlerFunction; 128] = from_fn!(
 ///                   buffer
 /// return \[Alpha]
 ///
-pub(super) fn CharacterDecoder_nextWLCharacter(
-    session: &mut Reader,
+impl Reader<'_> {
+    pub(crate) fn next_wl_character(
+    &mut self,
     policy: NextPolicy,
 ) -> WLCharacter {
-    let mut point = session.next_source_char(policy);
+    let mut point = self.next_source_char(policy);
 
     if point != '\\' {
         incr_diagnostic!(CharacterDecoder_UnescapedCount);
@@ -98,28 +62,31 @@ pub(super) fn CharacterDecoder_nextWLCharacter(
     // There was a \
     //
 
-    let escaped = session.mark();
+    let escaped = self.mark();
 
-    point = session.peek_source_char(policy);
+    point = self.peek_source_char(policy);
 
     if !point.is_ascii() {
-        // MUSTTAIL
-        return CharacterDecoder_handleUncommon(session, escaped, policy);
+        return self.handle_uncommon(escaped, policy);
     }
 
-    let index = usize::try_from(point.as_i32()).unwrap();
-
-    return CHARACTER_DECODER_HANDLER_TABLE[index](session, escaped, policy);
+    match point.as_i32() as u8 {
+        b'"'  => self.handle_string_meta_double_quote(escaped, policy),
+        b'<'  => self.handle_string_meta_open(escaped, policy),
+        b'>'  => self.handle_string_meta_close(escaped, policy),
+        b'\\' => self.handle_string_meta_backslash(escaped, policy),
+        _     => self.handle_uncommon(escaped, policy),
+    }
 }
 
-fn CharacterDecoder_handleStringMetaDoubleQuote(
-    session: &mut Reader,
+fn handle_string_meta_double_quote(
+    &mut self,
     _: InputMark,
     policy: NextPolicy,
 ) -> WLCharacter {
     incr_diagnostic!(CharacterDecoder_StringMetaDoubleQuoteCount);
 
-    session.next_source_char(policy);
+    self.next_source_char(policy);
 
     return WLCharacter::new_with_escape(
         StringMeta_DoubleQuote,
@@ -135,145 +102,144 @@ fn CharacterDecoder_handleStringMetaDoubleQuote(
 // https://mathematica.stackexchange.com/questions/105018/what-are-and-delimiters-in-box-expressions
 // https://stackoverflow.com/q/6065887
 //
-fn CharacterDecoder_handleStringMetaOpen(
-    session: &mut Reader,
+fn handle_string_meta_open(
+    &mut self,
     escaped: InputMark,
     policy: NextPolicy,
 ) -> WLCharacter {
     incr_diagnostic!(CharacterDecoder_StringMetaOpenCount);
 
-    session.next_source_char(policy);
+    self.next_source_char(policy);
 
     let c = WLCharacter::new_with_escape(StringMeta_Open, Escape::Single);
 
-    if session.check_issues {
-        let graphicalStr = c.graphicalString();
+    if self.check_issues {
+        let graphical_str = c.graphical_string();
 
-        let currentWLCharacterStartLoc = escaped.src_loc.previous();
+        let current_wl_character_start_loc = escaped.src_loc.previous();
 
-        let currentWLCharacterEndLoc = session.SrcLoc;
+        let current_wl_character_end_loc = self.src_loc;
 
-        let Src =
-            Span::new(currentWLCharacterStartLoc, currentWLCharacterEndLoc);
+        let src_span =
+            Span::new(current_wl_character_start_loc, current_wl_character_end_loc);
 
         //
         // matched reduced severity of unexpected characters inside strings or comments
         //
 
-        let I = SyntaxIssue(
+        let issue = syntax_issue(
             IssueTag::UnexpectedCharacter,
-            format!("Unexpected string meta character: ``{}``.", graphicalStr),
+            format!("Unexpected string meta character: ``{}``.", graphical_str),
             Severity::Remark,
-            Src,
+            src_span,
             0.95,
             vec![],
             vec![format!(
-                "The kernel parses ``\"{graphicalStr}\"`` as an empty string."
+                "The kernel parses ``\"{graphical_str}\"`` as an empty string."
             )],
         );
 
-        session.addIssue(I);
+        self.add_issue(issue);
     }
 
     return c;
 }
 
-fn CharacterDecoder_handleStringMetaClose(
-    session: &mut Reader,
+fn handle_string_meta_close(
+    &mut self,
     escaped: InputMark,
     policy: NextPolicy,
 ) -> WLCharacter {
     incr_diagnostic!(CharacterDecoder_StringMetaCloseCount);
 
-    session.next_source_char(policy);
+    self.next_source_char(policy);
 
     let c = WLCharacter::new_with_escape(StringMeta_Close, Escape::Single);
 
-    if session.check_issues {
-        let graphicalStr = c.graphicalString();
+    if self.check_issues {
+        let graphical_str = c.graphical_string();
 
-        let currentWLCharacterStartLoc = escaped.src_loc.previous();
+        let current_wl_character_start_loc = escaped.src_loc.previous();
 
-        let currentWLCharacterEndLoc = session.SrcLoc;
+        let current_wl_character_end_loc = self.src_loc;
 
-        let Src =
-            Span::new(currentWLCharacterStartLoc, currentWLCharacterEndLoc);
+        let src_span =
+            Span::new(current_wl_character_start_loc, current_wl_character_end_loc);
 
         //
         // matched reduced severity of unexpected characters inside strings or comments
         //
 
-        let I = SyntaxIssue(
+        let issue = syntax_issue(
             IssueTag::UnexpectedCharacter,
-            format!("Unexpected string meta character: ``{graphicalStr}``."),
+            format!("Unexpected string meta character: ``{graphical_str}``."),
             Severity::Remark,
-            Src,
+            src_span,
             0.95,
             vec![],
             vec![format!(
-                "The kernel parses ``\"{graphicalStr}\"`` as an empty string."
+                "The kernel parses ``\"{graphical_str}\"`` as an empty string."
             )],
         );
 
-        session.addIssue(I);
+        self.add_issue(issue);
     }
 
     return c;
 }
 
-fn CharacterDecoder_handleStringMetaBackslash(
-    session: &mut Reader,
+fn handle_string_meta_backslash(
+    &mut self,
     _: InputMark,
     policy: NextPolicy,
 ) -> WLCharacter {
     incr_diagnostic!(CharacterDecoder_StringMetaBackslashCount);
 
-    session.next_source_char(policy);
+    self.next_source_char(policy);
 
-    //    MUSTTAIL
-    return CharacterDecoder_handleBackslash(session, policy);
+    return self.handle_backslash(policy);
 }
 
-fn CharacterDecoder_handleLongName(
-    session: &mut Reader,
+fn handle_long_name(
+    &mut self,
     open_square: InputMark,
     policy: NextPolicy,
 ) -> WLCharacter {
     // assert!(openSquareBuf[0] == b'[');
-    assert!(session.input[open_square.offset] == b'[');
+    assert!(self.input[open_square.offset] == b'[');
 
     incr_diagnostic!(CharacterDecoder_LongNameCount);
 
     //
     // Do not write leading \[ or trailing ] to LongName
     //
-    let longNameStartBuf = session.buffer();
+    let long_name_start_buf = self.buffer();
 
-    let mut curSource = session.peek_source_char(policy);
+    let mut cur_source = self.peek_source_char(policy);
 
-    let mut wellFormed = false;
+    let mut well_formed = false;
 
-    let mut atleast1DigitOrAlpha = false;
+    let mut atleast_1_digit_or_alpha = false;
 
     //
     // Read at least 1 alnum before entering loop
     //
     // Must start with upper
     //
-    if curSource.isUpper() {
-        atleast1DigitOrAlpha = true;
+    if cur_source.is_upper() {
+        atleast_1_digit_or_alpha = true;
 
-        session.next_source_char(policy);
+        self.next_source_char(policy);
 
-        curSource = session.peek_source_char(policy);
+        cur_source = self.peek_source_char(policy);
 
         loop {
-            if curSource.isAlphaOrDigit() {
-                session.next_source_char(policy);
+            if cur_source.is_alpha_or_digit() {
+                self.next_source_char(policy);
 
-                curSource = session.peek_source_char(policy);
-            } else if curSource == ']' {
-                wellFormed = true;
+                cur_source = self.peek_source_char(policy);
+            } else if cur_source == ']' {
+                well_formed = true;
 
                 break;
             } else {
@@ -284,37 +250,37 @@ fn CharacterDecoder_handleLongName(
                 break;
             }
         }
-    } else if curSource == ']' {
+    } else if cur_source == ']' {
         //
         // Handle \[]
         //
 
-        session.next_source_char(policy);
+        self.next_source_char(policy);
 
-        curSource = session.peek_source_char(policy);
+        cur_source = self.peek_source_char(policy);
     }
 
-    if !wellFormed {
+    if !well_formed {
         //
         // Not well-formed
         //
 
-        if session.check_issues
+        if self.check_issues
             && policy.contains(ENABLE_CHARACTER_DECODING_ISSUES)
         {
-            let currentWLCharacterStartLoc = open_square.src_loc.previous();
+            let current_wl_character_start_loc = open_square.src_loc.previous();
 
-            let currentWLCharacterEndBuf = session.buffer();
-            let currentWLCharacterEndLoc = session.SrcLoc;
+            let current_wl_character_end_buf = self.buffer();
+            let current_wl_character_end_loc = self.src_loc;
 
-            let longNameEndBuf = currentWLCharacterEndBuf;
+            let long_name_end_buf = current_wl_character_end_buf;
 
-            // let longNameBufAndLen = BufferAndLength(longNameStartBuf, longNameEndBuf - longNameStartBuf);
-            let longNameBufAndLen =
-                BufferAndLength::between(longNameStartBuf, longNameEndBuf);
-            let longNameStr = longNameBufAndLen.as_str();
+            // let long_name_buf_and_len = BufferAndLength(long_name_start_buf, long_name_end_buf - long_name_start_buf);
+            let long_name_buf_and_len =
+                BufferAndLength::between(long_name_start_buf, long_name_end_buf);
+            let long_name_str = long_name_buf_and_len.as_str();
 
-            if atleast1DigitOrAlpha {
+            if atleast_1_digit_or_alpha {
                 //
                 // Something like \[Alpha
                 //
@@ -322,35 +288,35 @@ fn CharacterDecoder_handleLongName(
                 //
 
                 let suggestion =
-                    CharacterDecoder_longNameSuggestion(longNameStr);
+                    long_name_suggestion(long_name_str);
 
-                let mut Actions: Vec<CodeAction> = Vec::new();
+                let mut actions: Vec<CodeAction> = Vec::new();
 
                 let found =
-                    long_names::longname_to_codepoint(longNameStr).is_some();
+                    long_names::longname_to_codepoint(long_name_str).is_some();
 
                 if found {
-                    Actions.push(CodeAction::insert_text(
+                    actions.push(CodeAction::insert_text(
                         format!("Insert ``]`` to form ``\\[{suggestion}]``"),
-                        Span::at(currentWLCharacterEndLoc),
+                        Span::at(current_wl_character_end_loc),
                         "]".into(),
                     ));
                 }
 
-                let I = SyntaxIssue(
+                let issue = syntax_issue(
                     IssueTag::UnhandledCharacter,
-                    format!("Unhandled character: ``\\[{longNameStr}``."),
+                    format!("Unhandled character: ``\\[{long_name_str}``."),
                     Severity::Fatal,
                     Span::new(
-                        currentWLCharacterStartLoc,
-                        currentWLCharacterEndLoc,
+                        current_wl_character_start_loc,
+                        current_wl_character_end_loc,
                     ),
                     1.0,
-                    Actions,
+                    actions,
                     vec![],
                 );
 
-                session.addIssue(I);
+                self.add_issue(issue);
             } else {
                 //
                 // Malformed some other way
@@ -359,35 +325,35 @@ fn CharacterDecoder_handleLongName(
                 // Something like \[*
                 //
 
-                let mut Actions: Vec<CodeAction> = Vec::new();
+                let mut actions: Vec<CodeAction> = Vec::new();
 
-                Actions.push(CodeAction::replace_text(
-                    format!("Replace with ``\\\\[{longNameStr}``"),
+                actions.push(CodeAction::replace_text(
+                    format!("Replace with ``\\\\[{long_name_str}``"),
                     Span::new(
-                        currentWLCharacterStartLoc,
-                        currentWLCharacterEndLoc,
+                        current_wl_character_start_loc,
+                        current_wl_character_end_loc,
                     ),
-                    format!("\\\\[{longNameStr}"),
+                    format!("\\\\[{long_name_str}"),
                 ));
 
-                let I = SyntaxIssue(
+                let issue = syntax_issue(
                     IssueTag::UnhandledCharacter,
-                    format!("Unhandled character: ``\\[{}``.", longNameStr),
+                    format!("Unhandled character: ``\\[{}``.", long_name_str),
                     Severity::Fatal,
                     Span::new(
-                        currentWLCharacterStartLoc,
-                        currentWLCharacterEndLoc,
+                        current_wl_character_start_loc,
+                        current_wl_character_end_loc,
                     ),
                     1.0,
-                    Actions,
+                    actions,
                     vec![],
                 );
 
-                session.addIssue(I);
+                self.add_issue(issue);
             }
         }
 
-        session.seek(open_square);
+        self.seek(open_square);
 
         return WLCharacter::new('\\');
     }
@@ -400,46 +366,46 @@ fn CharacterDecoder_handleLongName(
     // if unlikelyEscapeChecking, then make sure to append all of the Source characters again
     //
 
-    let longNameEndBuf = session.buffer();
+    let long_name_end_buf = self.buffer();
 
-    let longNameBufAndLen =
-        BufferAndLength::between(longNameStartBuf, longNameEndBuf);
-    // let longNameBufAndLen = BufferAndLength {
-    //     buf: longNameStartBuf,
-    //     len: longNameEndBuf.as_ptr().addr() - longNameStartBuf.as_ptr().addr(),
+    let long_name_buf_and_len =
+        BufferAndLength::between(long_name_start_buf, long_name_end_buf);
+    // let long_name_buf_and_len = BufferAndLength {
+    //     buf: long_name_start_buf,
+    //     len: long_name_end_buf.as_ptr().addr() - long_name_start_buf.as_ptr().addr(),
     // };
 
-    // let longNameStr = std::string(reinterpret_cast::<*const i8>(longNameBufAndLen.Buf), longNameBufAndLen.length());
-    let longNameStr = longNameBufAndLen.as_str();
+    // let long_name_str = std::string(reinterpret_cast::<*const i8>(long_name_buf_and_len.Buf), long_name_buf_and_len.length());
+    let long_name_str = long_name_buf_and_len.as_str();
 
     let found: Option<CodePoint> =
-        long_names::longname_to_codepoint(longNameStr);
+        long_names::longname_to_codepoint(long_name_str);
 
     if found == None {
         //
         // Name not found
         //
 
-        if session.check_issues
+        if self.check_issues
             && policy.contains(ENABLE_CHARACTER_DECODING_ISSUES)
         {
-            let longNameEndLoc = session.SrcLoc;
+            let long_name_end_loc = self.src_loc;
 
-            let currentWLCharacterStartLoc = open_square.src_loc.previous();
+            let current_wl_character_start_loc = open_square.src_loc.previous();
 
             //
             // Accomodate the ] character
             //
-            let currentWLCharacterEndLoc = longNameEndLoc.next();
+            let current_wl_character_end_loc = long_name_end_loc.next();
 
-            let suggestion = CharacterDecoder_longNameSuggestion(longNameStr);
+            let suggestion = long_name_suggestion(long_name_str);
 
-            let mut Actions: Vec<CodeAction> = Vec::new();
+            let mut actions: Vec<CodeAction> = Vec::new();
 
             // if !suggestion.is_empty() {
-            //     Actions.push(CodeAction::replace_text(
+            //     actions.push(CodeAction::replace_text(
             //         format!("Replace with ``\\[{suggestion}]``"),
-            //         Span::new(currentWLCharacterStartLoc, currentWLCharacterEndLoc),
+            //         Span::new(current_wl_character_start_loc, current_wl_character_end_loc),
             //         format!("\\[{suggestion}]"),
             //     ));
             // }
@@ -447,81 +413,81 @@ fn CharacterDecoder_handleLongName(
             // //
             // // More specifically: Unrecognized
             // //
-            // let I = SyntaxIssue(
+            // let issue = syntax_issue(
             //     STRING_UNHANDLEDCHARACTER,
-            //     format!("Unhandled character: ``\\[{longNameStr}]``."),
+            //     format!("Unhandled character: ``\\[{long_name_str}]``."),
             //     STRING_FATAL,
-            //     Span::new(currentWLCharacterStartLoc, currentWLCharacterEndLoc),
+            //     Span::new(current_wl_character_start_loc, current_wl_character_end_loc),
             //     1.0,
             //     Actions,
-            //     vec![format!("``{longNameStr}`` is not a recognized long name.")],
+            //     vec![format!("``{long_name_str}`` is not a recognized long name.")],
             // );
 
-            // session.addIssue(I);
+            // self.add_issue(issue);
 
             if policy.contains(SCAN_FOR_UNRECOGNIZEDLONGNAMES) {
-                let currentUnrecognizedStartLoc =
-                    currentWLCharacterStartLoc.previous();
+                let current_unrecognized_start_loc =
+                    current_wl_character_start_loc.previous();
 
                 if !suggestion.is_empty() {
-                    Actions.push(CodeAction::replace_text(
+                    actions.push(CodeAction::replace_text(
                         format!("Replace with ``\\\\[{suggestion}]``"),
                         Span::new(
-                            currentUnrecognizedStartLoc,
-                            currentWLCharacterEndLoc,
+                            current_unrecognized_start_loc,
+                            current_wl_character_end_loc,
                         ),
                         format!("\\\\[{suggestion}]"),
                     ));
                 }
 
-                let I = SyntaxIssue(
+                let issue = syntax_issue(
                     IssueTag::UnrecognizedLongName,
-                    format!("Unrecognized longname: ``\\\\[{longNameStr}]``."),
+                    format!("Unrecognized longname: ``\\\\[{long_name_str}]``."),
                     Severity::Error,
                     Span::new(
-                        currentUnrecognizedStartLoc,
-                        currentWLCharacterEndLoc,
+                        current_unrecognized_start_loc,
+                        current_wl_character_end_loc,
                     ),
                     0.75,
-                    Actions,
+                    actions,
                     vec![format!(
-                        "``{longNameStr}`` is not a valid long name."
+                        "``{long_name_str}`` is not a valid long name."
                     )],
                 );
 
-                session.addIssue(I);
+                self.add_issue(issue);
             } else {
                 if !suggestion.is_empty() {
-                    Actions.push(CodeAction::replace_text(
+                    actions.push(CodeAction::replace_text(
                         format!("Replace with ``\\[{suggestion}]``"),
                         Span::new(
-                            currentWLCharacterStartLoc,
-                            currentWLCharacterEndLoc,
+                            current_wl_character_start_loc,
+                            current_wl_character_end_loc,
                         ),
                         format!("\\[{suggestion}]"),
                     ));
                 }
 
-                let I = SyntaxIssue(
+                let issue = syntax_issue(
                     IssueTag::UnhandledCharacter,
-                    format!("Unhandled character: ``\\[{longNameStr}]``."),
+                    format!("Unhandled character: ``\\[{long_name_str}]``."),
                     Severity::Fatal,
                     Span::new(
-                        currentWLCharacterStartLoc,
-                        currentWLCharacterEndLoc,
+                        current_wl_character_start_loc,
+                        current_wl_character_end_loc,
                     ),
                     1.0,
-                    Actions,
+                    actions,
                     vec![format!(
-                        "``{longNameStr}`` is not a valid long name."
+                        "``{long_name_str}`` is not a valid long name."
                     )],
                 );
 
-                session.addIssue(I);
+                self.add_issue(issue);
             }
         }
 
-        session.seek(open_square);
+        self.seek(open_square);
 
         return WLCharacter::new('\\');
     }
@@ -532,21 +498,20 @@ fn CharacterDecoder_handleLongName(
 
     let point: CodePoint = found.unwrap();
 
-    session.next_source_char(policy);
+    self.next_source_char(policy);
 
-    if session.check_issues && policy.contains(ENABLE_CHARACTER_DECODING_ISSUES)
+    if self.check_issues && policy.contains(ENABLE_CHARACTER_DECODING_ISSUES)
     {
-        // let longNameBufAndLen = BufferAndLength(longNameStartBuf, longNameEndBuf - longNameStartBuf);
-        let longNameBufAndLen =
-            BufferAndLength::between(longNameStartBuf, longNameEndBuf);
-        let longNameStr = longNameBufAndLen.as_str();
+        // let long_name_buf_and_len = BufferAndLength(long_name_start_buf, long_name_end_buf - long_name_start_buf);
+        let long_name_buf_and_len =
+            BufferAndLength::between(long_name_start_buf, long_name_end_buf);
+        let long_name_str = long_name_buf_and_len.as_str();
 
-        check_strange_syntax_issue(
-            session,
+        self.check_strange_syntax_issue(
             policy,
             point,
             open_square.src_loc,
-            if LongNames::isRaw(longNameStr) {
+            if LongNames::is_raw(long_name_str) {
                 Escape::Raw
             } else {
                 Escape::LongName
@@ -554,29 +519,29 @@ fn CharacterDecoder_handleLongName(
         );
     }
 
-    if LongNames::isRaw(longNameStr) {
+    if LongNames::is_raw(long_name_str) {
         return WLCharacter::new_with_escape(point, Escape::Raw);
     }
 
     return WLCharacter::new_with_escape(point, Escape::LongName);
 }
 
-fn CharacterDecoder_handle4Hex(
-    session: &mut Reader,
+fn handle_4hex(
+    &mut self,
     colon: InputMark,
     policy: NextPolicy,
 ) -> WLCharacter {
-    assert!(session.input[colon.offset] == b':');
+    assert!(self.input[colon.offset] == b':');
 
     incr_diagnostic!(CharacterDecoder_4HexCount);
 
-    let hexStartBuf = session.buffer();
+    let hex_start_buf = self.buffer();
 
     for _ in 0..4 {
-        let curSource = session.peek_source_char(policy);
+        let cur_source = self.peek_source_char(policy);
 
-        if curSource.isHex() {
-            session.next_source_char(policy);
+        if cur_source.is_hex() {
+            self.next_source_char(policy);
         } else {
             //
             // Not well-formed
@@ -584,49 +549,49 @@ fn CharacterDecoder_handle4Hex(
             // Something like \:z
             //
 
-            if session.check_issues
+            if self.check_issues
                 && policy.contains(ENABLE_CHARACTER_DECODING_ISSUES)
             {
-                let currentWLCharacterStartLoc = colon.src_loc.previous();
+                let current_wl_character_start_loc = colon.src_loc.previous();
 
-                let currentWLCharacterEndBuf = session.buffer();
-                let currentWLCharacterEndLoc = session.SrcLoc;
+                let current_wl_character_end_buf = self.buffer();
+                let current_wl_character_end_loc = self.src_loc;
 
-                let hexEndBuf = currentWLCharacterEndBuf;
+                let hex_end_buf = current_wl_character_end_buf;
 
-                // let hexBufAndLen = BufferAndLength(hexStartBuf, hexEndBuf - hexStartBuf);
-                let hexBufAndLen =
-                    BufferAndLength::between(hexStartBuf, hexEndBuf);
-                let hexStr = hexBufAndLen.as_str();
+                // let hex_buf_and_len = BufferAndLength(hex_start_buf, hex_end_buf - hex_start_buf);
+                let hex_buf_and_len =
+                    BufferAndLength::between(hex_start_buf, hex_end_buf);
+                let hex_str = hex_buf_and_len.as_str();
 
-                let mut Actions: Vec<CodeAction> = Vec::new();
+                let mut actions: Vec<CodeAction> = Vec::new();
 
-                Actions.push(CodeAction::replace_text(
-                    format!("Replace with ``\\\\:{hexStr}``"),
+                actions.push(CodeAction::replace_text(
+                    format!("Replace with ``\\\\:{hex_str}``"),
                     Span::new(
-                        currentWLCharacterStartLoc,
-                        currentWLCharacterEndLoc,
+                        current_wl_character_start_loc,
+                        current_wl_character_end_loc,
                     ),
-                    format!("\\\\:{hexStr}"),
+                    format!("\\\\:{hex_str}"),
                 ));
 
-                let I = SyntaxIssue(
+                let issue = syntax_issue(
                     IssueTag::UnhandledCharacter,
-                    format!("Unhandled character: ``\\:{hexStr}``."),
+                    format!("Unhandled character: ``\\:{hex_str}``."),
                     Severity::Fatal,
                     Span::new(
-                        currentWLCharacterStartLoc,
-                        currentWLCharacterEndLoc,
+                        current_wl_character_start_loc,
+                        current_wl_character_end_loc,
                     ),
                     1.0,
-                    Actions,
+                    actions,
                     vec![],
                 );
 
-                session.addIssue(I);
+                self.add_issue(issue);
             }
 
-            session.seek(colon);
+            self.seek(colon);
 
             return WLCharacter::new('\\');
         }
@@ -636,10 +601,10 @@ fn CharacterDecoder_handle4Hex(
     // Success!
     //
 
-    let d3 = u32::from(utils::toDigit(hexStartBuf[0]));
-    let d2 = u32::from(utils::toDigit(hexStartBuf[1]));
-    let d1 = u32::from(utils::toDigit(hexStartBuf[2]));
-    let d0 = u32::from(utils::toDigit(hexStartBuf[3]));
+    let d3 = u32::from(utils::to_digit(hex_start_buf[0]));
+    let d2 = u32::from(utils::to_digit(hex_start_buf[1]));
+    let d1 = u32::from(utils::to_digit(hex_start_buf[2]));
+    let d0 = u32::from(utils::to_digit(hex_start_buf[3]));
     let point: u32 = d3 << 12 | d2 << 8 | d1 << 4 | d0;
     let mut point = CodePoint::from_u32(point).unwrap();
 
@@ -653,8 +618,7 @@ fn CharacterDecoder_handle4Hex(
         _ => (),
     }
 
-    check_strange_syntax_issue(
-        session,
+    self.check_strange_syntax_issue(
         policy,
         point,
         colon.src_loc,
@@ -664,22 +628,22 @@ fn CharacterDecoder_handle4Hex(
     return WLCharacter::new_with_escape(point, Escape::Hex4);
 }
 
-fn CharacterDecoder_handle2Hex(
-    session: &mut Reader,
+fn handle_2hex(
+    &mut self,
     dot: InputMark,
     policy: NextPolicy,
 ) -> WLCharacter {
-    assert!(session.input[dot.offset] == b'.');
+    assert!(self.input[dot.offset] == b'.');
 
     incr_diagnostic!(CharacterDecoder_2HexCount);
 
-    let hexStartBuf = session.buffer();
+    let hex_start_buf = self.buffer();
 
     for _ in 0..2 {
-        let curSource = session.peek_source_char(policy);
+        let cur_source = self.peek_source_char(policy);
 
-        if curSource.isHex() {
-            session.next_source_char(policy);
+        if cur_source.is_hex() {
+            self.next_source_char(policy);
         } else {
             //
             // Not well-formed
@@ -687,49 +651,49 @@ fn CharacterDecoder_handle2Hex(
             // Something like \.z
             //
 
-            if session.check_issues
+            if self.check_issues
                 && policy.contains(ENABLE_CHARACTER_DECODING_ISSUES)
             {
-                let currentWLCharacterStartLoc = dot.src_loc.previous();
+                let current_wl_character_start_loc = dot.src_loc.previous();
 
-                let currentWLCharacterEndBuf = session.buffer();
-                let currentWLCharacterEndLoc = session.SrcLoc;
+                let current_wl_character_end_buf = self.buffer();
+                let current_wl_character_end_loc = self.src_loc;
 
-                let hexEndBuf = currentWLCharacterEndBuf;
+                let hex_end_buf = current_wl_character_end_buf;
 
-                // let hexBufAndLen = BufferAndLength(hexStartBuf, hexEndBuf - hexStartBuf);
-                let hexBufAndLen =
-                    BufferAndLength::between(hexStartBuf, hexEndBuf);
-                let hexStr = hexBufAndLen.as_str();
+                // let hex_buf_and_len = BufferAndLength(hex_start_buf, hex_end_buf - hex_start_buf);
+                let hex_buf_and_len =
+                    BufferAndLength::between(hex_start_buf, hex_end_buf);
+                let hex_str = hex_buf_and_len.as_str();
 
-                let mut Actions: Vec<CodeAction> = Vec::new();
+                let mut actions: Vec<CodeAction> = Vec::new();
 
-                Actions.push(CodeAction::replace_text(
-                    format!("Replace with ``\\\\.{hexStr}``"),
+                actions.push(CodeAction::replace_text(
+                    format!("Replace with ``\\\\.{hex_str}``"),
                     Span::new(
-                        currentWLCharacterStartLoc,
-                        currentWLCharacterEndLoc,
+                        current_wl_character_start_loc,
+                        current_wl_character_end_loc,
                     ),
-                    format!("\\\\.{hexStr}"),
+                    format!("\\\\.{hex_str}"),
                 ));
 
-                let I = SyntaxIssue(
+                let issue = syntax_issue(
                     IssueTag::UnhandledCharacter,
-                    format!("Unhandled character: ``\\.{hexStr}``."),
+                    format!("Unhandled character: ``\\.{hex_str}``."),
                     Severity::Fatal,
                     Span::new(
-                        currentWLCharacterStartLoc,
-                        currentWLCharacterEndLoc,
+                        current_wl_character_start_loc,
+                        current_wl_character_end_loc,
                     ),
                     1.0,
-                    Actions,
+                    actions,
                     vec![],
                 );
 
-                session.addIssue(I);
+                self.add_issue(issue);
             }
 
-            session.seek(dot);
+            self.seek(dot);
 
             return WLCharacter::new('\\');
         }
@@ -739,8 +703,8 @@ fn CharacterDecoder_handle2Hex(
     // Success!
     //
 
-    let d1 = utils::toDigit(hexStartBuf[0]);
-    let d0 = utils::toDigit(hexStartBuf[1]);
+    let d1 = utils::to_digit(hex_start_buf[0]);
+    let d0 = utils::to_digit(hex_start_buf[1]);
     let mut point: CodePoint = CodePoint::Char(char::from(d1 << 4 | d0));
 
     match point {
@@ -753,8 +717,7 @@ fn CharacterDecoder_handle2Hex(
         _ => (),
     }
 
-    check_strange_syntax_issue(
-        session,
+    self.check_strange_syntax_issue(
         policy,
         point,
         dot.src_loc,
@@ -764,25 +727,25 @@ fn CharacterDecoder_handle2Hex(
     return WLCharacter::new_with_escape(point, Escape::Hex2);
 }
 
-fn CharacterDecoder_handleOctal(
-    session: &mut Reader,
+fn handle_octal(
+    &mut self,
     first_octal: InputMark,
     policy: NextPolicy,
 ) -> WLCharacter {
     assert!(SourceCharacter::from(char::from(
-        session.input[first_octal.offset]
+        self.input[first_octal.offset]
     ))
-    .isOctal());
+    .is_octal());
 
     incr_diagnostic!(CharacterDecoder_OctalCount);
 
-    let octalStartBuf = session.buffer_at(first_octal.offset);
+    let octal_start_buf = self.buffer_at(first_octal.offset);
 
     for _ in 0..3 - 1 {
-        let curSource = session.peek_source_char(policy);
+        let cur_source = self.peek_source_char(policy);
 
-        if curSource.isOctal() {
-            session.next_source_char(policy);
+        if cur_source.is_octal() {
+            self.next_source_char(policy);
         } else {
             //
             // Not well-formed
@@ -790,49 +753,49 @@ fn CharacterDecoder_handleOctal(
             // Something like \1z
             //
 
-            if session.check_issues
+            if self.check_issues
                 && policy.contains(ENABLE_CHARACTER_DECODING_ISSUES)
             {
-                let currentWLCharacterStartLoc = first_octal.src_loc.previous();
+                let current_wl_character_start_loc = first_octal.src_loc.previous();
 
-                let currentWLCharacterEndBuf = session.buffer();
-                let currentWLCharacterEndLoc = session.SrcLoc;
+                let current_wl_character_end_buf = self.buffer();
+                let current_wl_character_end_loc = self.src_loc;
 
-                let octalEndBuf = currentWLCharacterEndBuf;
+                let octal_end_buf = current_wl_character_end_buf;
 
-                // let octalBufAndLen = BufferAndLength(octalStartBuf, octalEndBuf - octalStartBuf);
-                let octalBufAndLen =
-                    BufferAndLength::between(octalStartBuf, octalEndBuf);
-                let octalStr = octalBufAndLen.as_str();
+                // let octal_buf_and_len = BufferAndLength(octal_start_buf, octal_end_buf - octal_start_buf);
+                let octal_buf_and_len =
+                    BufferAndLength::between(octal_start_buf, octal_end_buf);
+                let octal_str = octal_buf_and_len.as_str();
 
-                let mut Actions: Vec<CodeAction> = Vec::new();
+                let mut actions: Vec<CodeAction> = Vec::new();
 
-                Actions.push(CodeAction::replace_text(
-                    format!("Replace with ``\\\\{octalStr}``"),
+                actions.push(CodeAction::replace_text(
+                    format!("Replace with ``\\\\{octal_str}``"),
                     Span::new(
-                        currentWLCharacterStartLoc,
-                        currentWLCharacterEndLoc,
+                        current_wl_character_start_loc,
+                        current_wl_character_end_loc,
                     ),
-                    format!("\\\\{octalStr}"),
+                    format!("\\\\{octal_str}"),
                 ));
 
-                let I = SyntaxIssue(
+                let issue = syntax_issue(
                     IssueTag::UnhandledCharacter,
-                    format!("Unhandled character: ``\\{octalStr}``."),
+                    format!("Unhandled character: ``\\{octal_str}``."),
                     Severity::Fatal,
                     Span::new(
-                        currentWLCharacterStartLoc,
-                        currentWLCharacterEndLoc,
+                        current_wl_character_start_loc,
+                        current_wl_character_end_loc,
                     ),
                     1.0,
-                    Actions,
+                    actions,
                     vec![],
                 );
 
-                session.addIssue(I);
+                self.add_issue(issue);
             }
 
-            session.seek(first_octal);
+            self.seek(first_octal);
 
             // FIXME: Why return a backslash if the character is not well-formed?
             return WLCharacter::new('\\');
@@ -843,9 +806,9 @@ fn CharacterDecoder_handleOctal(
     // Success!
     //
 
-    let d2 = utils::toDigit(octalStartBuf[0]);
-    let d1 = utils::toDigit(octalStartBuf[1]);
-    let d0 = utils::toDigit(octalStartBuf[2]);
+    let d2 = utils::to_digit(octal_start_buf[0]);
+    let d1 = utils::to_digit(octal_start_buf[1]);
+    let d0 = utils::to_digit(octal_start_buf[2]);
     let point: u32 = u32::from(d2) << 6 | u32::from(d1) << 3 | u32::from(d0);
     let mut point = CodePoint::from_u32(point).unwrap();
 
@@ -862,8 +825,7 @@ fn CharacterDecoder_handleOctal(
         _ => (),
     }
 
-    check_strange_syntax_issue(
-        session,
+    self.check_strange_syntax_issue(
         policy,
         point,
         first_octal.src_loc,
@@ -873,22 +835,22 @@ fn CharacterDecoder_handleOctal(
     return WLCharacter::new_with_escape(point, Escape::Octal);
 }
 
-fn CharacterDecoder_handle6Hex(
-    session: &mut Reader,
+fn handle_6hex(
+    &mut self,
     bar: InputMark,
     policy: NextPolicy,
 ) -> WLCharacter {
-    assert!(session.input[bar.offset] == b'|');
+    assert!(self.input[bar.offset] == b'|');
 
     incr_diagnostic!(CharacterDecoder_6HexCount);
 
-    let hexStartBuf = session.buffer();
+    let hex_start_buf = self.buffer();
 
     for _ in 0..6 {
-        let curSource = session.peek_source_char(policy);
+        let cur_source = self.peek_source_char(policy);
 
-        if curSource.isHex() {
-            session.next_source_char(policy);
+        if cur_source.is_hex() {
+            self.next_source_char(policy);
         } else {
             //
             // Not well-formed
@@ -896,49 +858,49 @@ fn CharacterDecoder_handle6Hex(
             // Something like \|z
             //
 
-            if session.check_issues
+            if self.check_issues
                 && policy.contains(ENABLE_CHARACTER_DECODING_ISSUES)
             {
-                let currentWLCharacterStartLoc = bar.src_loc.previous();
+                let current_wl_character_start_loc = bar.src_loc.previous();
 
-                let currentWLCharacterEndBuf = session.buffer();
-                let currentWLCharacterEndLoc = session.SrcLoc;
+                let current_wl_character_end_buf = self.buffer();
+                let current_wl_character_end_loc = self.src_loc;
 
-                let hexEndBuf = currentWLCharacterEndBuf;
+                let hex_end_buf = current_wl_character_end_buf;
 
-                // let hexBufAndLen = BufferAndLength(hexStartBuf, hexEndBuf - hexStartBuf);
-                let hexBufAndLen =
-                    BufferAndLength::between(hexStartBuf, hexEndBuf);
-                let hexStr = hexBufAndLen.as_str();
+                // let hex_buf_and_len = BufferAndLength(hex_start_buf, hex_end_buf - hex_start_buf);
+                let hex_buf_and_len =
+                    BufferAndLength::between(hex_start_buf, hex_end_buf);
+                let hex_str = hex_buf_and_len.as_str();
 
-                let mut Actions: Vec<CodeAction> = Vec::new();
+                let mut actions: Vec<CodeAction> = Vec::new();
 
-                Actions.push(CodeAction::replace_text(
-                    format!("Replace with ``\\\\|{hexStr}``"),
+                actions.push(CodeAction::replace_text(
+                    format!("Replace with ``\\\\|{hex_str}``"),
                     Span::new(
-                        currentWLCharacterStartLoc,
-                        currentWLCharacterEndLoc,
+                        current_wl_character_start_loc,
+                        current_wl_character_end_loc,
                     ),
-                    format!("\\\\|{hexStr}"),
+                    format!("\\\\|{hex_str}"),
                 ));
 
-                let I = SyntaxIssue(
+                let issue = syntax_issue(
                     IssueTag::UnhandledCharacter,
-                    format!("Unhandled character: ``\\|{hexStr}``."),
+                    format!("Unhandled character: ``\\|{hex_str}``."),
                     Severity::Fatal,
                     Span::new(
-                        currentWLCharacterStartLoc,
-                        currentWLCharacterEndLoc,
+                        current_wl_character_start_loc,
+                        current_wl_character_end_loc,
                     ),
                     1.0,
-                    Actions,
+                    actions,
                     vec![],
                 );
 
-                session.addIssue(I);
+                self.add_issue(issue);
             }
 
-            session.seek(bar);
+            self.seek(bar);
 
             return WLCharacter::new('\\');
         }
@@ -948,12 +910,12 @@ fn CharacterDecoder_handle6Hex(
     // Well-formed
     //
 
-    let d5 = utils::toDigit(hexStartBuf[0]);
-    let d4 = utils::toDigit(hexStartBuf[1]);
-    let d3 = utils::toDigit(hexStartBuf[2]);
-    let d2 = utils::toDigit(hexStartBuf[3]);
-    let d1 = utils::toDigit(hexStartBuf[4]);
-    let d0 = utils::toDigit(hexStartBuf[5]);
+    let d5 = utils::to_digit(hex_start_buf[0]);
+    let d4 = utils::to_digit(hex_start_buf[1]);
+    let d3 = utils::to_digit(hex_start_buf[2]);
+    let d2 = utils::to_digit(hex_start_buf[3]);
+    let d1 = utils::to_digit(hex_start_buf[4]);
+    let d0 = utils::to_digit(hex_start_buf[5]);
     // let point: u32 = d5 << 20 | d4 << 16 | d3 << 12 | d2 << 8 | d1 << 4 | d0;
     let point: u32 =
         u32::from_be_bytes([0, d5 << 4 | d4, d3 << 4 | d2, d1 << 4 | d0]);
@@ -961,7 +923,7 @@ fn CharacterDecoder_handle6Hex(
     // TODO: Is this logic here correct? Why always return a \ if point is out
     //       of range?
     if point > 0x10ffff {
-        session.seek(bar);
+        self.seek(bar);
 
         return WLCharacter::new('\\');
     }
@@ -982,8 +944,7 @@ fn CharacterDecoder_handle6Hex(
         _ => (),
     }
 
-    check_strange_syntax_issue(
-        session,
+    self.check_strange_syntax_issue(
         policy,
         point,
         bar.src_loc,
@@ -993,8 +954,8 @@ fn CharacterDecoder_handle6Hex(
     return WLCharacter::new_with_escape(point, Escape::Hex6);
 }
 
-fn CharacterDecoder_handleBackslash(
-    session: &mut Reader,
+fn handle_backslash(
+    &mut self,
     policy: NextPolicy,
 ) -> WLCharacter {
     //
@@ -1002,13 +963,13 @@ fn CharacterDecoder_handleBackslash(
     // converting "\[Alpa]" into "\\[Alpa]", copying that, and then never giving any further warnings
     // when dealing with "\\[Alpa]"
     //
-    if session.check_issues {
-        let reset_mark = session.mark();
+    if self.check_issues {
+        let reset_mark = self.mark();
 
         //
         // will be resetting any way, so just use nextSourceCharacter here
         //
-        let mut c = session.next_source_char(policy);
+        let mut c = self.next_source_char(policy);
 
         if c == '[' {
             //
@@ -1017,52 +978,52 @@ fn CharacterDecoder_handleBackslash(
             // If well-formed, then warn
             //
 
-            let longNameStartBuf = session.offset;
-            let longNameStartLoc = session.SrcLoc;
+            let long_name_start_buf = self.offset;
+            let long_name_start_loc = self.src_loc;
 
-            c = session.next_source_char(policy);
+            c = self.next_source_char(policy);
 
-            let mut wellFormed = false;
+            let mut well_formed = false;
 
-            if c.isUpper() {
-                c = session.next_source_char(policy);
+            if c.is_upper() {
+                c = self.next_source_char(policy);
 
                 loop {
-                    if c.isAlphaOrDigit() {
-                        c = session.next_source_char(policy);
+                    if c.is_alpha_or_digit() {
+                        c = self.next_source_char(policy);
 
                         continue;
                     }
 
                     if c == ']' {
-                        wellFormed = true;
+                        well_formed = true;
                     }
 
                     break;
                 }
             }
 
-            if wellFormed {
-                let mut tmpPolicy = policy;
+            if well_formed {
+                let mut tmp_policy = policy;
 
-                tmpPolicy |= ENABLE_CHARACTER_DECODING_ISSUES;
-                tmpPolicy |= SCAN_FOR_UNRECOGNIZEDLONGNAMES;
+                tmp_policy |= ENABLE_CHARACTER_DECODING_ISSUES;
+                tmp_policy |= SCAN_FOR_UNRECOGNIZEDLONGNAMES;
 
-                session.offset = longNameStartBuf;
-                session.SrcLoc = longNameStartLoc;
+                self.offset = long_name_start_buf;
+                self.src_loc = long_name_start_loc;
 
-                CharacterDecoder_handleLongName(session, reset_mark, tmpPolicy);
+                self.handle_long_name(reset_mark, tmp_policy);
             }
         }
 
-        session.seek(reset_mark);
+        self.seek(reset_mark);
     }
 
     return WLCharacter::new_with_escape(StringMeta_Backslash, Escape::Single);
 }
 
-fn CharacterDecoder_handleUnhandledEscape(
-    session: &mut Reader,
+fn handle_unhandled_escape(
+    &mut self,
     unhandled: InputMark,
     policy: NextPolicy,
 ) -> WLCharacter {
@@ -1072,44 +1033,44 @@ fn CharacterDecoder_handleUnhandledEscape(
     // Something like  \A
     //
 
-    let escapedChar = session.peek_source_char(policy);
+    let escaped_char = self.peek_source_char(policy);
 
-    session.next_source_char(policy);
+    self.next_source_char(policy);
 
     //
     // Make the warnings a little more relevant
     //
 
-    if session.check_issues && policy.contains(ENABLE_CHARACTER_DECODING_ISSUES)
+    if self.check_issues && policy.contains(ENABLE_CHARACTER_DECODING_ISSUES)
     {
-        let currentWLCharacterStartLoc = unhandled.src_loc.previous();
+        let current_wl_character_start_loc = unhandled.src_loc.previous();
 
-        let mut currentWLCharacterEndLoc = session.SrcLoc;
+        let mut current_wl_character_end_loc = self.src_loc;
 
-        if escapedChar.isUpper() {
+        if escaped_char.is_upper() {
             //
             // Attempt to read \Alpha] and report a missing [
             //
 
             let mut alnumRun: String = String::new();
 
-            alnumRun.push(escapedChar.as_char().unwrap());
+            alnumRun.push(escaped_char.as_char().unwrap());
 
-            let mut curSource = session.peek_source_char(policy);
+            let mut cur_source = self.peek_source_char(policy);
 
-            let mut wellFormed = false;
+            let mut well_formed = false;
 
             loop {
-                if curSource.isAlphaOrDigit() {
-                    alnumRun.push(curSource.as_char().unwrap());
+                if cur_source.is_alpha_or_digit() {
+                    alnumRun.push(cur_source.as_char().unwrap());
 
-                    session.next_source_char(policy);
+                    self.next_source_char(policy);
 
-                    curSource = session.peek_source_char(policy);
-                } else if curSource == ']' {
-                    session.next_source_char(policy);
+                    cur_source = self.peek_source_char(policy);
+                } else if cur_source == ']' {
+                    self.next_source_char(policy);
 
-                    wellFormed = true;
+                    well_formed = true;
 
                     break;
                 } else {
@@ -1123,161 +1084,161 @@ fn CharacterDecoder_handleUnhandledEscape(
                 }
             }
 
-            let mut wellFormedAndFound = false;
+            let mut well_formedAndFound = false;
 
-            if wellFormed {
-                wellFormedAndFound =
+            if well_formed {
+                well_formedAndFound =
                     long_names::longname_to_codepoint(alnumRun.as_str())
                         .is_some();
             }
 
-            if wellFormedAndFound {
+            if well_formedAndFound {
                 //
                 // Something like \Alpha]
                 //
 
-                currentWLCharacterEndLoc = session.SrcLoc;
+                current_wl_character_end_loc = self.src_loc;
 
-                let curSourceGraphicalStr = format!("{alnumRun}]");
+                let cur_source_graphical_str = format!("{alnumRun}]");
 
-                let mut Actions: Vec<CodeAction> = Vec::new();
+                let mut actions: Vec<CodeAction> = Vec::new();
 
-                Actions.push(CodeAction::insert_text(
+                actions.push(CodeAction::insert_text(
                     format!("Insert ``[`` to form ``\\[{alnumRun}]``"),
-                    Span::at(currentWLCharacterStartLoc.next()),
+                    Span::at(current_wl_character_start_loc.next()),
                     "[".into(),
                 ));
 
-                let I = SyntaxIssue(
+                let issue = syntax_issue(
                     IssueTag::UnhandledCharacter,
                     format!(
-                        "Unhandled character ``\\{curSourceGraphicalStr}``."
+                        "Unhandled character ``\\{cur_source_graphical_str}``."
                     ),
                     Severity::Fatal,
                     Span::new(
-                        currentWLCharacterStartLoc,
-                        currentWLCharacterEndLoc,
+                        current_wl_character_start_loc,
+                        current_wl_character_end_loc,
                     ),
                     1.0,
-                    Actions,
+                    actions,
                     vec![],
                 );
 
-                session.addIssue(I);
+                self.add_issue(issue);
             } else {
-                if escapedChar.isHex() {
-                    let curSourceGraphicalStr =
-                        WLCharacter::new(escapedChar).graphicalString();
+                if escaped_char.is_hex() {
+                    let cur_source_graphical_str =
+                        WLCharacter::new(escaped_char).graphical_string();
 
-                    let mut Actions: Vec<CodeAction> = Vec::new();
+                    let mut actions: Vec<CodeAction> = Vec::new();
 
-                    Actions.push(CodeAction::replace_text(
+                    actions.push(CodeAction::replace_text(
                         format!(
                             "Replace with ``\\[{}XXX]``",
-                            curSourceGraphicalStr
+                            cur_source_graphical_str
                         ),
                         Span::new(
-                            currentWLCharacterStartLoc,
-                            currentWLCharacterEndLoc,
+                            current_wl_character_start_loc,
+                            current_wl_character_end_loc,
                         ),
-                        format!("\\[{}XXX]", curSourceGraphicalStr),
+                        format!("\\[{}XXX]", cur_source_graphical_str),
                     ));
 
-                    Actions.push(CodeAction::replace_text(
+                    actions.push(CodeAction::replace_text(
                         format!(
                             "Replace with ``\\:{}XXX``",
-                            curSourceGraphicalStr
+                            cur_source_graphical_str
                         ),
                         Span::new(
-                            currentWLCharacterStartLoc,
-                            currentWLCharacterEndLoc,
+                            current_wl_character_start_loc,
+                            current_wl_character_end_loc,
                         ),
-                        format!("\\:{}XXX", curSourceGraphicalStr),
+                        format!("\\:{}XXX", cur_source_graphical_str),
                     ));
 
-                    let I = SyntaxIssue(
+                    let issue = syntax_issue(
                         IssueTag::UnhandledCharacter,
                         format!(
                             "Unhandled character ``\\{}``.",
-                            curSourceGraphicalStr
+                            cur_source_graphical_str
                         ),
                         Severity::Fatal,
                         Span::new(
-                            currentWLCharacterStartLoc,
-                            currentWLCharacterEndLoc,
+                            current_wl_character_start_loc,
+                            current_wl_character_end_loc,
                         ),
                         1.0,
-                        Actions,
+                        actions,
                         vec![],
                     );
 
-                    session.addIssue(I);
+                    self.add_issue(issue);
                 } else {
-                    let curSourceGraphicalStr =
-                        WLCharacter::new(escapedChar).graphicalString();
+                    let cur_source_graphical_str =
+                        WLCharacter::new(escaped_char).graphical_string();
 
-                    let mut Actions: Vec<CodeAction> = Vec::new();
+                    let mut actions: Vec<CodeAction> = Vec::new();
 
-                    Actions.push(CodeAction::replace_text(
+                    actions.push(CodeAction::replace_text(
                         format!(
                             "Replace with ``\\[{}XXX]``",
-                            curSourceGraphicalStr
+                            cur_source_graphical_str
                         ),
                         Span::new(
-                            currentWLCharacterStartLoc,
-                            currentWLCharacterEndLoc,
+                            current_wl_character_start_loc,
+                            current_wl_character_end_loc,
                         ),
-                        format!("\\[{}XXX]", curSourceGraphicalStr),
+                        format!("\\[{}XXX]", cur_source_graphical_str),
                     ));
 
-                    let I = SyntaxIssue(
+                    let issue = syntax_issue(
                         IssueTag::UnhandledCharacter,
                         format!(
                             "Unhandled character ``\\{}``.",
-                            curSourceGraphicalStr
+                            cur_source_graphical_str
                         ),
                         Severity::Fatal,
                         Span::new(
-                            currentWLCharacterStartLoc,
-                            currentWLCharacterEndLoc,
+                            current_wl_character_start_loc,
+                            current_wl_character_end_loc,
                         ),
                         1.0,
-                        Actions,
+                        actions,
                         vec![],
                     );
 
-                    session.addIssue(I);
+                    self.add_issue(issue);
                 }
             }
-        } else if escapedChar.isHex() {
-            let curSourceGraphicalStr =
-                WLCharacter::new(escapedChar).graphicalString();
+        } else if escaped_char.is_hex() {
+            let cur_source_graphical_str =
+                WLCharacter::new(escaped_char).graphical_string();
 
-            let mut Actions: Vec<CodeAction> = Vec::new();
+            let mut actions: Vec<CodeAction> = Vec::new();
 
-            Actions.push(CodeAction::replace_text(
-                format!("Replace with ``\\:{}xxx``", curSourceGraphicalStr),
-                Span::new(currentWLCharacterStartLoc, currentWLCharacterEndLoc),
-                format!("\\:{}xxx", curSourceGraphicalStr),
+            actions.push(CodeAction::replace_text(
+                format!("Replace with ``\\:{}xxx``", cur_source_graphical_str),
+                Span::new(current_wl_character_start_loc, current_wl_character_end_loc),
+                format!("\\:{}xxx", cur_source_graphical_str),
             ));
 
-            let I = SyntaxIssue(
+            let issue = syntax_issue(
                 IssueTag::UnhandledCharacter,
-                format!("Unhandled character ``\\{}``.", curSourceGraphicalStr),
+                format!("Unhandled character ``\\{}``.", cur_source_graphical_str),
                 Severity::Fatal,
-                Span::new(currentWLCharacterStartLoc, currentWLCharacterEndLoc),
+                Span::new(current_wl_character_start_loc, current_wl_character_end_loc),
                 1.0,
-                Actions,
+                actions,
                 vec![],
             );
 
-            session.addIssue(I);
-        } else if escapedChar.isEndOfFile() {
+            self.add_issue(issue);
+        } else if escaped_char.is_end_of_file() {
 
             //
             // Do not know what a good suggestion would be for \<EOF>
             //
-        } else if escapedChar.isMBUnsafeUTF8Sequence() {
+        } else if escaped_char.is_mb_unsafe_utf8_sequence() {
 
             //
             // Do not know what a good suggestion would be for \<0xa9>
@@ -1287,14 +1248,14 @@ fn CharacterDecoder_handleUnhandledEscape(
             // Anything else
             //
 
-            let curSourceGraphicalStr =
-                WLCharacter::new(escapedChar).graphicalString();
+            let cur_source_graphical_str =
+                WLCharacter::new(escaped_char).graphical_string();
 
-            if curSourceGraphicalStr.len() > 1 {
+            if cur_source_graphical_str.len() > 1 {
                 //
                 // Something like \<tab>
                 //
-                // curSourceGraphicalStr is now the 2 characters '\' 't'
+                // cur_source_graphical_str is now the 2 characters '\' 't'
                 //
                 // This can now be confusing when reporting the issue.
                 // The correct number of backslashes is required.
@@ -1302,52 +1263,52 @@ fn CharacterDecoder_handleUnhandledEscape(
                 // Do the simple thing: No actions, and report the character with all escaped backslashes now
                 //
 
-                let I = SyntaxIssue(
+                let issue = syntax_issue(
                     IssueTag::UnhandledCharacter,
                     format!(
                         "Unhandled character ``\\\\{}``.",
-                        curSourceGraphicalStr
+                        cur_source_graphical_str
                     ),
                     Severity::Fatal,
                     Span::new(
-                        currentWLCharacterStartLoc,
-                        currentWLCharacterEndLoc,
+                        current_wl_character_start_loc,
+                        current_wl_character_end_loc,
                     ),
                     1.0,
                     vec![],
                     vec![],
                 );
 
-                session.addIssue(I);
+                self.add_issue(issue);
             } else {
-                let mut Actions: Vec<CodeAction> = Vec::new();
+                let mut actions: Vec<CodeAction> = Vec::new();
 
-                Actions.push(CodeAction::replace_text(
-                    format!("Replace with ``\\\\{}``", curSourceGraphicalStr),
+                actions.push(CodeAction::replace_text(
+                    format!("Replace with ``\\\\{}``", cur_source_graphical_str),
                     Span::new(
-                        currentWLCharacterStartLoc,
-                        currentWLCharacterEndLoc,
+                        current_wl_character_start_loc,
+                        current_wl_character_end_loc,
                     ),
-                    format!("\\\\{}", curSourceGraphicalStr),
+                    format!("\\\\{}", cur_source_graphical_str),
                 ));
 
-                let I = SyntaxIssue(
+                let issue = syntax_issue(
                     IssueTag::UnhandledCharacter,
                     format!(
                         "Unhandled character ``\\{}``.",
-                        curSourceGraphicalStr
+                        cur_source_graphical_str
                     ),
                     Severity::Fatal,
                     Span::new(
-                        currentWLCharacterStartLoc,
-                        currentWLCharacterEndLoc,
+                        current_wl_character_start_loc,
+                        current_wl_character_end_loc,
                     ),
                     1.0,
-                    Actions,
+                    actions,
                     vec![],
                 );
 
-                session.addIssue(I);
+                self.add_issue(issue);
             }
         }
     }
@@ -1363,21 +1324,21 @@ fn CharacterDecoder_handleUnhandledEscape(
     // The tokenizer will use the bad character to decide what to do
     //
 
-    session.seek(unhandled);
+    self.seek(unhandled);
 
     return WLCharacter::new('\\');
 }
 
-fn CharacterDecoder_handleUncommon<'i, 's>(
-    session: &'s mut Reader<'i>,
+fn handle_uncommon(
+    &mut self,
     escaped: InputMark,
     policy: NextPolicy,
 ) -> WLCharacter {
-    let curSource = session.peek_source_char(policy);
+    let cur_source = self.peek_source_char(policy);
 
-    match curSource {
+    match cur_source {
         Char('\n') => {
-            session.next_source_char(policy);
+            self.next_source_char(policy);
 
             return WLCharacter::new_with_escape(
                 LineContinuation_LineFeed,
@@ -1385,7 +1346,7 @@ fn CharacterDecoder_handleUncommon<'i, 's>(
             );
         },
         Char('\r') => {
-            session.next_source_char(policy);
+            self.next_source_char(policy);
 
             return WLCharacter::new_with_escape(
                 LineContinuation_CarriageReturn,
@@ -1393,7 +1354,7 @@ fn CharacterDecoder_handleUncommon<'i, 's>(
             );
         },
         CodePoint::CRLF => {
-            session.next_source_char(policy);
+            self.next_source_char(policy);
 
             return WLCharacter::new_with_escape(
                 LineContinuation_CRLF,
@@ -1401,34 +1362,29 @@ fn CharacterDecoder_handleUncommon<'i, 's>(
             );
         },
         Char('[') => {
-            session.next_source_char(policy);
+            self.next_source_char(policy);
 
-            //            MUSTTAIL
-            return CharacterDecoder_handleLongName(session, escaped, policy);
+            return self.handle_long_name(escaped, policy);
         },
         Char(':') => {
-            session.next_source_char(policy);
+            self.next_source_char(policy);
 
-            //            MUSTTAIL
-            return CharacterDecoder_handle4Hex(session, escaped, policy);
+            return self.handle_4hex(escaped, policy);
         },
         Char('.') => {
-            session.next_source_char(policy);
+            self.next_source_char(policy);
 
-            //            MUSTTAIL
-            return CharacterDecoder_handle2Hex(session, escaped, policy);
+            return self.handle_2hex(escaped, policy);
         },
         Char('|') => {
-            session.next_source_char(policy);
+            self.next_source_char(policy);
 
-            //            MUSTTAIL
-            return CharacterDecoder_handle6Hex(session, escaped, policy);
+            return self.handle_6hex(escaped, policy);
         },
         Char('0' | '1' | '2' | '3' | '4' | '5' | '6' | '7') => {
-            session.next_source_char(policy);
+            self.next_source_char(policy);
 
-            //            MUSTTAIL
-            return CharacterDecoder_handleOctal(session, escaped, policy);
+            return self.handle_octal(escaped, policy);
         },
 
         //
@@ -1438,40 +1394,40 @@ fn CharacterDecoder_handleUncommon<'i, 's>(
         Char('b') => {
             incr_diagnostic!(CharacterDecoder_StringMetaBackspaceCount);
 
-            session.next_source_char(policy);
+            self.next_source_char(policy);
 
             let c = WLCharacter::new_with_escape(
                 StringMeta_Backspace,
                 Escape::Single,
             );
 
-            if session.check_issues {
-                let graphicalStr = c.graphicalString();
+            if self.check_issues {
+                let graphical_str = c.graphical_string();
 
-                let currentWLCharacterStartLoc = escaped.src_loc.previous();
+                let current_wl_character_start_loc = escaped.src_loc.previous();
 
-                let currentWLCharacterEndLoc = session.SrcLoc;
+                let current_wl_character_end_loc = self.src_loc;
 
-                let Src = Span::new(
-                    currentWLCharacterStartLoc,
-                    currentWLCharacterEndLoc,
+                let src_span = Span::new(
+                    current_wl_character_start_loc,
+                    current_wl_character_end_loc,
                 );
 
                 //
                 // matched reduced severity of unexpected characters inside strings or comments
                 //
 
-                let I = SyntaxIssue(
+                let issue = syntax_issue(
                     IssueTag::UnexpectedCharacter,
-                    format!("Unexpected character: ``{graphicalStr}``."),
+                    format!("Unexpected character: ``{graphical_str}``."),
                     Severity::Remark,
-                    Src,
+                    src_span,
                     0.95,
                     vec![],
                     vec![],
                 );
 
-                session.addIssue(I);
+                self.add_issue(issue);
             }
 
             return c;
@@ -1484,40 +1440,40 @@ fn CharacterDecoder_handleUncommon<'i, 's>(
 
             incr_diagnostic!(CharacterDecoder_StringMetaFormFeedCount);
 
-            session.next_source_char(policy);
+            self.next_source_char(policy);
 
             let c = WLCharacter::new_with_escape(
                 StringMeta_FormFeed,
                 Escape::Single,
             );
 
-            if session.check_issues {
-                let graphicalStr = c.graphicalString();
+            if self.check_issues {
+                let graphical_str = c.graphical_string();
 
-                let currentWLCharacterStartLoc = escaped.src_loc.previous();
+                let current_wl_character_start_loc = escaped.src_loc.previous();
 
-                let currentWLCharacterEndLoc = session.SrcLoc;
+                let current_wl_character_end_loc = self.src_loc;
 
-                let Src = Span::new(
-                    currentWLCharacterStartLoc,
-                    currentWLCharacterEndLoc,
+                let src_span = Span::new(
+                    current_wl_character_start_loc,
+                    current_wl_character_end_loc,
                 );
 
                 //
                 // matched reduced severity of unexpected characters inside strings or comments
                 //
 
-                let I = SyntaxIssue(
+                let issue = syntax_issue(
                     IssueTag::UnexpectedCharacter,
-                    format!("Unexpected character: ``{graphicalStr}``."),
+                    format!("Unexpected character: ``{graphical_str}``."),
                     Severity::Remark,
-                    Src,
+                    src_span,
                     0.95,
                     vec![],
                     vec![],
                 );
 
-                session.addIssue(I);
+                self.add_issue(issue);
             }
 
             return c;
@@ -1530,7 +1486,7 @@ fn CharacterDecoder_handleUncommon<'i, 's>(
 
             incr_diagnostic!(CharacterDecoder_StringMetaLineFeedCount);
 
-            session.next_source_char(policy);
+            self.next_source_char(policy);
 
             return WLCharacter::new_with_escape(
                 StringMeta_LineFeed,
@@ -1545,7 +1501,7 @@ fn CharacterDecoder_handleUncommon<'i, 's>(
 
             incr_diagnostic!(CharacterDecoder_StringMetaCarriageReturnCount);
 
-            session.next_source_char(policy);
+            self.next_source_char(policy);
 
             return WLCharacter::new_with_escape(
                 StringMeta_CarriageReturn,
@@ -1560,7 +1516,7 @@ fn CharacterDecoder_handleUncommon<'i, 's>(
 
             incr_diagnostic!(CharacterDecoder_StringMetaTabCount);
 
-            session.next_source_char(policy);
+            self.next_source_char(policy);
 
             return WLCharacter::new_with_escape(
                 StringMeta_Tab,
@@ -1574,7 +1530,7 @@ fn CharacterDecoder_handleUncommon<'i, 's>(
         Char('!') => {
             incr_diagnostic!(CharacterDecoder_LinearSyntaxBangCount);
 
-            session.next_source_char(policy);
+            self.next_source_char(policy);
 
             return WLCharacter::new_with_escape(
                 CODEPOINT_LINEARSYNTAX_BANG,
@@ -1584,7 +1540,7 @@ fn CharacterDecoder_handleUncommon<'i, 's>(
         Char('%') => {
             incr_diagnostic!(CharacterDecoder_LinearSyntaxPercentCount);
 
-            session.next_source_char(policy);
+            self.next_source_char(policy);
 
             return WLCharacter::new_with_escape(
                 CODEPOINT_LINEARSYNTAX_PERCENT,
@@ -1594,7 +1550,7 @@ fn CharacterDecoder_handleUncommon<'i, 's>(
         Char('&') => {
             incr_diagnostic!(CharacterDecoder_LinearSyntaxAmpCount);
 
-            session.next_source_char(policy);
+            self.next_source_char(policy);
 
             return WLCharacter::new_with_escape(
                 CODEPOINT_LINEARSYNTAX_AMP,
@@ -1604,7 +1560,7 @@ fn CharacterDecoder_handleUncommon<'i, 's>(
         Char('(') => {
             incr_diagnostic!(CharacterDecoder_LinearSyntaxOpenParenCount);
 
-            session.next_source_char(policy);
+            self.next_source_char(policy);
 
             return WLCharacter::new_with_escape(
                 CODEPOINT_LINEARSYNTAX_OPENPAREN,
@@ -1614,7 +1570,7 @@ fn CharacterDecoder_handleUncommon<'i, 's>(
         Char(')') => {
             incr_diagnostic!(CharacterDecoder_LinearSyntaxCloseParenCount);
 
-            session.next_source_char(policy);
+            self.next_source_char(policy);
 
             return WLCharacter::new_with_escape(
                 CODEPOINT_LINEARSYNTAX_CLOSEPAREN,
@@ -1624,7 +1580,7 @@ fn CharacterDecoder_handleUncommon<'i, 's>(
         Char('*') => {
             incr_diagnostic!(CharacterDecoder_LinearSyntaxStarCount);
 
-            session.next_source_char(policy);
+            self.next_source_char(policy);
 
             return WLCharacter::new_with_escape(
                 CODEPOINT_LINEARSYNTAX_STAR,
@@ -1634,7 +1590,7 @@ fn CharacterDecoder_handleUncommon<'i, 's>(
         Char('+') => {
             incr_diagnostic!(CharacterDecoder_LinearSyntaxPlusCount);
 
-            session.next_source_char(policy);
+            self.next_source_char(policy);
 
             return WLCharacter::new_with_escape(
                 CODEPOINT_LINEARSYNTAX_PLUS,
@@ -1644,7 +1600,7 @@ fn CharacterDecoder_handleUncommon<'i, 's>(
         Char('/') => {
             incr_diagnostic!(CharacterDecoder_LinearSyntaxSlashCount);
 
-            session.next_source_char(policy);
+            self.next_source_char(policy);
 
             return WLCharacter::new_with_escape(
                 CODEPOINT_LINEARSYNTAX_SLASH,
@@ -1654,7 +1610,7 @@ fn CharacterDecoder_handleUncommon<'i, 's>(
         Char('@') => {
             incr_diagnostic!(CharacterDecoder_LinearSyntaxAtCount);
 
-            session.next_source_char(policy);
+            self.next_source_char(policy);
 
             return WLCharacter::new_with_escape(
                 CODEPOINT_LINEARSYNTAX_AT,
@@ -1664,7 +1620,7 @@ fn CharacterDecoder_handleUncommon<'i, 's>(
         Char('^') => {
             incr_diagnostic!(CharacterDecoder_LinearSyntaxCaretCount);
 
-            session.next_source_char(policy);
+            self.next_source_char(policy);
 
             return WLCharacter::new_with_escape(
                 CODEPOINT_LINEARSYNTAX_CARET,
@@ -1674,7 +1630,7 @@ fn CharacterDecoder_handleUncommon<'i, 's>(
         Char('_') => {
             incr_diagnostic!(CharacterDecoder_LinearSyntaxUnderscoreCount);
 
-            session.next_source_char(policy);
+            self.next_source_char(policy);
 
             return WLCharacter::new_with_escape(
                 CODEPOINT_LINEARSYNTAX_UNDER,
@@ -1684,7 +1640,7 @@ fn CharacterDecoder_handleUncommon<'i, 's>(
         Char('`') => {
             incr_diagnostic!(CharacterDecoder_LinearSyntaxBacktickCount);
 
-            session.next_source_char(policy);
+            self.next_source_char(policy);
 
             return WLCharacter::new_with_escape(
                 CODEPOINT_LINEARSYNTAX_BACKTICK,
@@ -1694,7 +1650,7 @@ fn CharacterDecoder_handleUncommon<'i, 's>(
         Char(' ') => {
             incr_diagnostic!(CharacterDecoder_LinearSyntaxSpaceCount);
 
-            session.next_source_char(policy);
+            self.next_source_char(policy);
 
             return WLCharacter::new_with_escape(
                 LinearSyntax_Space,
@@ -1711,8 +1667,7 @@ fn CharacterDecoder_handleUncommon<'i, 's>(
     //
     incr_diagnostic!(CharacterDecoder_UnhandledCount);
 
-    //    MUSTTAIL
-    return CharacterDecoder_handleUnhandledEscape(session, escaped, policy);
+    return self.handle_unhandled_escape(escaped, policy);
 }
 
 //
@@ -1722,8 +1677,10 @@ fn CharacterDecoder_handleUncommon<'i, 's>(
 //
 // Return empty string if no suggestion.
 //
+}
+
 #[cfg(feature = "USE_EXPR_LIB")]
-fn CharacterDecoder_longNameSuggestion(input: String) -> String {
+fn long_name_suggestion(input: String) -> String {
     let InputExpr = Expr_UTF8BytesToStringExpr(input.c_str(), input.len());
 
     let e = Expr_LongNameSuggestion(InputExpr);
@@ -1740,7 +1697,7 @@ fn CharacterDecoder_longNameSuggestion(input: String) -> String {
     return suggestion;
 }
 
-fn CharacterDecoder_longNameSuggestion(input: &str) -> String {
+fn long_name_suggestion(input: &str) -> String {
     use edit_distance::edit_distance;
 
     let closest: Option<&&str> = CODEPOINT_TO_LONGNAME_MAP
@@ -1764,30 +1721,31 @@ fn CharacterDecoder_longNameSuggestion(input: &str) -> String {
     }
 }
 
+impl Reader<'_> {
 /// Add an [`Issue`][crate::issue::Issue] if the specified [`CodePoint`] is
 /// a "strange" character.
 pub(crate) fn check_strange_syntax_issue(
-    session: &mut Reader,
+    &mut self,
     policy: NextPolicy,
     point: CodePoint,
     start_loc: Location,
     escape_style: Escape,
 ) {
-    if !session.check_issues {
+    if !self.check_issues {
         // Don't add any issues
         return;
     }
 
     let c = WLCharacter::new_with_escape(point, escape_style);
 
-    let issue_value: f64 = if utils::isStrange(point) {
-        if c.isStrangeWhitespace() {
+    let issue_value: f64 = if utils::is_strange(point) {
+        if c.is_strange_whitespace() {
             return;
         } else {
             0.95
         }
-    } else if utils::isMBStrange(point) {
-        if c.isMBStrangeWhitespace() {
+    } else if utils::is_mb_strange(point) {
+        if c.is_mb_strange_whitespace() {
             return;
         } else {
             0.85
@@ -1800,19 +1758,19 @@ pub(crate) fn check_strange_syntax_issue(
     // Just generally strange character is in the code
     //
 
-    let currentWLCharacterStartLoc = start_loc.previous();
+    let current_wl_character_start_loc = start_loc.previous();
 
-    let currentSourceCharacterEndLoc = session.SrcLoc;
+    let current_source_character_end_loc = self.src_loc;
 
-    let graphicalStr = c.graphicalString();
+    let graphical_str = c.graphical_string();
 
-    let Src =
-        Span::new(currentWLCharacterStartLoc, currentSourceCharacterEndLoc);
+    let src_span =
+        Span::new(current_wl_character_start_loc, current_source_character_end_loc);
 
-    let mut Actions: Vec<CodeAction> = Vec::new();
+    let mut actions: Vec<CodeAction> = Vec::new();
 
-    for A in utils::certainCharacterReplacementActions(c, Src) {
-        Actions.push(A);
+    for a in utils::certain_character_replacement_actions(c, src_span) {
+        actions.push(a);
     }
 
     //
@@ -1822,13 +1780,13 @@ pub(crate) fn check_strange_syntax_issue(
     //
     // any ASCII replacements
     //
-    for r in LongNames::asciiReplacements(point) {
-        Actions.push(CodeAction::replace_text(
+    for r in LongNames::ascii_replacements(point) {
+        actions.push(CodeAction::replace_text(
             format!(
                 "Replace with ``{}``",
-                LongNames::replacementGraphical(r.clone())
+                LongNames::replacement_graphical(r.clone())
             ),
-            Src,
+            src_span,
             r,
         ));
     }
@@ -1842,15 +1800,16 @@ pub(crate) fn check_strange_syntax_issue(
         Severity::Warning
     };
 
-    let issue = SyntaxIssue(
+    let issue = syntax_issue(
         IssueTag::UnexpectedCharacter,
-        format!("Unexpected character: ``{graphicalStr}``."),
+        format!("Unexpected character: ``{graphical_str}``."),
         severity,
-        Src,
+        src_span,
         issue_value,
-        Actions,
+        actions,
         vec![],
     );
 
-    session.addIssue(issue);
+    self.add_issue(issue);
+}
 }

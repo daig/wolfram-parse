@@ -14,10 +14,6 @@ use crate::{
     EncodingMode, ParseOptions, UnsafeCharacterEncoding,
 };
 
-use self::{
-    byte_decoder::ByteDecoder_nextSourceCharacter,
-    character_decoder::CharacterDecoder_nextWLCharacter,
-};
 
 pub use self::wl_character::{Escape, WLCharacter};
 
@@ -34,9 +30,9 @@ pub(crate) struct Reader<'i> {
     /// Offset of the current byte in [`input`][Reader::input] that is next up to be parsed.
     pub(crate) offset: usize,
 
-    pub(crate) wasEOF: bool,
+    pub(crate) was_eof: bool,
 
-    pub(crate) SrcLoc: Location,
+    pub(crate) src_loc: Location,
 
     pub(crate) tab_width: u32,
     pub(crate) check_issues: bool,
@@ -55,7 +51,7 @@ pub(crate) struct InputMark {
     offset: usize,
     pub src_loc: Location,
 
-    wasEOF: Option<bool>,
+    was_eof: Option<bool>,
 }
 
 /// A set of fields of [`Reader`] used to update the current [`Location`].
@@ -87,8 +83,8 @@ impl<'i> Reader<'i> {
         Reader {
             input,
             offset: 0,
-            wasEOF: false,
-            SrcLoc: src_convention.newSourceLocation(),
+            was_eof: false,
+            src_loc: src_convention.new_source_location(),
 
             tab_width,
             check_issues,
@@ -162,7 +158,7 @@ impl<'i> Reader<'i> {
         &mut self,
         policy: NextPolicy,
     ) -> SourceCharacter {
-        ByteDecoder_nextSourceCharacter(self, policy)
+        self.next_source_character(policy)
     }
 
     //==================================
@@ -187,7 +183,7 @@ impl<'i> Reader<'i> {
         &mut self,
         policy: NextPolicy,
     ) -> WLCharacter {
-        CharacterDecoder_nextWLCharacter(self, policy)
+        self.next_wl_character(policy)
     }
 
     //==================================
@@ -198,7 +194,7 @@ impl<'i> Reader<'i> {
     pub(crate) fn src(&mut self) -> SourceManager {
         SourceManager {
             tab_width: self.tab_width,
-            loc: &mut self.SrcLoc,
+            loc: &mut self.src_loc,
         }
     }
 
@@ -211,8 +207,8 @@ impl<'i> Reader<'i> {
     pub(crate) fn mark(&self) -> InputMark {
         InputMark {
             offset: self.offset,
-            wasEOF: Some(self.wasEOF),
-            src_loc: self.SrcLoc,
+            was_eof: Some(self.was_eof),
+            src_loc: self.src_loc,
         }
     }
 
@@ -221,15 +217,15 @@ impl<'i> Reader<'i> {
     pub(crate) fn seek(&mut self, mark: InputMark) {
         let InputMark {
             offset,
-            wasEOF,
+            was_eof,
             src_loc,
         } = mark;
 
         self.offset = offset;
-        self.SrcLoc = src_loc;
+        self.src_loc = src_loc;
 
-        if let Some(wasEOF) = wasEOF {
-            self.wasEOF = wasEOF;
+        if let Some(was_eof) = was_eof {
+            self.was_eof = was_eof;
         }
     }
 
@@ -237,14 +233,14 @@ impl<'i> Reader<'i> {
     // Issue tracking
     //==================================
 
-    pub(crate) fn setUnsafeCharacterEncodingFlag(
+    pub(crate) fn set_unsafe_character_encoding_flag(
         &mut self,
         flag: UnsafeCharacterEncoding,
     ) {
         self.unsafe_character_encoding_flag = Some(flag);
     }
 
-    pub(crate) fn addIssue(&mut self, issue: Issue) {
+    pub(crate) fn add_issue(&mut self, issue: Issue) {
         if issue.sev == Severity::Fatal {
             //
             // There may be situations where many (1000+) fatal errors are generated.
@@ -285,7 +281,7 @@ impl InputMark {
         InputMark {
             offset,
             src_loc,
-            wasEOF: None,
+            was_eof: None,
         }
     }
 }

@@ -322,14 +322,14 @@ impl<'i> TokenRef<'i> {
                     LineColumn, LineColumnSpan, SourceCharacter, SpanKind,
                 };
 
-                if tok.isEmpty() {
+                if tok.is_empty() {
                     assert!(
                         (buf.length() == 0) ||
                         //
                         // There could be a line continuation in front.
                         // Token is still empty.
                         //
-                        (buf.as_bytes()[0] == b'\\' && SourceCharacter::from(buf.as_bytes()[1]).isNewline()),
+                        (buf.as_bytes()[0] == b'\\' && SourceCharacter::from(buf.as_bytes()[1]).is_newline()),
                     );
                 } else {
                     assert!(buf.length() > 0);
@@ -364,8 +364,8 @@ impl<'i> TokenRef<'i> {
                                     // If a character was in source with \XXX octal notation but was stringified with \:XXXX hex notation
                                     //
                                     assert!(
-                                        !buf.containsOnlyASCII()
-                                            || buf.containsTab()
+                                        !buf.contains_only_ascii()
+                                            || buf.contains_tab()
                                     );
                                 }
                             }
@@ -498,7 +498,7 @@ impl<'i> TokenRef<'i> {
         //
 
         session.offset = session.offset_of(self.input.buf.buf);
-        session.SrcLoc = self.src.start();
+        session.src_loc = self.src.start();
     }
 
     pub(crate) fn skip(&self, session: &mut Tokenizer) {
@@ -506,8 +506,8 @@ impl<'i> TokenRef<'i> {
             session.offset_of(self.input.buf.buf) + self.input.buf.buf.len();
 
         session.offset = end;
-        session.wasEOF = self.tok == TokenKind::EndOfFile;
-        session.SrcLoc = self.src.end();
+        session.was_eof = self.tok == TokenKind::EndOfFile;
+        session.src_loc = self.src.end();
     }
 }
 
@@ -521,9 +521,9 @@ impl<I, S> Token<I, S> {
     //     // printing the token  123  as LeafNode[Integer, "123", <||>] seems the wrong way around, but it is convenient
     //     //
 
-    //     if Tok.isError() {
+    //     if Tok.is_error() {
 
-    //         if Tok.isUnterminated() {
+    //         if Tok.is_unterminated() {
 
     //             SYMBOL_CODEPARSER_UNTERMINATEDTOKENERRORNEEDSREPARSENODE.print(s);
 

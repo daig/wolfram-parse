@@ -30,12 +30,12 @@ pub(crate) fn longname_to_codepoint(longname: &str) -> Option<CodePoint> {
 }
 
 /// Is this \[Raw] something?
-pub fn isRaw(long_name_str: &str) -> bool {
+pub fn is_raw(long_name_str: &str) -> bool {
     debug_assert!(utils::is_sorted(&RAW_SET));
     return RAW_SET.binary_search(&long_name_str).is_ok();
 }
 
-pub fn isMBNotStrangeLetterlike(point: CodePoint) -> bool {
+pub fn is_mb_not_strange_letterlike(point: CodePoint) -> bool {
     // TODO(cleanup): Change param type?
     let Some(char) = point.as_char() else {
         return false;
@@ -47,7 +47,7 @@ pub fn isMBNotStrangeLetterlike(point: CodePoint) -> bool {
         .is_ok();
 }
 
-pub fn asciiReplacements(point: CodePoint) -> Vec<String> {
+pub fn ascii_replacements(point: CodePoint) -> Vec<String> {
     // TODO(cleanup): Change param type?
     let Some(char) = point.as_char() else {
         return Vec::new();
@@ -70,7 +70,7 @@ pub fn asciiReplacements(point: CodePoint) -> Vec<String> {
         .collect()
 }
 
-pub fn replacementGraphical(replacement: String) -> String {
+pub fn replacement_graphical(replacement: String) -> String {
     if replacement == " " {
         //
         // \[SpaceIndicator]
@@ -96,7 +96,7 @@ pub fn replacementGraphical(replacement: String) -> String {
     return replacement;
 }
 
-pub fn isMBPunctuation(point: CodePoint) -> bool {
+pub fn is_mb_punctuation(point: CodePoint) -> bool {
     // TODO(cleanup): Change param type?
     let Some(char) = point.as_char() else {
         return false;
@@ -106,7 +106,7 @@ pub fn isMBPunctuation(point: CodePoint) -> bool {
     return MB_PUNCTUATION_CODE_POINTS.binary_search(&char).is_ok();
 }
 
-pub fn isMBWhitespace(point: CodePoint) -> bool {
+pub fn is_mb_whitespace(point: CodePoint) -> bool {
     // TODO(cleanup): Change param type?
     let Some(char) = point.as_char() else {
         return false;
@@ -116,12 +116,12 @@ pub fn isMBWhitespace(point: CodePoint) -> bool {
     return MB_WHITESPACE_CODE_POINTS.binary_search(&char).is_ok();
 }
 
-pub fn isMBNewline(point: CodePoint) -> bool {
+pub fn is_mb_newline(point: CodePoint) -> bool {
     debug_assert!(utils::is_sorted(&MB_NEWLINE_CODE_POINTS));
     return MB_NEWLINE_CODE_POINTS.binary_search(&point).is_ok();
 }
 
-pub fn isMBUninterpretable(point: CodePoint) -> bool {
+pub fn is_mb_uninterpretable(point: CodePoint) -> bool {
     // TODO(cleanup): Change param type?
     let Some(char) = point.as_char() else {
         return false;

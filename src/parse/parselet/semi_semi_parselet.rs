@@ -22,11 +22,10 @@ impl<'i, B: ParseBuilder<'i> + 'i> InfixParselet<'i, B> for SemiSemiParselet {
 
         let tok_in = session.push_syntax_and_next(tok_in);
 
-        // MUSTTAIL
         return SemiSemiParselet::parse1(session, lhs_node, trivia1, tok_in);
     }
 
-    fn getPrecedence(&self, _: &ParserSession<'i, B>) -> Option<Precedence> {
+    fn get_precedence(&self, _: &ParserSession<'i, B>) -> Option<Precedence> {
         return Some(Precedence::SEMISEMI);
     }
 
@@ -66,7 +65,6 @@ impl<'i, B: ParseBuilder<'i> + 'i> PrefixParselet<'i, B> for SemiSemiParselet {
         // nextToken() is not needed after an implicit token
         //
 
-        // MUSTTAIL
         return self.parse_infix(
             session,
             first_operand,
@@ -96,7 +94,7 @@ impl SemiSemiParselet {
         //  ^~tok_in
         //
 
-        if !SecondTok.tok.isPossibleBeginning() {
+        if !SecondTok.tok.is_possible_beginning() {
             //
             // a;;&
             //    ^SecondTok
@@ -111,7 +109,6 @@ impl SemiSemiParselet {
             // nextToken() is not needed after an implicit token
             //
 
-            // MUSTTAIL
             return SemiSemiParselet::reduce_binary(
                 session,
                 first_operand,
@@ -128,7 +125,6 @@ impl SemiSemiParselet {
             //    ^SecondTok
             //
 
-            // MUSTTAIL
             let second_operand = session.parse_prefix(SecondTok);
 
             return SemiSemiParselet::parse2(
@@ -165,7 +161,7 @@ impl SemiSemiParselet {
         let (trivia4, ThirdTok) =
             session.current_token_eat_trivia_but_not_toplevel_newlines_into();
 
-        if !ThirdTok.tok.isPossibleBeginning()
+        if !ThirdTok.tok.is_possible_beginning()
             || ThirdTok.tok == TokenKind::SemiSemi
         {
             //
@@ -181,7 +177,6 @@ impl SemiSemiParselet {
             session.trivia_reset(trivia4);
             SecondTok.reset(&mut session.tokenizer);
 
-            // MUSTTAIL
             return SemiSemiParselet::reduce_binary(
                 session,
                 first_operand,
@@ -205,7 +200,6 @@ impl SemiSemiParselet {
 
         let trivia4 = session.builder.push_trivia_seq(trivia4);
 
-        // MUSTTAIL
         let third_operand = session.parse_prefix(ThirdTok);
 
         SemiSemiParselet::reduce_ternary(
@@ -242,7 +236,7 @@ impl SemiSemiParselet {
         // TODO(cleanup): Can this condition be simplified? It would seem to
         //                imply that ThirdTok is always SemiSemi if it's false,
         //                so why check isPossibleBeginning()?
-        if !ThirdTok.tok.isPossibleBeginning()
+        if !ThirdTok.tok.is_possible_beginning()
             || ThirdTok.tok != TokenKind::SemiSemi
         {
             //
@@ -257,7 +251,6 @@ impl SemiSemiParselet {
 
             session.trivia_reset(trivia3);
 
-            // MUSTTAIL
             return SemiSemiParselet::reduce_binary(
                 session,
                 first_operand,
@@ -283,7 +276,7 @@ impl SemiSemiParselet {
         let (trivia4, FourthTok) =
             session.current_token_eat_trivia_but_not_toplevel_newlines_into();
 
-        if !FourthTok.tok.isPossibleBeginning()
+        if !FourthTok.tok.is_possible_beginning()
             || FourthTok.tok == TokenKind::SemiSemi
         {
             //
@@ -300,7 +293,6 @@ impl SemiSemiParselet {
             ThirdTok.reset(&mut session.tokenizer);
             session.trivia_reset(trivia3);
 
-            // MUSTTAIL
             return SemiSemiParselet::reduce_binary(
                 session,
                 first_operand,

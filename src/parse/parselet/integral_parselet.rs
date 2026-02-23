@@ -49,7 +49,6 @@ impl<'i, B: ParseBuilder<'i> + 'i> PrefixParselet<'i, B> for IntegralParselet {
 
         let lhs_expr = session.parse_prefix(Tok);
 
-        // MUSTTAIL
         return IntegralParselet::parse1(
             self, session, tok_in, trivia1, lhs_expr,
         );
@@ -85,7 +84,6 @@ impl IntegralParselet {
                 first_operand,
             );
 
-            // MUSTTAIL
             return session.parse_climb(node);
         }
 
@@ -96,7 +94,6 @@ impl IntegralParselet {
         // Statically check somehow that `second_operand` is a prefix
         // parselet, because we know it is LongName_{Capital}DifferentialD
 
-        // MUSTTAIL
         let second_operand = session.parse_prefix(tok);
 
 
@@ -128,7 +125,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> InfixParselet<'i, B>
         panic!("illegal call to InfixDifferentialDParselet::parse_infix()")
     }
 
-    fn getPrecedence(
+    fn get_precedence(
         &self,
         session: &ParserSession<'i, B>,
     ) -> Option<Precedence> {

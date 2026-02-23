@@ -366,7 +366,7 @@ impl Issue {
     // }
 }
 
-pub(crate) fn SyntaxIssue(
+pub(crate) fn syntax_issue(
     tag: IssueTag,
     msg: String,
     sev: Severity,
@@ -387,7 +387,7 @@ pub(crate) fn SyntaxIssue(
     )
 }
 
-pub(crate) fn FormatIssue(
+pub(crate) fn format_issue(
     tag: IssueTag,
     msg: String,
     sev: Severity,
@@ -408,7 +408,7 @@ pub(crate) fn FormatIssue(
     )
 }
 
-pub(crate) fn EncodingIssue(
+pub(crate) fn encoding_issue(
     tag: IssueTag,
     msg: String,
     sev: Severity,

@@ -44,16 +44,6 @@ pub enum Escape {
 pub struct WLCharacter {
     pub(crate) point: CodePoint,
     escape: Escape,
-    //
-    // valBits: i32, // uint32_t valBits : 21;
-    // signBit: bool, // uint8_t signBit : 1;
-    // escapeBits: u8, // uint8_t escapeBits : 3;
-    //
-    // constexpr bool operator==(const WLCharacter& o) const {
-    //     return valBits == o.valBits &&
-    //         signBit == o.signBit &&
-    //         escapeBits == o.escapeBits;
-    // }
 }
 
 impl Debug for WLCharacter {
@@ -114,49 +104,18 @@ impl WLCharacter {
     ) -> Self {
         Self {
             point: val.into(),
-            // signBit: val < 0,
-            // escapeBits: escape,
             escape,
         }
     }
-
-    // constexpr codepoint to_point() const {
-    //     //
-    //     // Sign extend the value
-    //     //
-    //     return signBit ? (valBits | -0x200000) : valBits;
-    // }
-    // pub(crate) fn to_point(&self) -> codepoint {
-    //     if self.signBit {
-    //         self.valBits as i32 | -0x20_00_00
-    //     } else {
-    //         self.valBits as i32
-    //     }
-    // }
 
     pub(crate) fn to_point(&self) -> CodePoint {
         self.point
     }
 
-    // pub(crate) fn as_char(&self) -> char {
-    //     let val = self.to_point();
-
-    //     let val = u32::try_from(val).expect("unable to convert SourceCharacter to u32");
-
-    //     char::from_u32(val).expect("unable to convert SourceCharacter u32 to char")
-    // }
-
     pub(crate) fn escape(&self) -> Escape {
-        // self.escapeBits as Escape
         self.escape
     }
 }
-
-//
-// Sizes of structs with bit-fields are implementation-dependent
-//
-// PRE_COMMIT: Reenable
-// const _: () = assert!(std::mem::size_of::<WLCharacter>() == 4, "Check your assumptions");
 
 
 //
@@ -232,13 +191,13 @@ impl Display for WLCharacter {
                 }
             },
             Escape::LongName => {
-                let LongName: &str = codepoint_to_longname(i)
+                let long_name: &str = codepoint_to_longname(i)
                     .expect("unable to find longname for codepoint");
 
                 format_char(SourceCharacter::from('\\'))?;
                 format_char(SourceCharacter::from('['))?;
 
-                for long_name_char in LongName.chars() {
+                for long_name_char in long_name.chars() {
                     format_char(SourceCharacter::from(long_name_char))?
                 }
                 // for (size_t idx = 0; idx < LongName.len(); idx++) {
@@ -269,9 +228,9 @@ impl Display for WLCharacter {
                 let o2: u8 = (i % 8) as u8;
 
                 format_char(SourceCharacter::from('\\'))?;
-                format_char(SourceCharacter::from(fromDigit(o2)))?;
-                format_char(SourceCharacter::from(fromDigit(o1)))?;
-                format_char(SourceCharacter::from(fromDigit(o0)))?;
+                format_char(SourceCharacter::from(from_digit(o2)))?;
+                format_char(SourceCharacter::from(from_digit(o1)))?;
+                format_char(SourceCharacter::from(from_digit(o0)))?;
 
                 return Ok(());
             },
@@ -294,8 +253,8 @@ impl Display for WLCharacter {
 
                 format_char(SourceCharacter::from('\\'))?;
                 format_char(SourceCharacter::from('.'))?;
-                format_char(SourceCharacter::from(fromDigit(x1)))?;
-                format_char(SourceCharacter::from(fromDigit(x0)))?;
+                format_char(SourceCharacter::from(from_digit(x1)))?;
+                format_char(SourceCharacter::from(from_digit(x0)))?;
 
                 return Ok(());
             },
@@ -322,10 +281,10 @@ impl Display for WLCharacter {
 
                 format_char(SourceCharacter::from('\\'))?;
                 format_char(SourceCharacter::from(':'))?;
-                format_char(SourceCharacter::from(fromDigit(x3)))?;
-                format_char(SourceCharacter::from(fromDigit(x2)))?;
-                format_char(SourceCharacter::from(fromDigit(x1)))?;
-                format_char(SourceCharacter::from(fromDigit(x0)))?;
+                format_char(SourceCharacter::from(from_digit(x3)))?;
+                format_char(SourceCharacter::from(from_digit(x2)))?;
+                format_char(SourceCharacter::from(from_digit(x1)))?;
+                format_char(SourceCharacter::from(from_digit(x0)))?;
 
                 return Ok(());
             },
@@ -356,12 +315,12 @@ impl Display for WLCharacter {
 
                 format_char(SourceCharacter::from('\\'))?;
                 format_char(SourceCharacter::from('|'))?;
-                format_char(SourceCharacter::from(fromDigit(x5)))?;
-                format_char(SourceCharacter::from(fromDigit(x4)))?;
-                format_char(SourceCharacter::from(fromDigit(x3)))?;
-                format_char(SourceCharacter::from(fromDigit(x2)))?;
-                format_char(SourceCharacter::from(fromDigit(x1)))?;
-                format_char(SourceCharacter::from(fromDigit(x0)))?;
+                format_char(SourceCharacter::from(from_digit(x5)))?;
+                format_char(SourceCharacter::from(from_digit(x4)))?;
+                format_char(SourceCharacter::from(from_digit(x3)))?;
+                format_char(SourceCharacter::from(from_digit(x2)))?;
+                format_char(SourceCharacter::from(from_digit(x1)))?;
+                format_char(SourceCharacter::from(from_digit(x0)))?;
 
                 return Ok(());
             },
@@ -371,17 +330,13 @@ impl Display for WLCharacter {
 
 
 impl WLCharacter {
-    pub(crate) fn graphicalString(&self) -> String {
+    pub(crate) fn graphical_string(&self) -> String {
         // Use '#' to force the "alternate" formatting, which for a
         // SourceCharacter is the graphical representation.
         format!("{:#}", self)
-
-        // std::ostringstream String;
-        // String << set_graphical << *this << clear_graphical;
-        // return String.str();
     }
 
-    pub(crate) fn safeAndGraphicalString(&self) -> String {
+    pub(crate) fn safe_and_graphical_string(&self) -> String {
         let WLCharacter { point: _, escape } = *self;
 
         if escape == Escape::None {
@@ -389,17 +344,9 @@ impl WLCharacter {
         } else {
             return format!("{}", self);
         }
-
-        // std::ostringstream String;
-        // if (escape() == Escape::None) {
-        //     String << "\"" << *this << "\" (" << set_graphical << *this << clear_graphical << ")";
-        //     return String.str();
-        // }
-        // String << *this;
-        // return String.str();
     }
 
-    pub(crate) fn isLetterlike(&self) -> bool {
+    pub(crate) fn is_letterlike(&self) -> bool {
         //
         // Most of ASCII control characters are letterlike.
         // jessef: There may be such a thing as *too* binary-safe...
@@ -425,11 +372,11 @@ impl WLCharacter {
         }
     }
 
-    pub(crate) fn isStrangeLetterlike(&self) -> bool {
+    pub(crate) fn is_strange_letterlike(&self) -> bool {
         //
         // Dump out if not a letterlike character
         //
-        if !self.isLetterlike() {
+        if !self.is_letterlike() {
             return false;
         }
 
@@ -438,70 +385,70 @@ impl WLCharacter {
         //
         // jessef: There may be such a thing as *too* binary-safe...
         //
-        if self.isControl() {
+        if self.is_control() {
             return true;
         }
 
         return false;
     }
 
-    pub(crate) fn isWhitespace(&self) -> bool {
+    pub(crate) fn is_whitespace(&self) -> bool {
         match self.to_point() {
             Char(' ' | '\t' | ASCII_VTAB | ASCII_FORM_FEED) => true,
             _ => false,
         }
     }
 
-    pub(crate) fn isStrangeWhitespace(&self) -> bool {
+    pub(crate) fn is_strange_whitespace(&self) -> bool {
         match self.to_point() {
             Char(ASCII_VTAB | ASCII_FORM_FEED) => true,
             _ => false,
         }
     }
 
-    pub(crate) fn isUpper(&self) -> bool {
+    pub(crate) fn is_upper(&self) -> bool {
         match self.to_point() {
             Char('A'..='Z') => true,
             _ => false,
         }
     }
 
-    pub(crate) fn isAlpha(&self) -> bool {
+    pub(crate) fn is_alpha(&self) -> bool {
         match self.to_point() {
             Char('A'..='Z' | 'a'..='z') => true,
             _ => false,
         }
     }
 
-    pub(crate) fn isDigit(&self) -> bool {
+    pub(crate) fn is_digit(&self) -> bool {
         match self.to_point() {
             Char('0'..='9') => true,
             _ => false,
         }
     }
 
-    pub(crate) fn isAlphaOrDigit(&self) -> bool {
+    pub(crate) fn is_alpha_or_digit(&self) -> bool {
         match self.to_point() {
             Char('A'..='Z' | 'a'..='z' | '0'..='9') => true,
             _ => false,
         }
     }
 
-    pub(crate) fn isHex(&self) -> bool {
+    pub(crate) fn is_hex(&self) -> bool {
         match self.to_point() {
             Char('A'..='F' | 'a'..='f' | '0'..='9') => true,
             _ => false,
         }
     }
 
-    pub(crate) fn isOctal(&self) -> bool {
+    pub(crate) fn is_octal(&self) -> bool {
         match self.to_point() {
             Char('0' | '1' | '2' | '3' | '4' | '5' | '6' | '7') => true,
             _ => false,
         }
     }
 
-    pub(crate) fn isControl(&self) -> bool {
+    pub(crate) fn is_control(&self) -> bool {
         let point = self.to_point();
 
         if !point.is_ascii() {
@@ -518,7 +465,7 @@ impl WLCharacter {
         }
     }
 
-    pub(crate) fn isSign(&self) -> bool {
+    pub(crate) fn is_sign(&self) -> bool {
         match self.to_point() {
             Char('-' | '+') => true,
             _ => false,
@@ -529,7 +476,7 @@ impl WLCharacter {
     // Multi-byte character properties
     //
 
-    pub(crate) fn isMBLinearSyntax(&self) -> bool {
+    pub(crate) fn is_mb_linear_syntax(&self) -> bool {
         match self.to_point() {
             CodePoint::Char(
                 CODEPOINT_LINEARSYNTAX_CLOSEPAREN
@@ -550,7 +497,7 @@ impl WLCharacter {
         }
     }
 
-    pub(crate) fn isMBStringMeta(&self) -> bool {
+    pub(crate) fn is_mb_string_meta(&self) -> bool {
         let val = self.to_point();
 
         match val {
@@ -567,20 +514,20 @@ impl WLCharacter {
         }
     }
 
-    /// isLetterlikeCharacter is special because it is defined in terms of other categories
+    /// is_letterlikeCharacter is special because it is defined in terms of other categories
     ///
     /// basically, if it's not anything else, then it's letterlike
-    pub(crate) fn isMBLetterlike(&self) -> bool {
+    pub(crate) fn is_mb_letterlike(&self) -> bool {
         let val = self.to_point();
 
         //
-        // Reject if single byte, should use isLetterlike()
+        // Reject if single byte, should use is_letterlike()
         //
         if val.is_ascii() {
             return false;
         }
 
-        if self.isMBPunctuation() {
+        if self.is_mb_punctuation() {
             return false;
         }
 
@@ -596,64 +543,64 @@ impl WLCharacter {
             return false;
         }
 
-        if self.isMBLineContinuation() {
+        if self.is_mb_line_continuation() {
             return false;
         }
 
-        if self.isMBLinearSyntax() {
+        if self.is_mb_linear_syntax() {
             return false;
         }
 
-        if self.isMBStringMeta() {
+        if self.is_mb_string_meta() {
             return false;
         }
 
-        if self.isMBWhitespace() {
+        if self.is_mb_whitespace() {
             return false;
         }
 
-        if self.isMBNewline() {
+        if self.is_mb_newline() {
             return false;
         }
 
-        if self.isMBUninterpretable() {
+        if self.is_mb_uninterpretable() {
             return false;
         }
 
-        if self.isMBUnsafeUTF8Sequence() {
+        if self.is_mb_unsafe_utf8_sequence() {
             return false;
         }
 
         return true;
     }
 
-    pub(crate) fn isMBStrangeLetterlike(&self) -> bool {
+    pub(crate) fn is_mb_strange_letterlike(&self) -> bool {
         //
         // Dump out if not a letterlike character
         //
-        if !self.isMBLetterlike() {
+        if !self.is_mb_letterlike() {
             return false;
         }
 
-        return !LongNames::isMBNotStrangeLetterlike(self.to_point());
+        return !LongNames::is_mb_not_strange_letterlike(self.to_point());
     }
 
-    pub(crate) fn isMBStrangeWhitespace(&self) -> bool {
+    pub(crate) fn is_mb_strange_whitespace(&self) -> bool {
         //
         // Dump out if not a space character
         //
-        if !self.isMBWhitespace() {
+        if !self.is_mb_whitespace() {
             return false;
         }
 
         return true;
     }
 
-    pub(crate) fn isMBStrangeNewline(&self) -> bool {
+    pub(crate) fn is_mb_strange_newline(&self) -> bool {
         //
         // Dump out if not a newline character
         //
-        if !self.isMBNewline() {
+        if !self.is_mb_newline() {
             return false;
         }
 
@@ -680,20 +627,20 @@ impl WLCharacter {
         return true;
     }
 
-    pub(crate) fn isMBNewline(&self) -> bool {
+    pub(crate) fn is_mb_newline(&self) -> bool {
         let val = self.to_point();
 
-        return LongNames::isMBNewline(val);
+        return LongNames::is_mb_newline(val);
     }
 
-    pub(crate) fn isMBWhitespace(&self) -> bool {
+    pub(crate) fn is_mb_whitespace(&self) -> bool {
         let val = self.to_point();
 
         //
         // Handle COMPATIBILITY characters here
         //
         // Cannot use LongNames data here, because the long name \[COMPATIBILITYNoBreak] is Unsupported and
-        // LongNames::isMBWhitespace(val) returns false
+        // LongNames::is_mb_whitespace(val) returns false
         //
         // But the actual *character* U+F3A2 is whitespace
         //
@@ -703,18 +650,18 @@ impl WLCharacter {
             return true;
         }
 
-        return LongNames::isMBWhitespace(val);
+        return LongNames::is_mb_whitespace(val);
     }
 
-    pub(crate) fn isMBPunctuation(&self) -> bool {
-        return LongNames::isMBPunctuation(self.to_point());
+    pub(crate) fn is_mb_punctuation(&self) -> bool {
+        return LongNames::is_mb_punctuation(self.to_point());
     }
 
-    pub(crate) fn isMBUninterpretable(&self) -> bool {
-        return LongNames::isMBUninterpretable(self.to_point());
+    pub(crate) fn is_mb_uninterpretable(&self) -> bool {
+        return LongNames::is_mb_uninterpretable(self.to_point());
     }
 
-    pub(crate) fn isMBLineContinuation(&self) -> bool {
+    pub(crate) fn is_mb_line_continuation(&self) -> bool {
         match self.to_point() {
             LineContinuation_LineFeed
             | LineContinuation_CarriageReturn
@@ -723,7 +670,7 @@ impl WLCharacter {
         }
     }
 
-    pub(crate) fn isMBUnsafeUTF8Sequence(&self) -> bool {
+    pub(crate) fn is_mb_unsafe_utf8_sequence(&self) -> bool {
         match self.to_point() {
             Unsafe1ByteUtf8Sequence
             | Unsafe2ByteUtf8Sequence
@@ -754,6 +701,6 @@ const FROM_DIGIT_LOOKUP: [char; 256] = [
     '!',
 ];
 
-fn fromDigit(d: u8) -> char {
+fn from_digit(d: u8) -> char {
     return FROM_DIGIT_LOOKUP[usize::from(d)];
 }

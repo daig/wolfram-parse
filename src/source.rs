@@ -114,7 +114,7 @@ impl<'i> BufferAndLength<'i> {
     }
 
     #[allow(dead_code)]
-    pub fn containsOnlyASCII(&self) -> bool {
+    pub fn contains_only_ascii(&self) -> bool {
         for c in self.as_bytes() {
             // TODO: Use is_ascii()
             if *c > 0x7f {
@@ -126,7 +126,7 @@ impl<'i> BufferAndLength<'i> {
     }
 
     #[allow(dead_code)]
-    pub fn containsTab(&self) -> bool {
+    pub fn contains_tab(&self) -> bool {
         // TODO: Use .contains() for performance.
         for c in self.as_bytes() {
             if *c == 0x09 {
@@ -225,8 +225,8 @@ pub(crate) mod NextPolicyBits {
         NextPolicy(0x01);
 
     //
-    /// when inside Tokenizer_currentWLCharacter, then do not track line continuations
-    /// since Tokenizer_currentWLCharacter is implemented as Tokenizer_nextWLCharacter that is then reset, there should be no side-effects
+    /// when inside tokenizer_current_wl_character, then do not track line continuations
+    /// since tokenizer_current_wl_character is implemented as tokenizer_next_wl_character that is then reset, there should be no side-effects
     //
     pub(crate) const TRACK_LC: NextPolicy = NextPolicy(0x02);
 
@@ -1247,28 +1247,28 @@ impl PartialOrd for Source {
 //==========================================================
 
 impl SourceCharacter {
-    pub fn isAlphaOrDigit(&self) -> bool {
+    pub fn is_alpha_or_digit(&self) -> bool {
         match self {
             CodePoint::Char(c) => c.is_alphanumeric(),
             _ => false,
         }
     }
 
-    pub fn isHex(&self) -> bool {
+    pub fn is_hex(&self) -> bool {
         match self {
             CodePoint::Char(c) => c.is_digit(16),
             _ => false,
         }
     }
 
-    pub fn isOctal(self) -> bool {
+    pub fn is_octal(self) -> bool {
         match self {
             CodePoint::Char(val) => '0' <= val && val <= '7',
             _ => false,
         }
     }
 
-    pub fn isUpper(&self) -> bool {
+    pub fn is_upper(&self) -> bool {
         // return std::isupper(val);
         match self {
             CodePoint::Char(c) => c.is_ascii_uppercase(),
@@ -1276,7 +1276,7 @@ impl SourceCharacter {
         }
     }
 
-    pub fn isEndOfFile(&self) -> bool {
+    pub fn is_end_of_file(&self) -> bool {
         // let Self { val } = self;
         // return val == EOF;
 
@@ -1287,7 +1287,7 @@ impl SourceCharacter {
     }
 
     #[allow(dead_code)]
-    pub fn isNewline(&self) -> bool {
+    pub fn is_newline(&self) -> bool {
         // FIXME: What about SpecialCodePoint::CRLF, which is a kind of newline / whitespace?
         match self {
             CodePoint::Char('\n' | '\r') => true,
@@ -1296,7 +1296,7 @@ impl SourceCharacter {
     }
 
     #[allow(dead_code)]
-    pub fn isWhitespace(self) -> bool {
+    pub fn is_whitespace(self) -> bool {
         // FIXME: What about SpecialCodePoint::CRLF, which is a kind of newline / whitespace?
         match self {
             CodePoint::Char(' ' | '\t' | ASCII_VTAB | ASCII_FORM_FEED) => true,
@@ -1304,15 +1304,15 @@ impl SourceCharacter {
         }
     }
 
-    pub fn isMBNewline(self) -> bool {
-        return LongNames::isMBNewline(self);
+    pub fn is_mb_newline(self) -> bool {
+        return LongNames::is_mb_newline(self);
     }
 
-    pub fn isMBWhitespace(self) -> bool {
-        return LongNames::isMBWhitespace(self);
+    pub fn is_mb_whitespace(self) -> bool {
+        return LongNames::is_mb_whitespace(self);
     }
 
-    pub fn isMBUnsafeUTF8Sequence(&self) -> bool {
+    pub fn is_mb_unsafe_utf8_sequence(&self) -> bool {
         match self {
             Unsafe1ByteUtf8Sequence
             | Unsafe2ByteUtf8Sequence
@@ -1321,7 +1321,7 @@ impl SourceCharacter {
         }
     }
 
-    pub fn graphicalString(&self) -> String {
+    pub fn graphical_string(&self) -> String {
         // Use '#' to force the "alternate" formatting, which for a
         // SourceCharacter is the graphical representation.
         format!("{:#}", self)
@@ -1331,7 +1331,7 @@ impl SourceCharacter {
         // return String.str();
     }
 
-    pub fn safeAndGraphicalString(&self) -> String {
+    pub fn safe_and_graphical_string(&self) -> String {
         format!("\"{}\" ({:#})", self, self)
 
         // std::ostringstream String;
@@ -1353,7 +1353,7 @@ impl Display for SourceCharacter {
 
             assert!(val != CodePoint::EndOfFile);
 
-            crate::byte_encoder::encodeBytes(stream, val)?;
+            crate::byte_encoder::encode_bytes(stream, val)?;
 
             return Ok(());
         }
@@ -1529,7 +1529,7 @@ impl Display for SourceCharacter {
         // Do not use CodePointToLongNameMap to find Raw names
         //
 
-        crate::byte_encoder::encodeBytes(stream, CodePoint::Char(val))?;
+        crate::byte_encoder::encode_bytes(stream, CodePoint::Char(val))?;
 
         return Ok(());
     }

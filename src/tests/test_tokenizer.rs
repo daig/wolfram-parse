@@ -186,9 +186,9 @@ fn TokenizerTest_Basic4() {
 
     let mut tokenizer = Tokenizer::new(arr, &ParseOptions::default());
 
-    assert_eq!(tokenizer.SrcLoc, src!(1:1).into());
+    assert_eq!(tokenizer.src_loc, src!(1:1).into());
 
-    assert_eq!(tokenizer.wasEOF, false);
+    assert_eq!(tokenizer.was_eof, false);
 
     let mut Tok = tokenizer.peek_token();
 
@@ -197,9 +197,9 @@ fn TokenizerTest_Basic4() {
         token!(Error_UnsafeCharacterEncoding, [0xff], src!(1:1-1:2))
     );
 
-    assert_eq!(tokenizer.SrcLoc, src!(1:1).into());
+    assert_eq!(tokenizer.src_loc, src!(1:1).into());
 
-    assert_eq!(tokenizer.wasEOF, false);
+    assert_eq!(tokenizer.was_eof, false);
 
     Tok.skip(&mut tokenizer);
 
@@ -209,9 +209,9 @@ fn TokenizerTest_Basic4() {
 
     Tok.skip(&mut tokenizer);
 
-    assert_eq!(tokenizer.SrcLoc, src!(1:2).into());
+    assert_eq!(tokenizer.src_loc, src!(1:2).into());
 
-    assert_eq!(tokenizer.wasEOF, true);
+    assert_eq!(tokenizer.was_eof, true);
 
     assert_eq!(tokenizer.non_fatal_issues.len(), 0);
     assert_eq!(tokenizer.fatal_issues.len(), 1);

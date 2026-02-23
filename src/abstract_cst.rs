@@ -373,7 +373,7 @@ fn abstract_<I: TokenInput + Debug, S: TokenSource + Debug>(
                                 Ast::call(
                                     st::Slot,
                                     vec![Ast::string(
-                                        escapeString_of_abstractSymbolString(
+                                        escape_string_of_abstract_symbol_string(
                                             s.as_str(),
                                         ),
                                         data1,
@@ -390,7 +390,7 @@ fn abstract_<I: TokenInput + Debug, S: TokenSource + Debug>(
                                 Ast::call(
                                     st::Slot,
                                     vec![Ast::string(
-                                        escapeString_of_abstractSymbolString(
+                                        escape_string_of_abstract_symbol_string(
                                             s.as_str(),
                                         ),
                                         data1,
@@ -435,14 +435,14 @@ fn abstract_<I: TokenInput + Debug, S: TokenSource + Debug>(
             PrefixOperator::Plus => {
                 let [_, rand] = expect_children(children);
 
-                abstractPrefixPlus(rand, data)
+                abstract_prefix_plus(rand, data)
             },
 
             // PrefixNode[PrefixNot2, {notNotTok_, rand_}, data_]
             PrefixOperator::CodeParser_PrefixNot2 => {
                 let [notNotTok, rand] = expect_children(children);
 
-                abstractNot2(rand, notNotTok, data)
+                abstract_not2(rand, notNotTok, data)
             },
 
             PrefixOperator::CodeParser_PrefixLinearSyntaxBang => {
@@ -495,7 +495,7 @@ fn abstract_<I: TokenInput + Debug, S: TokenSource + Debug>(
                     }) => Ast::call(
                         st::Get,
                         vec![Ast::string(
-                            escapeString_of_abstractFileString(str.as_str()),
+                            escape_string_of_abstract_file_string(str.as_str()),
                             data1,
                         )],
                         data,
@@ -536,7 +536,7 @@ fn abstract_<I: TokenInput + Debug, S: TokenSource + Debug>(
                             ..
                         }) => {
                             let (order, abstractedBody) =
-                                derivativeOrderAndAbstractedBody(operand);
+                                derivative_order_and_abstracted_body(operand);
 
                             Ast::call2(
                                 Ast::call(
@@ -583,7 +583,7 @@ fn abstract_<I: TokenInput + Debug, S: TokenSource + Debug>(
 
             match op {
                 BinaryOperator::Divide => {
-                    abstractTimes_BinaryNode_Divide([left, right], data)
+                    abstract_times_binary_node_divide([left, right], data)
                 },
 
                 BinaryOperator::CodeParser_BinaryAt => {
@@ -635,7 +635,7 @@ fn abstract_<I: TokenInput + Debug, S: TokenSource + Debug>(
                         vec![
                             abstract_(left),
                             Ast::string(
-                                escapeString_of_abstractFileString(str),
+                                escape_string_of_abstract_file_string(str),
                                 data1,
                             ),
                         ],
@@ -706,7 +706,7 @@ fn abstract_<I: TokenInput + Debug, S: TokenSource + Debug>(
             match op {
                 // InfixNode[InfixInequality, children_, data_]
                 InfixOperator::CodeParser_InfixInequality => {
-                    abstractInfixInequality(children, data)
+                    abstract_infix_inequality(children, data)
                 },
 
                 // Handle SameQ and UnsameQ specially because they do not
@@ -728,7 +728,7 @@ fn abstract_<I: TokenInput + Debug, S: TokenSource + Debug>(
                 InfixOperator::Plus => {
                     // Do not do children[[;;;;2]]
                     // need to remember whether Token`Plus or Token`Minus
-                    abstractPlus(children, data)
+                    abstract_plus(children, data)
                 },
 
                 // InfixNode[Times, children_, data_]
@@ -737,7 +737,7 @@ fn abstract_<I: TokenInput + Debug, S: TokenSource + Debug>(
                     //   children[[;; ;; 2]]
                     let children = part_span_even_children(children, None);
 
-                    abstractTimes_InfixNode(
+                    abstract_times_infix_node(
                         InfixNode(OperatorNode {
                             op: InfixOperator::Times,
                             children: NodeSeq(children),
@@ -753,7 +753,7 @@ fn abstract_<I: TokenInput + Debug, S: TokenSource + Debug>(
                     let processed = children
                         .into_iter()
                         .map(|node| {
-                            processInfixBinaryAtQuirk(node, "Divisible")
+                            process_infix_binary_at_quirk(node, "Divisible")
                         })
                         // make sure to reverse children of Divisible
                         .rev()
@@ -793,7 +793,7 @@ fn abstract_<I: TokenInput + Debug, S: TokenSource + Debug>(
                     let children =
                         part_span_even_children(children, Some(TK::ColonColon));
 
-                    abstractMessageName(children, data)
+                    abstract_message_name(children, data)
                 },
 
                 InfixOperator::CodeParser_InfixTilde => {
@@ -803,11 +803,11 @@ fn abstract_<I: TokenInput + Debug, S: TokenSource + Debug>(
                         Some(TokenKind::Tilde),
                     );
 
-                    abstractInfixTilde(children, AstMetadata::from_src(data))
+                    abstract_infix_tilde(children, AstMetadata::from_src(data))
                 },
 
                 // abstract[InfixNode[op_, children_ /; OddQ[Length[children]], data_]] :=
-                //   CallNode[ToNode[op], abstract /@ (processInfixBinaryAtQuirk[#, ToString[op]]& /@ children[[;;;;2]]), data]
+                //   CallNode[ToNode[op], abstract /@ (process_infix_binary_at_quirk[#, ToString[op]]& /@ children[[;;;;2]]), data]
                 _ => {
                     if !is_odd(children.len()) {
                         unhandled()
@@ -821,7 +821,7 @@ fn abstract_<I: TokenInput + Debug, S: TokenSource + Debug>(
                     let children = children
                         .into_iter()
                         .map(|child| {
-                            processInfixBinaryAtQuirk(
+                            process_infix_binary_at_quirk(
                                 child,
                                 op.to_symbol().symbol_name().as_str(),
                             )
@@ -1112,7 +1112,7 @@ fn abstract_<I: TokenInput + Debug, S: TokenSource + Debug>(
                 },
 
                 // GroupNode[tag_, children_, data_]
-                _ => Ast::from(abstractGroupNode(GroupNode(OperatorNode {
+                _ => Ast::from(abstract_group_node(GroupNode(OperatorNode {
                     op,
                     children,
                 }))),
@@ -1124,7 +1124,7 @@ fn abstract_<I: TokenInput + Debug, S: TokenSource + Debug>(
         //==============================
         Cst::GroupMissingCloser(node) => {
             let (op, abstracted_children, data) =
-                abstractGroupNode_GroupMissingCloserNode(node);
+                abstract_group_node_group_missing_closer_node(node);
 
             Ast::GroupMissingCloser {
                 kind: op,
@@ -1137,7 +1137,7 @@ fn abstract_<I: TokenInput + Debug, S: TokenSource + Debug>(
         // GroupMissingOpenerNode
         //==============================
         Cst::GroupMissingOpener(node) => {
-            abstractGroupNode_GroupMissingOpenerNode(node)
+            abstract_group_node_group_missing_opener_node(node)
         },
 
         //=================
@@ -1347,7 +1347,7 @@ fn abstract_replace_token<I: TokenInput, S: TokenSource>(
             Ast::symbol_with_data(st::Null, data)
         },
 
-        kind if kind.isError() => Ast::Error {
+        kind if kind.is_error() => Ast::Error {
             kind,
             input: input.into_owned(),
             data: AstMetadata::from_src(data),
@@ -1431,7 +1431,7 @@ pub(crate) fn expect_children<I: Debug, S: Debug, const N: usize>(
 
 
 /// Ported composition of `escapeString(abstractSymbolString(s))`.
-fn escapeString_of_abstractSymbolString(s: &str) -> String {
+fn escape_string_of_abstract_symbol_string(s: &str) -> String {
     // FIXME: This is made up. Consult original WL source and finish porting
     //        this function.
     if s.starts_with('"') {
@@ -1444,7 +1444,7 @@ fn escapeString_of_abstractSymbolString(s: &str) -> String {
 }
 
 /// Ported composition of `escapeString(abstractFileString(s))`.
-fn escapeString_of_abstractFileString(s: &str) -> String {
+fn escape_string_of_abstract_file_string(s: &str) -> String {
     // FIXME: This is made up. Consult original WL source and finish porting
     //        this function.
     if s.starts_with('"') {
@@ -1569,10 +1569,10 @@ fn unhandled() -> ! {
 // negate
 //--------------------------------------
 
-fn parenthesizedIntegerOrRealQ<I: Debug, S: Debug>(node: &Cst<I, S>) -> bool {
+fn parenthesized_integer_or_real_q<I: Debug, S: Debug>(node: &Cst<I, S>) -> bool {
     match node {
-        // parenthesizedIntegerOrRealQ[GroupNode[GroupParen, { _, child_, _ }, _]] :=
-        //     parenthesizedIntegerOrRealQ[child]
+        // parenthesized_integer_or_real_q[GroupNode[GroupParen, { _, child_, _ }, _]] :=
+        //     parenthesized_integer_or_real_q[child]
         Cst::Group(GroupNode(OperatorNode {
             op: GroupOperator::CodeParser_GroupParen,
             children,
@@ -1582,28 +1582,28 @@ fn parenthesizedIntegerOrRealQ<I: Debug, S: Debug>(node: &Cst<I, S>) -> bool {
                     "GroupParen Group node has unexpected number of children",
                 );
 
-            parenthesizedIntegerOrRealQ(child)
+            parenthesized_integer_or_real_q(child)
         },
-        // parenthesizedIntegerOrRealQ[LeafNode[Integer, _, _]] := True
-        // parenthesizedIntegerOrRealQ[LeafNode[Real, _, _]] := True
+        // parenthesized_integer_or_real_q[LeafNode[Integer, _, _]] := True
+        // parenthesized_integer_or_real_q[LeafNode[Real, _, _]] := True
         Cst::Token(Token {
             tok: TokenKind::Integer | TokenKind::Real,
             input: _,
             src: _,
         }) => true,
-        // parenthesizedIntegerOrRealQ[_] := False
+        // parenthesized_integer_or_real_q[_] := False
         _ => false,
     }
 }
 
-fn extractParenthesizedIntegerOrRealQ<I: Debug, S: Debug>(
+fn extract_parenthesized_integer_or_real_q<I: Debug, S: Debug>(
     node: Cst<I, S>,
 ) -> Cst<I, S> {
-    debug_assert!(parenthesizedIntegerOrRealQ(&node));
+    debug_assert!(parenthesized_integer_or_real_q(&node));
 
     match node {
-        // parenthesizedIntegerOrRealQ[GroupNode[GroupParen, { _, child_, _ }, _]] :=
-        //     parenthesizedIntegerOrRealQ[child]
+        // parenthesized_integer_or_real_q[GroupNode[GroupParen, { _, child_, _ }, _]] :=
+        //     parenthesized_integer_or_real_q[child]
         Cst::Group(GroupNode(OperatorNode {
             op: GroupOperator::CodeParser_GroupParen,
             children: NodeSeq(children),
@@ -1620,37 +1620,37 @@ fn extractParenthesizedIntegerOrRealQ<I: Debug, S: Debug>(
 
 // TODO(optimization): Make this take a `&Cst`, so we don't have to
 //                     clone at the callsite to this function.
-fn possiblyNegatedZeroQ<I: TokenInput + Debug, S: Debug>(
+fn possibly_negated_zero_q<I: TokenInput + Debug, S: Debug>(
     node: Cst<I, S>,
 ) -> bool {
     match node {
-        // possiblyNegatedZeroQ[LeafNode[Integer, "0", _]] := True
+        // possibly_negated_zero_q[LeafNode[Integer, "0", _]] := True
         Cst::Token(Token {
             tok: TokenKind::Integer,
             input,
             src: _,
         }) if input.as_str() == "0" => true,
-        // possiblyNegatedZeroQ[GroupNode[GroupParen, { _, child_, _ }, _]] :=
-        //     possiblyNegatedZeroQ[child]
+        // possibly_negated_zero_q[GroupNode[GroupParen, { _, child_, _ }, _]] :=
+        //     possibly_negated_zero_q[child]
         Cst::Group(GroupNode(OperatorNode {
             op: GroupOperator::CodeParser_GroupParen,
             children,
         })) => {
             expect_children!(children, {_, child:_, _});
 
-            possiblyNegatedZeroQ(child)
+            possibly_negated_zero_q(child)
         },
-        // possiblyNegatedZeroQ[PrefixNode[Minus, { _, child_}, _]] :=
-        //     possiblyNegatedZeroQ[child]
+        // possibly_negated_zero_q[PrefixNode[Minus, { _, child_}, _]] :=
+        //     possibly_negated_zero_q[child]
         Cst::Prefix(PrefixNode(OperatorNode {
             op: PrefixOperator::Minus,
             children,
         })) => {
             expect_children!(children, {_, child:_});
 
-            possiblyNegatedZeroQ(child)
+            possibly_negated_zero_q(child)
         },
-        // possiblyNegatedZeroQ[_] := False
+        // possibly_negated_zero_q[_] := False
         _ => false,
     }
 }
@@ -1711,7 +1711,7 @@ impl<I: TokenInput + Debug, S: TokenSource + Debug> Negated<I, S> {
                     head,
                     mut args,
                     data,
-                } = abstractTimes_InfixNode(infix, data)
+                } = abstract_times_infix_node(infix, data)
                 else {
                     panic!("expected InfixNode after abstract Times")
                 };
@@ -1769,7 +1769,7 @@ fn negate<I: TokenInput + Debug, S: TokenSource + Debug>(
     })) = node.clone()
     {
         // TODO(optimization): Avoid this clone().
-        if possiblyNegatedZeroQ(children[1].clone()) {
+        if possibly_negated_zero_q(children[1].clone()) {
             return negate(children.remove(1));
         }
     }
@@ -1781,13 +1781,13 @@ fn negate<I: TokenInput + Debug, S: TokenSource + Debug>(
     })) = node.clone()
     {
         // TODO(optimization): Avoid this clone().
-        if possiblyNegatedZeroQ(children[1].clone()) {
+        if possibly_negated_zero_q(children[1].clone()) {
             return negate(children.remove(1));
         }
     }
 
-    if parenthesizedIntegerOrRealQ(&node) {
-        let child = extractParenthesizedIntegerOrRealQ(node);
+    if parenthesized_integer_or_real_q(&node) {
+        let child = extract_parenthesized_integer_or_real_q(node);
         return negate(child);
     }
 
@@ -1844,7 +1844,7 @@ impl<I: TokenInput + Debug, S: TokenSource + Debug> Reciprocate<I, S> {
 //======================================
 
 /// Collect all of the `'` in `f'''[x]`
-fn derivativeOrderAndAbstractedBody<
+fn derivative_order_and_abstracted_body<
     I: TokenInput + Debug,
     S: TokenSource + Debug,
 >(
@@ -1857,7 +1857,7 @@ fn derivativeOrderAndAbstractedBody<
         })) => {
             let [rand, _] = expect_children(children);
 
-            let (order, body) = derivativeOrderAndAbstractedBody(rand);
+            let (order, body) = derivative_order_and_abstracted_body(rand);
 
             (order + 1, body)
         },
@@ -1867,7 +1867,7 @@ fn derivativeOrderAndAbstractedBody<
 
 //======================================
 
-fn processPlusPair<I: TokenInput + Debug, S: TokenSource + Debug>(
+fn process_plus_pair<I: TokenInput + Debug, S: TokenSource + Debug>(
     pair: [Cst<I, S>; 2],
 ) -> Operand<I, S> {
     match pair {
@@ -1900,7 +1900,7 @@ fn processPlusPair<I: TokenInput + Debug, S: TokenSource + Debug>(
 // is it a quirk that  a + + b  is parsed as  a + b  ?
 // The prefix + is eaten
 // TODO: add to kernel quirks mode
-fn flattenPrefixPlus<I: Debug, S: Debug>(node: Cst<I, S>) -> Cst<I, S> {
+fn flatten_prefix_plus<I: Debug, S: Debug>(node: Cst<I, S>) -> Cst<I, S> {
     match node {
         Cst::Prefix(PrefixNode(OperatorNode {
             op: PrefixOperator::Plus,
@@ -1908,7 +1908,7 @@ fn flattenPrefixPlus<I: Debug, S: Debug>(node: Cst<I, S>) -> Cst<I, S> {
         })) => {
             let [_, rand] = expect_children(children);
 
-            flattenPrefixPlus(rand)
+            flatten_prefix_plus(rand)
         },
         rand => rand,
     }
@@ -1923,7 +1923,7 @@ fn flattenPrefixPlus<I: Debug, S: Debug>(node: Cst<I, S>) -> Cst<I, S> {
 /// Related bugs: 365287
 ///
 /// TODO: add 365287 to kernel quirks mode
-fn abstractPlus<I: TokenInput + Debug, S: TokenSource + Debug>(
+fn abstract_plus<I: TokenInput + Debug, S: TokenSource + Debug>(
     children: Vec<Cst<I, S>>,
     data: S,
 ) -> Ast {
@@ -1937,13 +1937,13 @@ fn abstractPlus<I: TokenInput + Debug, S: TokenSource + Debug>(
         })
         .collect();
 
-    let processedPairs = pairs.into_iter().map(processPlusPair);
+    let processed_pairs = pairs.into_iter().map(process_plus_pair);
 
     let children = std::iter::once(Operand::Cst(children[0].clone()))
-        .chain(processedPairs)
+        .chain(processed_pairs)
         .map(|node| match node {
-            Operand::Cst(node) => abstract_(flattenPrefixPlus(
-                processInfixBinaryAtQuirk(node, "Plus"),
+            Operand::Cst(node) => abstract_(flatten_prefix_plus(
+                process_infix_binary_at_quirk(node, "Plus"),
             )),
             // NOTE: These cases wouldn't be effected by the flatten prefix
             //       plus or process infix binary at quirk because their
@@ -1964,7 +1964,7 @@ fn abstractPlus<I: TokenInput + Debug, S: TokenSource + Debug>(
 /// The first + is eaten
 ///
 /// TODO: add to kernel quirks mode
-fn abstractPrefixPlus<I: TokenInput + Debug, S: TokenSource + Debug>(
+fn abstract_prefix_plus<I: TokenInput + Debug, S: TokenSource + Debug>(
     rand: Cst<I, S>,
     data: S,
 ) -> Ast {
@@ -1976,7 +1976,7 @@ fn abstractPrefixPlus<I: TokenInput + Debug, S: TokenSource + Debug>(
         })) => {
             let [_, rand] = expect_children(children);
 
-            abstractPrefixPlus(rand, data)
+            abstract_prefix_plus(rand, data)
         },
         // rand_, data_
         _ => Ast::call(st::Plus, vec![abstract_(rand)], data),
@@ -1991,7 +1991,7 @@ fn abstractPrefixPlus<I: TokenInput + Debug, S: TokenSource + Debug>(
 ///
 /// The sequence returned from this function will be the arguments
 /// to a `Times[...]` expression.
-fn flattenTimes<I: TokenInput + Debug, S: TokenSource + Debug>(
+fn flatten_times<I: TokenInput + Debug, S: TokenSource + Debug>(
     nodes: Vec<Cst<I, S>>,
     data: S,
 ) -> Vec<Operand<I, S>> {
@@ -2006,7 +2006,7 @@ where
     I: TokenInput + Debug,
     S: TokenSource + Debug,
 {
-    let flattenTimesQuirk = quirks::is_quirk_enabled(Quirk::FlattenTimes);
+    let flatten_times_quirk = quirks::is_quirk_enabled(Quirk::FlattenTimes);
 
     match node {
         // These rules for PrefixNode illustrate the difference between the FE and kernel
@@ -2027,16 +2027,16 @@ where
                     input: _,
                     src: _,
                 }) => vec![Operand::Negated(negate(operand), data.clone())],
-                // PrefixNode[Minus, { _, _?parenthesizedIntegerOrRealQ }, _]
-                _ if parenthesizedIntegerOrRealQ(&operand) => {
+                // PrefixNode[Minus, { _, _?parenthesized_integer_or_real_q }, _]
+                _ if parenthesized_integer_or_real_q(&operand) => {
                     vec![Operand::Negated(negate(operand), data.clone())]
                 },
                 // PrefixNode[Minus, {_, _}, _]
                 _ => {
-                    if flattenTimesQuirk {
+                    if flatten_times_quirk {
                         // (*
                         // it is possible to have nested prefix Minus, e.g., - - a
-                        // so must call recursively into flattenTimes
+                        // so must call recursively into flatten_times
                         //
                         // TID:231012/3 -- "- - a"
                         // TID:231012/4 -- "- - a * b"
@@ -2060,7 +2060,7 @@ where
         })) => {
             let children = part_span_even_children(children, Some(TK::Star));
 
-            flattenTimes(children, data.clone())
+            flatten_times(children, data.clone())
         },
         // This rule for BinaryNode[Divide] illustrates the difference between the FE and kernel
         //
@@ -2070,7 +2070,7 @@ where
             op: BinaryOperator::Divide,
             ref children,
         })) => {
-            if flattenTimesQuirk {
+            if flatten_times_quirk {
                 let [left, _, right] = expect_children(children.clone());
 
                 // TID:231010/1
@@ -2087,7 +2087,7 @@ where
 }
 
 // InfixNode[Times, children_, data_]
-fn abstractTimes_InfixNode<I: TokenInput + Debug, S: TokenSource + Debug>(
+fn abstract_times_infix_node<I: TokenInput + Debug, S: TokenSource + Debug>(
     infix: InfixNode<I, S>,
     data: S,
 ) -> Ast {
@@ -2098,13 +2098,13 @@ fn abstractTimes_InfixNode<I: TokenInput + Debug, S: TokenSource + Debug>(
 
     debug_assert!(op == InfixOperator::Times);
 
-    let flattened = flattenTimes(children, data.clone());
+    let flattened = flatten_times(children, data.clone());
 
     let children: Vec<Ast> = flattened
         .into_iter()
         .map(|node| match node {
             Operand::Cst(node) => {
-                abstract_(processInfixBinaryAtQuirk(node, "Times"))
+                abstract_(process_infix_binary_at_quirk(node, "Times"))
             },
             Operand::NegativeOne => leaf!(Integer, "-1", <||>),
             Operand::Negated(negated, data) => negated.into_ast(data),
@@ -2116,7 +2116,7 @@ fn abstractTimes_InfixNode<I: TokenInput + Debug, S: TokenSource + Debug>(
 }
 
 // BinaryNode[Divide, {left_, right_}, data_]
-fn abstractTimes_BinaryNode_Divide<
+fn abstract_times_binary_node_divide<
     I: TokenInput + Debug,
     S: TokenSource + Debug,
 >(
@@ -2143,7 +2143,7 @@ fn abstractTimes_BinaryNode_Divide<
 
 //======================================
 
-pub(crate) fn processInfixBinaryAtQuirk<
+pub(crate) fn process_infix_binary_at_quirk<
     I: TokenInput + Debug,
     S: TokenSource + Debug,
 >(
@@ -2214,7 +2214,7 @@ pub(crate) fn processInfixBinaryAtQuirk<
 // concrete syntax: a::"b"
 // abstract syntax MessageName[a, "b"]
 // *)
-fn abstractMessageName<I: TokenInput + Debug, S: TokenSource + Debug>(
+fn abstract_message_name<I: TokenInput + Debug, S: TokenSource + Debug>(
     mut children: Vec<Cst<I, S>>,
     data: S,
 ) -> Ast {
@@ -2256,7 +2256,7 @@ fn abstractMessageName<I: TokenInput + Debug, S: TokenSource + Debug>(
             input: str,
             src: data,
         }) => Ast::string(
-            escapeString_of_abstractSymbolString(str.as_str()),
+            escape_string_of_abstract_symbol_string(str.as_str()),
             data,
         ),
         // FIXME: The original WL here didn't call abstract[..] here. Is that
@@ -2272,7 +2272,7 @@ fn abstractMessageName<I: TokenInput + Debug, S: TokenSource + Debug>(
 /// attempt to simplify e.g. Inequality[a, Less, b, Less, c] to Less[a, b, c]
 ///
 /// Also integrate the newer VectorInequality functionality
-fn abstractInfixInequality<I: TokenInput + Debug, S: TokenSource + Debug>(
+fn abstract_infix_inequality<I: TokenInput + Debug, S: TokenSource + Debug>(
     children: Vec<Cst<I, S>>,
     data: S,
 ) -> Ast {
@@ -2289,7 +2289,7 @@ fn abstractInfixInequality<I: TokenInput + Debug, S: TokenSource + Debug>(
             let left = match left {
                 Cst::Token(token) => token,
                 other => panic!(
-                    "abstractInfixInequality: expected odd index to contain Token; got: {other:?}"
+                    "abstract_infix_inequality: expected odd index to contain Token; got: {other:?}"
                 ),
             };
 
@@ -2303,16 +2303,16 @@ fn abstractInfixInequality<I: TokenInput + Debug, S: TokenSource + Debug>(
     let mut affinity = None;
 
     for (rator, rand) in pairs {
-        let rator: Symbol = inequalityOperatorToSymbol(rator.tok);
+        let rator: Symbol = inequality_operator_to_symbol(rator.tok);
         let rand = abstract_(rand);
 
-        if vectorInequalityAffinity(rator) == Some(false) {
+        if vector_inequality_affinity(rator) == Some(false) {
             if affinity == Some(true) {
                 // (*
                 // affinity is True, so all operators up to now are 1 sub node
                 // *)
                 processed = (
-                    simplifyInfixInequality(processed, affinity, data.clone()),
+                    simplify_infix_inequality(processed, affinity, data.clone()),
                     vec![(rator, rand)],
                 );
             } else {
@@ -2322,13 +2322,13 @@ fn abstractInfixInequality<I: TokenInput + Debug, S: TokenSource + Debug>(
             // affinity is definitely False now
             //
             affinity = Some(false);
-        } else if vectorInequalityAffinity(rator) == Some(true) {
+        } else if vector_inequality_affinity(rator) == Some(true) {
             if affinity == Some(false) {
                 //
                 // affinity is True, so all operators up to now are 1 sub node
                 //
                 processed = (
-                    simplifyInfixInequality(processed, affinity, data.clone()),
+                    simplify_infix_inequality(processed, affinity, data.clone()),
                     vec![(rator, rand)],
                 );
             } else {
@@ -2343,10 +2343,10 @@ fn abstractInfixInequality<I: TokenInput + Debug, S: TokenSource + Debug>(
         }
     }
 
-    simplifyInfixInequality(processed, affinity, data)
+    simplify_infix_inequality(processed, affinity, data)
 }
 
-fn simplifyInfixInequality<S: TokenSource>(
+fn simplify_infix_inequality<S: TokenSource>(
     processed: (Ast, Vec<(Symbol, Ast)>),
     affinity: Option<bool>,
     data: S,
@@ -2510,7 +2510,7 @@ fn simplifyInfixInequality<S: TokenSource>(
     }
 }
 
-fn inequalityOperatorToSymbol(tok: TokenKind) -> Symbol {
+fn inequality_operator_to_symbol(tok: TokenKind) -> Symbol {
     use crate::symbols as sym;
 
     match tok {
@@ -2565,13 +2565,13 @@ fn inequalityOperatorToSymbol(tok: TokenKind) -> Symbol {
         TK::LongName_VectorGreaterEqual => sym::VectorGreaterEqual,
 
         other => panic!(
-            "inequalityOperatorToSymbol(): token '{other:?}' is not a known inequality operator"
+            "inequality_operator_to_symbol(): token '{other:?}' is not a known inequality operator"
         ),
     }
 }
 
 
-fn vectorInequalityAffinity(op: Symbol) -> Option<bool> {
+fn vector_inequality_affinity(op: Symbol) -> Option<bool> {
     use crate::symbols as sym;
 
     let boole = match op {
@@ -2627,7 +2627,7 @@ fn vectorInequalityAffinity(op: Symbol) -> Option<bool> {
         | sym::VectorLessEqual
         | sym::VectorGreaterEqual => true,
 
-        _ => panic!("vectorInequalityAffinity(): unrecognized symbol: {op:?}"),
+        _ => panic!("vector_inequality_affinity(): unrecognized symbol: {op:?}"),
     };
 
     Some(boole)
@@ -2639,7 +2639,7 @@ fn vectorInequalityAffinity(op: Symbol) -> Option<bool> {
 // only from boxes
 //
 
-fn abstractInfixTilde<I: TokenInput + Debug, S: TokenSource + Debug>(
+fn abstract_infix_tilde<I: TokenInput + Debug, S: TokenSource + Debug>(
     children: Vec<Cst<I, S>>,
     data: AstMetadata,
 ) -> Ast {
@@ -2660,7 +2660,7 @@ fn abstractInfixTilde<I: TokenInput + Debug, S: TokenSource + Debug>(
         [_, _, _] => {
             let [left, middle, right] = expect_children(NodeSeq(children));
 
-            abstractInfixTildeLeftAlreadyAbstracted(
+            abstract_infix_tilde_left_already_abstracted(
                 abstract_(left),
                 vec![middle, right],
                 data,
@@ -2673,8 +2673,8 @@ fn abstractInfixTilde<I: TokenInput + Debug, S: TokenSource + Debug>(
             let right = right.clone();
             let rest = rest.to_vec();
 
-            abstractInfixTildeLeftAlreadyAbstracted(
-                abstractInfixTilde(
+            abstract_infix_tilde_left_already_abstracted(
+                abstract_infix_tilde(
                     vec![left, middle, right],
                     AstMetadata::empty(),
                 ),
@@ -2683,12 +2683,12 @@ fn abstractInfixTilde<I: TokenInput + Debug, S: TokenSource + Debug>(
             )
         },
         _ => panic!(
-            "abstractInfixTilde: invalid number of children: {children:?}"
+            "abstract_infix_tilde: invalid number of children: {children:?}"
         ),
     }
 }
 
-fn abstractInfixTildeLeftAlreadyAbstracted<
+fn abstract_infix_tilde_left_already_abstracted<
     I: TokenInput + Debug,
     S: TokenSource + Debug,
 >(
@@ -2717,19 +2717,19 @@ fn abstractInfixTildeLeftAlreadyAbstracted<
             let right = right.clone();
             let rest = rest.to_vec();
 
-            abstractInfixTildeLeftAlreadyAbstracted(
-                abstractInfixTildeLeftAlreadyAbstracted(left, vec![middle, right], AstMetadata::empty()),
+            abstract_infix_tilde_left_already_abstracted(
+                abstract_infix_tilde_left_already_abstracted(left, vec![middle, right], AstMetadata::empty()),
                 rest,
                 data,
             )
         },
-        _ => panic!("abstractInfixTildeLeftAlreadyAbstracted: invalid number of rest: {rest:?}"),
+        _ => panic!("abstract_infix_tilde_left_already_abstracted: invalid number of rest: {rest:?}"),
     }
 }
 
 
 //======================================
-// abstractGroupNode
+// abstract_group_node
 //======================================
 
 /// Precondition: Opener and Closer are still present
@@ -2738,7 +2738,7 @@ fn abstractInfixTildeLeftAlreadyAbstracted<
 /// Removes all commas
 ///
 /// Fills in Nulls and gives SyntaxIssues for e.g. {1,,2}
-fn abstractGroupNode<
+fn abstract_group_node<
     I: TokenInput + Debug,
     S: TokenSource + Debug,
     O: Operator,
@@ -2755,11 +2755,11 @@ fn abstractGroupNode<
     // children = children[[2 ;; -2]];
     let children = part_span_drop_first_and_last(children);
 
-    // abstractedChildren = Flatten[selectChildren /@ (abstract /@ children)];
+    // abstractedChildren = Flatten[select_children /@ (abstract /@ children)];
     let abstracted_children = children
         .into_iter()
         .map(abstract_)
-        .flat_map(|child: Ast| selectChildren(child))
+        .flat_map(|child: Ast| select_children(child))
         .collect();
 
     /*  FIXME: Port this issues handling code
@@ -2773,7 +2773,7 @@ fn abstractGroupNode<
     // CallNode[ToNode[tag], abstractedChildren, data]
     AstCall {
         // TODO(clean): Is this head field read anywhere in the callers of
-        //              abstractGroupNode()? I don't think so, since the
+        //              abstract_group_node()? I don't think so, since the
         //              ToNode_Op(tag) where tag is CodeParser`* are not valid
         //              abstract syntax nodes anyway.
         head: Box::new(Ast::symbol(tag.to_symbol())),
@@ -2782,7 +2782,7 @@ fn abstractGroupNode<
     }
 }
 
-fn abstractGroupNode_GroupMissingCloserNode<
+fn abstract_group_node_group_missing_closer_node<
     I: TokenInput + Debug,
     S: TokenSource + Debug,
     O,
@@ -2802,13 +2802,13 @@ fn abstractGroupNode_GroupMissingCloserNode<
     let abstractedChildren = children
         .into_iter()
         .map(abstract_)
-        .flat_map(selectChildren)
+        .flat_map(select_children)
         .collect();
 
     (op, abstractedChildren, AstMetadata::from_src(data))
 }
 
-fn abstractGroupNode_GroupMissingOpenerNode<
+fn abstract_group_node_group_missing_opener_node<
     I: TokenInput + Debug,
     S: TokenSource + Debug,
 >(
@@ -2827,7 +2827,7 @@ fn abstractGroupNode_GroupMissingOpenerNode<
     let abstracted_children = children
         .into_iter()
         .map(abstract_)
-        .flat_map(selectChildren)
+        .flat_map(select_children)
         .collect();
 
     Ast::GroupMissingOpener {
@@ -2838,10 +2838,10 @@ fn abstractGroupNode_GroupMissingOpenerNode<
 }
 
 
-fn selectChildren(node: Ast) -> Vec<Ast> {
-    // selectChildren[CallNode[ToNode[Comma], children_, _]] := children
+fn select_children(node: Ast) -> Vec<Ast> {
+    // select_children[CallNode[ToNode[Comma], children_, _]] := children
     //
-    // selectChildren[n_] := n
+    // select_children[n_] := n
     match node {
         // TODO(cleanup): Refactor how Comma nodes are abstracted so that
         //                fake Ast::Call of CodeParser`Comma heads is not
@@ -2873,7 +2873,7 @@ fn selectChildren(node: Ast) -> Vec<Ast> {
 
 //======================================
 
-fn abstractNot2<I: TokenInput + Debug, S: TokenSource + Debug>(
+fn abstract_not2<I: TokenInput + Debug, S: TokenSource + Debug>(
     rand: Cst<I, S>,
     notNotTok: Cst<I, S>,
     data: S,

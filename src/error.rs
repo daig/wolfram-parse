@@ -24,7 +24,7 @@ pub(crate) fn reparse_unterminated<'i>(
     nodes.visit_mut(&mut |node| {
         let Cst::Token(token) = node else { return };
 
-        if token.tok.isError() && token.tok.isUnterminated() {
+        if token.tok.is_error() && token.tok.is_unterminated() {
             reparse_unterminated_token_error_node(token, input, tab_width);
         }
     });
@@ -44,7 +44,7 @@ pub(crate) fn reparse_unterminated_tokens<'i>(
     let NodeSeq(mut tokens) = tokens;
 
     for token in &mut tokens {
-        if token.tok.isError() && token.tok.isUnterminated() {
+        if token.tok.is_error() && token.tok.is_unterminated() {
             reparse_unterminated_token_error_node(token, input, tab_width);
         }
     }
@@ -131,7 +131,7 @@ fn reparse_unterminated_token_error_node<'i>(
     str: &'i str,
     tab_width: u32,
 ) {
-    debug_assert!(error.tok.isError() && error.tok.isUnterminated());
+    debug_assert!(error.tok.is_error() && error.tok.is_unterminated());
 
     // TODO: Use `input` here to optimize the process_lines() calculation?
     let Token {
@@ -183,7 +183,7 @@ fn reparse_unterminated_token_error_node<'i>(
             make_better_input(better_str2)
         },
         SpanKind::CharacterSpan(better_src) => {
-            let better_str: &str = StringTake(str, better_src);
+            let better_str: &str = string_take(str, better_src);
 
             make_better_input(better_str)
         },
@@ -264,7 +264,7 @@ fn first_chunk_and_last_good_line(
                         #[[1]] + 1,
                         #[[2]]
                     }& /@ Partition[
-                        FoldList[#1 + StringLength[#2[[1]]] + StringLength[#2[[2]]]&, 0, lines],
+                        FoldList[#1 + string_length[#2[[1]]] + string_length[#2[[2]]]&, 0, lines],
                         2,
                         1
                     ];
@@ -377,7 +377,7 @@ fn is_new_statement_line(line: &str) -> bool {
             }
 
             // Remove whitespace that isn't at the very start of the line.
-            if tok.tok.isTrivia() {
+            if tok.tok.is_trivia() {
                 match tok.src.start() {
                     Location::LineColumn(LineColumn(_, NonZeroU32::MIN))
                     | Location::CharacterIndex(0) => return true,
@@ -515,7 +515,7 @@ fn to_lines_and_expand_tabs(input: &str, _tab_width: u32) -> Vec<Line> {
     Line::split(input)
 
     // FIXME: Expand tabs? Needed to make the CharacterIndex Source positions
-    //        work with StringTake[..] in WL.
+    //        work with string_take[..] in WL.
     //
     //        Though, this is the only place (at least in compiled code I've
     //        looked carefully at) where the original input string is modified.
@@ -533,14 +533,14 @@ fn to_lines_and_expand_tabs(input: &str, _tab_width: u32) -> Vec<Line> {
     //     .collect();
 }
 
-fn StringLength(s: &str) -> usize {
-    // FIXME: StringLength is NOT equal to string byte count. StringLengh counts
+fn string_length(s: &str) -> usize {
+    // FIXME: string_length is NOT equal to string byte count. StringLengh counts
     //        WL characters (e.g. \[Alpha] counts as 1 character), but
     //        String::len() counts bytes. This is wrong.
     s.len()
 }
 
-fn StringTake(s: &str, range: CharacterSpan) -> &str {
+fn string_take(s: &str, range: CharacterSpan) -> &str {
     // FIXME: This treats WL characters as bytes.
     &s[range.to_rust_range()]
 }
@@ -565,7 +565,7 @@ fn lines_start_and_end_char_indexes(
 
         current_character_index = current_character_index
             .checked_add(
-                u32::try_from(StringLength(content) + StringLength(newline))
+                u32::try_from(string_length(content) + string_length(newline))
                     .unwrap(),
             )
             // Unlikely that this will fail, but could happen if

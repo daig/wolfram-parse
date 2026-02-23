@@ -18,8 +18,8 @@ use crate::{
     precedence::Precedence,
     source::*,
     tokenize::{
-        token_kind::{Closer, GroupOpenerToCloser, TokenToCloser},
-        tokenizer::Tokenizer_currentToken_stringifyAsTag,
+        token_kind::{Closer, group_opener_to_closer, token_to_closer},
+        tokenizer::tokenizer_current_token_stringify_as_tag,
         Token, TokenKind, TokenRef,
     },
 };
@@ -58,12 +58,12 @@ pub(crate) trait InfixParselet<'i, B: ParseBuilder<'i> + 'i>:
         token: TokenRef<'i>,
     ) -> B::Node;
 
-    fn getPrecedence(
+    fn get_precedence(
         &self,
         session: &ParserSession<'i, B>,
     ) -> Option<Precedence>;
 
-    fn getOp(&self) -> InfixParseletOperator {
+    fn get_op(&self) -> InfixParseletOperator {
         // TODO: Make this sentinel value unnecessary?
         return InfixParseletOperator::Infix(
             InfixOperator::CodeParser_InternalInvalid,
@@ -155,86 +155,86 @@ impl_Parselet!(
 );
 
 #[derive(Debug)]
-pub(crate) struct CallParselet /*: public InfixParselet*/ {
+pub(crate) struct CallParselet {
     GP: GroupParselet,
 }
 
 #[derive(Debug)]
-pub(crate) struct LeafParselet /* : PrefixParselet */ {}
+pub(crate) struct LeafParselet {}
 
 
 #[derive(Debug)]
-pub(crate) struct PrefixEndOfFileParselet /* : PrefixParselet */ {}
+pub(crate) struct PrefixEndOfFileParselet {}
 
 
 #[derive(Debug)]
-pub(crate) struct PrefixErrorParselet /* : PrefixParselet */ {}
+pub(crate) struct PrefixErrorParselet {}
 
 
 #[derive(Debug)]
-pub(crate) struct PrefixCloserParselet /* : PrefixParselet */ {}
+pub(crate) struct PrefixCloserParselet {}
 
 
 #[derive(Debug)]
-pub(crate) struct PrefixToplevelCloserParselet /* : PrefixParselet */ {}
+pub(crate) struct PrefixToplevelCloserParselet {}
 
 
 #[derive(Debug)]
-pub(crate) struct PrefixUnsupportedTokenParselet /* : PrefixParselet */ {}
+pub(crate) struct PrefixUnsupportedTokenParselet {}
 
 
 //
 // The comma infix operator can have leading commas with no operand
 //
 #[derive(Debug)]
-pub(crate) struct PrefixCommaParselet /* : PrefixParselet */ {}
+pub(crate) struct PrefixCommaParselet {}
 
 
 //
 // All other unhandleds are handled here
 //
 #[derive(Debug)]
-pub(crate) struct PrefixUnhandledParselet /* : PrefixParselet */ {}
+pub(crate) struct PrefixUnhandledParselet {}
 
 
 #[derive(Debug)]
-pub(crate) struct PrefixOperatorParselet /* : PrefixParselet */ {
+pub(crate) struct PrefixOperatorParselet {
     precedence: Precedence,
     Op: PrefixOperator,
 }
 
 #[derive(Debug)]
-pub(crate) struct PrefixAssertFalseParselet /* : InfixParselet */ {}
+pub(crate) struct PrefixAssertFalseParselet {}
 
 #[derive(Debug)]
-pub(crate) struct InfixImplicitTimesParselet /* : InfixParselet */ {}
+pub(crate) struct InfixImplicitTimesParselet {}
 
 
 #[derive(Debug)]
-pub(crate) struct InfixAssertFalseParselet /* : InfixParselet */ {}
+pub(crate) struct InfixAssertFalseParselet {}
 
 
 //
 // InfixDifferentialDParselet only exists to properly supply precedence, depending on context
 //
 #[derive(Debug)]
-pub(crate) struct InfixDifferentialDParselet /* : InfixParselet */ {}
+pub(crate) struct InfixDifferentialDParselet {}
 
 
 
 #[derive(Debug)]
-pub(crate) struct InfixToplevelNewlineParselet /* : InfixParselet */ {}
+pub(crate) struct InfixToplevelNewlineParselet {}
 
 
 #[derive(Debug)]
-pub(crate) struct BinaryOperatorParselet /* : InfixParselet */ {
+pub(crate) struct BinaryOperatorParselet {
     precedence: Precedence,
     Op: BinaryOperator,
 }
 
 
 #[derive(Debug)]
-pub(crate) struct InfixOperatorParselet /* : InfixParselet */ {
+pub(crate) struct InfixOperatorParselet {
     precedence: Precedence,
     Op: InfixOperator,
 }
@@ -244,26 +244,26 @@ pub(crate) struct InfixOperatorParselet /* : InfixParselet */ {
 //
 //
 #[derive(Debug)]
-pub(crate) struct TimesParselet /* : InfixParselet */ {}
+pub(crate) struct TimesParselet {}
 
 
 
 #[derive(Debug)]
-pub(crate) struct PostfixOperatorParselet /* : InfixParselet */ {
+pub(crate) struct PostfixOperatorParselet {
     precedence: Precedence,
     Op: PostfixOperator,
 }
 
 
 #[derive(Debug)]
-pub(crate) struct GroupParselet /* : PrefixParselet */ {
+pub(crate) struct GroupParselet {
     Op: GroupOperator,
     closer: Closer,
 }
 
 
 #[derive(Debug)]
-pub(crate) struct SymbolParselet /* : PrefixParselet */ {}
+pub(crate) struct SymbolParselet {}
 
 
 //
@@ -271,7 +271,7 @@ pub(crate) struct SymbolParselet /* : PrefixParselet */ {}
 // multiple inheritance
 //
 #[derive(Debug)]
-pub(crate) struct CommaParselet /* : InfixParselet */ {}
+pub(crate) struct CommaParselet {}
 
 
 //
@@ -279,7 +279,7 @@ pub(crate) struct CommaParselet /* : InfixParselet */ {}
 // multiple inheritance
 //
 #[derive(Debug)]
-pub(crate) struct SemiParselet /* : InfixParselet */ {}
+pub(crate) struct SemiParselet {}
 
 
 //
@@ -287,39 +287,39 @@ pub(crate) struct SemiParselet /* : InfixParselet */ {}
 // multiple inheritance
 //
 #[derive(Debug)]
-pub(crate) struct SemiSemiParselet /* : public PrefixParselet, public InfixParselet */
+pub(crate) struct SemiSemiParselet
 {}
 
 
 
 #[derive(Debug)]
-pub(crate) struct TildeParselet /* : InfixParselet */ {}
+pub(crate) struct TildeParselet {}
 
 
 #[derive(Debug)]
-pub(crate) struct ColonParselet /* : InfixParselet */ {}
+pub(crate) struct ColonParselet {}
 
 
 #[derive(Debug)]
-pub(crate) struct SlashColonParselet /* : InfixParselet */ {}
+pub(crate) struct SlashColonParselet {}
 
 
 #[derive(Debug)]
-pub(crate) struct EqualParselet /* : BinaryOperatorParselet */ {
+pub(crate) struct EqualParselet {
     // EqualParselet();
     op: BinaryOperatorParselet,
 }
 
 
 #[derive(Debug)]
-pub(crate) struct ColonEqualParselet /* : BinaryOperatorParselet */ {
+pub(crate) struct ColonEqualParselet {
     // ColonEqualParselet();
     op: BinaryOperatorParselet,
 }
 
 
 #[derive(Debug, Copy, Clone)]
-pub(crate) struct IntegralParselet /* : PrefixParselet */ {
+pub(crate) struct IntegralParselet {
     pub(crate) Op1: PrefixBinaryOperator,
     pub(crate) Op2: PrefixOperator,
 }
@@ -327,35 +327,35 @@ pub(crate) struct IntegralParselet /* : PrefixParselet */ {
 
 
 #[derive(Debug)]
-pub(crate) struct ColonColonParselet /* : InfixParselet */ {}
+pub(crate) struct ColonColonParselet {}
 
 
 #[derive(Debug)]
-pub(crate) struct GreaterGreaterParselet /* : InfixParselet */ {}
+pub(crate) struct GreaterGreaterParselet {}
 
 
 #[derive(Debug)]
-pub(crate) struct GreaterGreaterGreaterParselet /* : InfixParselet */ {}
+pub(crate) struct GreaterGreaterGreaterParselet {}
 
 
 #[derive(Debug)]
-pub(crate) struct LessLessParselet /* : PrefixParselet */ {}
+pub(crate) struct LessLessParselet {}
 
 
 #[derive(Debug)]
-pub(crate) struct HashParselet /* : PrefixParselet */ {}
+pub(crate) struct HashParselet {}
 
 
 #[derive(Debug)]
-pub(crate) struct HashHashParselet /* : PrefixParselet */ {}
+pub(crate) struct HashHashParselet {}
 
 
 #[derive(Debug)]
-pub(crate) struct PercentParselet /* : PrefixParselet */ {}
+pub(crate) struct PercentParselet {}
 
 
 #[derive(Debug)]
-pub(crate) struct UnderParselet /* : PrefixParselet */ {
+pub(crate) struct UnderParselet {
     /// Operator used if this underscore pattern does not bind a named pattern
     pub BOp: CompoundOperator,
 
@@ -365,7 +365,7 @@ pub(crate) struct UnderParselet /* : PrefixParselet */ {
 
 
 #[derive(Debug)]
-pub(crate) struct UnderDotParselet /* : PrefixParselet */ {}
+pub(crate) struct UnderDotParselet {}
 
 
 
@@ -381,7 +381,6 @@ impl<'i, B: ParseBuilder<'i> + 'i> PrefixParselet<'i, B> for LeafParselet {
     ) -> B::Node {
         let node = session.push_leaf_and_next(tok_in);
 
-        // MUSTTAIL
         return session.parse_climb(node);
     }
 }
@@ -398,7 +397,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> PrefixParselet<'i, B>
         session: &mut ParserSession<'i, B>,
         tok_in: TokenRef<'i>,
     ) -> B::Node {
-        assert!(tok_in.tok.isError());
+        assert!(tok_in.tok.is_error());
 
         let node = session.push_leaf_and_next(tok_in);
 
@@ -418,7 +417,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> PrefixParselet<'i, B>
         session: &mut ParserSession<'i, B>,
         tok_in: TokenRef<'i>,
     ) -> B::Node {
-        assert!(tok_in.tok.isCloser());
+        assert!(tok_in.tok.is_closer());
 
         panic_if_aborted!();
 
@@ -458,7 +457,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> PrefixParselet<'i, B>
         session: &mut ParserSession<'i, B>,
         tok_in: TokenRef<'i>,
     ) -> B::Node {
-        assert!(tok_in.tok.isCloser());
+        assert!(tok_in.tok.is_closer());
 
         panic_if_aborted!();
 
@@ -559,7 +558,6 @@ impl<'i, B: ParseBuilder<'i> + 'i> PrefixParselet<'i, B>
 
         let node = session.push_leaf(Token::at_start(kind, tok_in));
 
-        // MUSTTAIL
         return session.parse_climb(node);
     }
 }
@@ -576,7 +574,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> PrefixParselet<'i, B>
         session: &mut ParserSession<'i, B>,
         tok_in: TokenRef<'i>,
     ) -> B::Node {
-        assert!(!tok_in.tok.isPossibleBeginning(), "handle at call site");
+        assert!(!tok_in.tok.is_possible_beginning(), "handle at call site");
 
         panic_if_aborted!();
 
@@ -593,7 +591,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> PrefixParselet<'i, B>
         let _ = session.tokenizer.peek_token();
 
         let TokenPrecedence = B::with_infix_parselet(tok_in.tok, |parselet| {
-            parselet.getPrecedence(session)
+            parselet.get_precedence(session)
         });
 
         //
@@ -620,7 +618,6 @@ impl<'i, B: ParseBuilder<'i> + 'i> PrefixParselet<'i, B>
 
         session.push_context(TokenPrecedence);
 
-        // MUSTTAIL
         return session.parse_infix(node, B::empty_trivia(), tok_in);
     }
 }
@@ -642,7 +639,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> InfixParselet<'i, B>
         panic!("invalid infix toplevel newline parselet")
     }
 
-    fn getPrecedence(&self, _: &ParserSession<'i, B>) -> Option<Precedence> {
+    fn get_precedence(&self, _: &ParserSession<'i, B>) -> Option<Precedence> {
         //
         // Do not do Implicit Times across top-level newlines
         //
@@ -753,7 +750,6 @@ impl<'i, B: ParseBuilder<'i> + 'i> PrefixParselet<'i, B> for SymbolParselet {
         // Something like  a
         //
 
-        // MUSTTAIL
         return session.push_and_climb(tok_in);
     }
 }
@@ -770,7 +766,7 @@ impl PrefixOperatorParselet {
         PrefixOperatorParselet { precedence, Op }
     }
 
-    fn getPrecedence(&self) -> Option<Precedence> {
+    fn get_precedence(&self) -> Option<Precedence> {
         return Some(self.precedence);
     }
 }
@@ -787,7 +783,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> PrefixParselet<'i, B>
 
         let tok_in = session.push_syntax_and_next(tok_in);
 
-        let _ = session.push_context(self.getPrecedence());
+        let _ = session.push_context(self.get_precedence());
 
         let (trivia, tok) = session.current_token_eat_trivia();
 
@@ -817,7 +813,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> InfixParselet<'i, B>
         panic!("invalid infix implicit times parselet")
     }
 
-    fn getPrecedence(
+    fn get_precedence(
         &self,
         _session: &ParserSession<'i, B>,
     ) -> Option<Precedence> {
@@ -841,7 +837,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> InfixParselet<'i, B>
 impl<'i, B: ParseBuilder<'i> + 'i> PrefixParselet<'i, B>
     for PrefixAssertFalseParselet
 {
-    // fn getPrecedence(&self, session: &mut ParserSession<'i, B>) -> Option<Precedence> {
+    // fn get_precedence(&self, session: &mut ParserSession<'i, B>) -> Option<Precedence> {
     //     None
     // }
 
@@ -872,7 +868,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> InfixParselet<'i, B>
         panic!("unexpected infix assert false parselet")
     }
 
-    fn getPrecedence(
+    fn get_precedence(
         &self,
         _session: &ParserSession<'i, B>,
     ) -> Option<Precedence> {
@@ -909,7 +905,6 @@ impl<'i, B: ParseBuilder<'i> + 'i> InfixParselet<'i, B>
 
         let (trivia2, tok) = session.current_token_eat_trivia();
 
-        // MUSTTAIL
         let rhs_node = session.parse_prefix(tok);
 
         let node = session.reduce_binary(
@@ -919,14 +914,14 @@ impl<'i, B: ParseBuilder<'i> + 'i> InfixParselet<'i, B>
         return session.parse_climb(node);
     }
 
-    fn getPrecedence(
+    fn get_precedence(
         &self,
         _session: &ParserSession<'i, B>,
     ) -> Option<Precedence> {
         Some(self.precedence)
     }
 
-    fn getOp(&self) -> InfixParseletOperator {
+    fn get_op(&self) -> InfixParseletOperator {
         self.Op.into()
     }
 }
@@ -976,14 +971,14 @@ impl<'i, B: ParseBuilder<'i> + 'i> InfixParselet<'i, B>
         return self.parse_loop(session, infix_state);
     }
 
-    fn getPrecedence(
+    fn get_precedence(
         &self,
         _session: &ParserSession<'i, B>,
     ) -> Option<Precedence> {
         Some(self.precedence)
     }
 
-    fn getOp(&self) -> InfixParseletOperator {
+    fn get_op(&self) -> InfixParseletOperator {
         self.Op.into()
     }
 }
@@ -1013,12 +1008,12 @@ impl InfixOperatorParselet {
             //
             // then just compare parselets directly here
             //
-            // if tok1.tok.infix_parselet().getOp() != self.getOp() {
+            // if tok1.tok.infix_parselet().get_op() != self.get_op() {
 
             let tok1_op =
-                B::with_infix_parselet(tok1.tok, |parselet| parselet.getOp());
+                B::with_infix_parselet(tok1.tok, |parselet| parselet.get_op());
 
-            if tok1_op != <Self as InfixParselet<'i, B>>::getOp(self) {
+            if tok1_op != <Self as InfixParselet<'i, B>>::get_op(self) {
                 //
                 // Tok.tok != tok_in.tok, so break
                 //
@@ -1027,7 +1022,6 @@ impl InfixOperatorParselet {
 
                 let node = session.reduce_infix(infix_state);
 
-                // MUSTTAIL
                 return session.parse_climb(node);
             }
 
@@ -1075,18 +1069,17 @@ impl<'i, B: ParseBuilder<'i> + 'i> InfixParselet<'i, B>
 
         let node = session.reduce_postfix(self.Op, finished, trivia1, tok_in);
 
-        // MUSTTAIL
         return session.parse_climb(node);
     }
 
-    fn getPrecedence(
+    fn get_precedence(
         &self,
         _session: &ParserSession<'i, B>,
     ) -> Option<Precedence> {
         Some(self.precedence)
     }
 
-    fn getOp(&self) -> InfixParseletOperator {
+    fn get_op(&self) -> InfixParseletOperator {
         InfixParseletOperator::Postfix(self.Op)
     }
 }
@@ -1099,7 +1092,7 @@ impl GroupParselet {
     pub(crate) const fn new(Opener: TokenKind, Op: GroupOperator) -> Self {
         Self {
             Op,
-            closer: GroupOpenerToCloser(Opener),
+            closer: group_opener_to_closer(Opener),
         }
     }
 }
@@ -1112,7 +1105,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> PrefixParselet<'i, B> for GroupParselet {
     ) -> B::Node {
         panic_if_aborted!();
 
-        session.push_group(GroupOpenerToCloser(tok_in.tok));
+        session.push_group(group_opener_to_closer(tok_in.tok));
 
 
         //------------------------------
@@ -1139,7 +1132,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> PrefixParselet<'i, B> for GroupParselet {
 
             let (trivia1, tok) = session.current_token();
 
-            if TokenToCloser(tok.tok) == self.closer {
+            if token_to_closer(tok.tok) == self.closer {
                 //
                 // Everything is good
                 //
@@ -1150,16 +1143,15 @@ impl<'i, B: ParseBuilder<'i> + 'i> PrefixParselet<'i, B> for GroupParselet {
                 let node =
                     session.reduce_group(self.Op, group_state, trivia1, tok);
 
-                // MUSTTAIL
                 return session.parse_climb(node);
             }
 
-            if tok.tok.isCloser() {
+            if tok.tok.is_closer() {
                 //
                 // some other closer
                 //
 
-                if session.check_group(TokenToCloser(tok.tok)) {
+                if session.check_group(token_to_closer(tok.tok)) {
                     //
                     // Something like  { ( }
                     //                     ^
@@ -1199,7 +1191,6 @@ impl<'i, B: ParseBuilder<'i> + 'i> PrefixParselet<'i, B> for GroupParselet {
                 // Handle something like   { a EOF
                 //
 
-                // MUSTTAIL
                 let node = session.reduce_unterminated_group(
                     self.Op,
                     group_state,
@@ -1255,7 +1246,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> InfixParselet<'i, B> for CallParselet {
         return session.parse_climb(node);
     }
 
-    fn getPrecedence(
+    fn get_precedence(
         &self,
         _session: &ParserSession<'i, B>,
     ) -> Option<Precedence> {
@@ -1312,7 +1303,6 @@ impl<'i, B: ParseBuilder<'i> + 'i> InfixParselet<'i, B> for TildeParselet {
                     middle_node,
                 });
 
-            // MUSTTAIL
             return session.parse_climb(node);
         }
 
@@ -1338,7 +1328,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> InfixParselet<'i, B> for TildeParselet {
         return session.parse_climb(node);
     }
 
-    fn getPrecedence(
+    fn get_precedence(
         &self,
         _session: &ParserSession<'i, B>,
     ) -> Option<Precedence> {
@@ -1430,7 +1420,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> InfixParselet<'i, B> for ColonParselet {
         }
     }
 
-    fn getPrecedence(
+    fn get_precedence(
         &self,
         session: &ParserSession<'i, B>,
     ) -> Option<Precedence> {
@@ -1534,11 +1524,10 @@ impl<'i, B: ParseBuilder<'i> + 'i> InfixParselet<'i, B> for SlashColonParselet {
 
         let node = session.reduce_syntax_error(SyntaxErrorData::ExpectedSet);
 
-        // MUSTTAIL
         return session.parse_climb(node);
     }
 
-    fn getPrecedence(
+    fn get_precedence(
         &self,
         _session: &ParserSession<'i, B>,
     ) -> Option<Precedence> {
@@ -1595,7 +1584,6 @@ impl<'i, B: ParseBuilder<'i> + 'i> InfixParselet<'i, B> for EqualParselet {
                 tok,
             );
 
-            // MUSTTAIL
             return session.parse_climb(node);
         }
 
@@ -1613,11 +1601,11 @@ impl<'i, B: ParseBuilder<'i> + 'i> InfixParselet<'i, B> for EqualParselet {
         return session.parse_climb(node);
     }
 
-    fn getPrecedence(
+    fn get_precedence(
         &self,
         session: &ParserSession<'i, B>,
     ) -> Option<Precedence> {
-        self.op.getPrecedence(session)
+        self.op.get_precedence(session)
     }
 }
 
@@ -1667,7 +1655,6 @@ impl EqualParselet {
                 tok,
             );
 
-            // MUSTTAIL
             return session.parse_climb(node);
         }
 
@@ -1736,11 +1723,11 @@ impl<'i, B: ParseBuilder<'i> + 'i> InfixParselet<'i, B> for ColonEqualParselet {
         return session.parse_climb(node);
     }
 
-    fn getPrecedence(
+    fn get_precedence(
         &self,
         session: &ParserSession<'i, B>,
     ) -> Option<Precedence> {
-        self.op.getPrecedence(session)
+        self.op.get_precedence(session)
     }
 }
 
@@ -1839,7 +1826,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> InfixParselet<'i, B> for CommaParselet {
         return CommaParselet::parse_loop(session, infix_state);
     }
 
-    fn getPrecedence(
+    fn get_precedence(
         &self,
         _session: &ParserSession<'i, B>,
     ) -> Option<Precedence> {
@@ -1866,7 +1853,6 @@ impl CommaParselet {
 
                 let node = session.reduce_infix(infix_state);
 
-                // MUSTTAIL
                 return CommaParselet::reduce_comma(session, node);
             }
 
@@ -1911,7 +1897,6 @@ impl CommaParselet {
         //
         // was:
         //
-        //    MUSTTAIL
         //    return Parser_parseClimb(ignored, ignored2);
 
         //
@@ -1976,7 +1961,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> InfixParselet<'i, B> for SemiParselet {
             return SemiParselet::parse_loop(session, infix_state);
         }
 
-        if tok2.tok.isPossibleBeginning() {
+        if tok2.tok.is_possible_beginning() {
             //
             // Something like  a;+2
             //
@@ -2015,11 +2000,10 @@ impl<'i, B: ParseBuilder<'i> + 'i> InfixParselet<'i, B> for SemiParselet {
         // nextToken() is not needed after an implicit token
         //
 
-        // MUSTTAIL
         return SemiParselet::reduce_CompoundExpression(session, infix_state);
     }
 
-    fn getPrecedence(
+    fn get_precedence(
         &self,
         _session: &ParserSession<'i, B>,
     ) -> Option<Precedence> {
@@ -2045,7 +2029,6 @@ impl SemiParselet {
 
                 session.trivia_reset(trivia1);
 
-                // MUSTTAIL
                 return SemiParselet::reduce_CompoundExpression(
                     session,
                     infix_state,
@@ -2089,7 +2072,7 @@ impl SemiParselet {
                 continue;
             }
 
-            if tok2.tok.isPossibleBeginning() {
+            if tok2.tok.is_possible_beginning() {
                 //
                 // Something like  a;b;+2
                 //
@@ -2128,7 +2111,6 @@ impl SemiParselet {
             // nextToken() is not needed after an implicit token
             //
 
-            // MUSTTAIL
             return SemiParselet::reduce_CompoundExpression(
                 session,
                 infix_state,
@@ -2177,7 +2159,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> InfixParselet<'i, B> for ColonColonParselet {
         //
 
         let Tok2 =
-            Tokenizer_currentToken_stringifyAsTag(&mut session.tokenizer);
+            tokenizer_current_token_stringify_as_tag(&mut session.tokenizer);
 
         let second_operand = session.push_leaf_and_next(Tok2);
 
@@ -2191,11 +2173,10 @@ impl<'i, B: ParseBuilder<'i> + 'i> InfixParselet<'i, B> for ColonColonParselet {
             second_operand,
         );
 
-        // MUSTTAIL
         return ColonColonParselet::parse_loop(session, infix_state);
     }
 
-    fn getPrecedence(
+    fn get_precedence(
         &self,
         _session: &ParserSession<'i, B>,
     ) -> Option<Precedence> {
@@ -2218,7 +2199,6 @@ impl ColonColonParselet {
 
                 let node = session.reduce_infix(infix_state);
 
-                // MUSTTAIL
                 return session.parse_climb(node);
             }
 
@@ -2229,7 +2209,7 @@ impl ColonColonParselet {
             //
 
             let Tok2 =
-                Tokenizer_currentToken_stringifyAsTag(&mut session.tokenizer);
+                tokenizer_current_token_stringify_as_tag(&mut session.tokenizer);
 
             let operand = session.push_leaf_and_next(Tok2);
 
@@ -2284,11 +2264,10 @@ impl<'i, B: ParseBuilder<'i> + 'i> InfixParselet<'i, B>
             rhs_node,
         );
 
-        // MUSTTAIL
         return session.parse_climb(node);
     }
 
-    fn getPrecedence(
+    fn get_precedence(
         &self,
         _session: &ParserSession<'i, B>,
     ) -> Option<Precedence> {
@@ -2336,11 +2315,10 @@ impl<'i, B: ParseBuilder<'i> + 'i> InfixParselet<'i, B>
             rhs_node,
         );
 
-        // MUSTTAIL
         return session.parse_climb(node);
     }
 
-    fn getPrecedence(
+    fn get_precedence(
         &self,
         _session: &ParserSession<'i, B>,
     ) -> Option<Precedence> {
@@ -2382,7 +2360,6 @@ impl<'i, B: ParseBuilder<'i> + 'i> PrefixParselet<'i, B> for LessLessParselet {
         let node =
             session.reduce_prefix_get(PrefixOperator::Get, tok_in, trivia, tok);
 
-        // MUSTTAIL
         return session.parse_climb(node);
     }
 }
@@ -2429,7 +2406,6 @@ impl<'i, B: ParseBuilder<'i> + 'i> PrefixParselet<'i, B> for HashParselet {
             return session.parse_climb(node);
         }
 
-        // MUSTTAIL
         return session.push_and_climb(tok_in);
     }
 }
@@ -2468,7 +2444,6 @@ impl<'i, B: ParseBuilder<'i> + 'i> PrefixParselet<'i, B> for HashHashParselet {
             return session.parse_climb(node);
         }
 
-        // MUSTTAIL
         return session.push_and_climb(tok_in);
     }
 }
@@ -2507,7 +2482,6 @@ impl<'i, B: ParseBuilder<'i> + 'i> PrefixParselet<'i, B> for PercentParselet {
             return session.parse_climb(node);
         }
 
-        // MUSTTAIL
         return session.push_and_climb(tok_in);
     }
 }

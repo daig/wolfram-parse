@@ -68,7 +68,7 @@ impl<I: TokenInput, S: TokenSource> Display for FmtAsExpr<&Token<I, S>> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let FmtAsExpr(Token { tok, src, input }) = self;
 
-        let head = if tok.isError() {
+        let head = if tok.is_error() {
             sym::CodeParser_ErrorNode
         } else {
             sym::CodeParser_LeafNode

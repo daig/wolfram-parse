@@ -70,7 +70,7 @@ use crate::{
     precedence::Precedence,
     quirks,
     tokenize::{
-        token_kind::Closer, tokenizer::Tokenizer_currentToken_stringifyAsFile,
+        token_kind::Closer, tokenizer::tokenizer_current_token_stringify_as_file,
         TokenKind, TokenRef, TokenStr, Tokenizer,
     },
     ParseOptions, ParseResult, QuirkSettings,
@@ -133,7 +133,7 @@ fn do_parse<'i, B: ParseBuilder<'i> + 'i>(
     //
 
     loop {
-        if feature::CHECK_ABORT && crate::abortQ() {
+        if feature::CHECK_ABORT && crate::should_abort() {
             break;
         }
 
@@ -143,7 +143,7 @@ fn do_parse<'i, B: ParseBuilder<'i> + 'i>(
             break;
         }
 
-        if peek.tok.isTrivia() {
+        if peek.tok.is_trivia() {
             session.builder.finish_top_level_trivia(peek);
 
             peek.skip(&mut session.tokenizer);
@@ -154,7 +154,7 @@ fn do_parse<'i, B: ParseBuilder<'i> + 'i>(
         //
         // special top-level handling of stray closers
         //
-        if peek.tok.isCloser() {
+        if peek.tok.is_closer() {
             let node = (PrefixToplevelCloserParselet {})
                 .parse_prefix(&mut session, peek);
 
@@ -987,7 +987,6 @@ impl<'i, B: ParseBuilder<'i> + 'i> ParserSession<'i, B> {
     // TODO(cleanup): Rename to avoid ambiguity with PrefixParselet::parse_prefix()?
     pub(crate) fn parse_prefix(&mut self, token: TokenRef<'i>) -> B::Node {
         B::with_prefix_parselet(token.tok, |parselet| {
-            // MUSTTAIL
             parselet.parse_prefix(self, token)
         })
     }
@@ -1004,7 +1003,6 @@ impl<'i, B: ParseBuilder<'i> + 'i> ParserSession<'i, B> {
         token: TokenRef<'i>,
     ) -> B::Node {
         B::with_infix_parselet(token.tok, |parselet| {
-            // MUSTTAIL
             parselet.parse_infix(self, finished, trivia1, token)
         })
     }
@@ -1042,7 +1040,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> ParserSession<'i, B> {
         token = self.do_process_implicit_times(token);
 
         let TokenPrecedence = B::with_infix_parselet(token.tok, |parselet| {
-            parselet.getPrecedence(self)
+            parselet.get_precedence(self)
         });
 
         //
@@ -1062,7 +1060,6 @@ impl<'i, B: ParseBuilder<'i> + 'i> ParserSession<'i, B> {
 
         let trivia1 = self.builder.push_trivia_seq(trivia1);
 
-        // MUSTTAIL
         return self.parse_infix(finished, trivia1, token);
     }
 
@@ -1143,7 +1140,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> ParserSession<'i, B> {
     /// `container` until the current token is no longer a trivia token.
     ///
     /// This function always returns a non-trivia token
-    /// ([`TokenKind::isTrivia()`] is false).
+    /// ([`TokenKind::is_trivia()`] is false).
     pub(crate) fn current_token_eat_trivia(
         &mut self,
     ) -> (B::TriviaHandle, TokenRef<'i>) {
@@ -1169,7 +1166,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> ParserSession<'i, B> {
 
         let mut trivia = self.builder.resettable_trivia_begin();
 
-        while tok.tok.isTrivia() {
+        while tok.tok.is_trivia() {
             self.builder.resettable_trivia_push(&mut trivia, tok);
 
             tok.skip(&mut self.tokenizer);
@@ -1179,7 +1176,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> ParserSession<'i, B> {
 
         let trivia = self.builder.resettable_trivia_end(trivia);
 
-        debug_assert!(!tok.tok.isTrivia());
+        debug_assert!(!tok.tok.is_trivia());
 
         (trivia, tok)
     }
@@ -1188,19 +1185,19 @@ impl<'i, B: ParseBuilder<'i> + 'i> ParserSession<'i, B> {
         &mut self,
     ) -> (B::TriviaHandle, TokenRef<'i>) {
         let mut token =
-            Tokenizer_currentToken_stringifyAsFile(&mut self.tokenizer);
+            tokenizer_current_token_stringify_as_file(&mut self.tokenizer);
 
         let mut trivia = self.builder.resettable_trivia_begin();
 
-        while token.tok.isTrivia() {
+        while token.tok.is_trivia() {
             self.builder.resettable_trivia_push(&mut trivia, token);
 
             token.skip(&mut self.tokenizer);
 
-            token = Tokenizer_currentToken_stringifyAsFile(&mut self.tokenizer);
+            token = tokenizer_current_token_stringify_as_file(&mut self.tokenizer);
         }
 
-        debug_assert!(!token.tok.isTrivia());
+        debug_assert!(!token.tok.is_trivia());
 
         let trivia = self.builder.resettable_trivia_end(trivia);
 
@@ -1232,7 +1229,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> ParserSession<'i, B> {
         //
         let mut trivia = self.builder.resettable_trivia_begin();
 
-        while tok.tok.isTriviaButNotToplevelNewline() {
+        while tok.tok.is_trivia_but_not_toplevel_newline() {
             self.builder.resettable_trivia_push(&mut trivia, tok);
 
             tok.skip(&mut self.tokenizer);
@@ -1609,17 +1606,17 @@ impl<'i, B: ParseBuilder<'i> + 'i> ParserSession<'i, B> {
     //==================================
 
     pub(crate) fn push_group(&mut self, closer: Closer) {
-        self.tokenizer.GroupStack.push(closer);
+        self.tokenizer.group_stack.push(closer);
     }
 
     pub(crate) fn pop_group(&mut self) {
-        assert!(!self.tokenizer.GroupStack.is_empty());
+        assert!(!self.tokenizer.group_stack.is_empty());
 
-        self.tokenizer.GroupStack.pop();
+        self.tokenizer.group_stack.pop();
     }
 
     pub(crate) fn check_group(&self, closer: Closer) -> bool {
-        for value in self.tokenizer.GroupStack.iter().rev() {
+        for value in self.tokenizer.group_stack.iter().rev() {
             if *value == closer {
                 return true;
             }
@@ -1662,7 +1659,7 @@ impl<'i, B: ParseBuilder<'i> + 'i> ParserSession<'i, B> {
             "expected empty context stack, got: {:#?}",
             self.context_stack
         );
-        assert!(self.tokenizer.GroupStack.is_empty());
+        assert!(self.tokenizer.group_stack.is_empty());
 
         return true;
     }

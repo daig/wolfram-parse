@@ -20,7 +20,7 @@ use crate::{
 };
 
 use super::{
-    abstractGroupNode, abstractGroupNode_GroupMissingCloserNode, abstract_,
+    abstract_group_node, abstract_group_node_group_missing_closer_node, abstract_,
     expect_children, AstCall,
 };
 
@@ -278,7 +278,7 @@ pub(super) fn abstract_call_node<
             //-----------------------------------------
 
             let head = abstract_(head);
-            let part = abstractGroupNode(part);
+            let part = abstract_group_node(part);
 
             // {head} ~Join~ part[[2]]
             let args = prepend(part.args, head);
@@ -318,7 +318,7 @@ pub(super) fn abstract_call_node<
             );
 
             let head = abstract_(head);
-            let part = abstractGroupNode(part);
+            let part = abstract_group_node(part);
 
             Ast::call2(head, part.args, data)
         },
@@ -336,7 +336,7 @@ pub(super) fn abstract_call_node<
                 head: _,
                 args,
                 data: _partData,
-            } = abstractGroupNode(part);
+            } = abstract_group_node(part);
 
             /* FIXME: Finish porting this issue handling logic
                 issues = Lookup[partData, AbstractSyntaxIssues, {}] ~Join~ issues;
@@ -374,7 +374,7 @@ pub(super) fn abstract_call_node<
             // but % is already scanned in CodeInspector TokenRules, and this just adds more noise
 
             let head = abstract_(head);
-            let part = abstractGroupNode(part);
+            let part = abstract_group_node(part);
 
             Ast::call2(head, part.args, data)
         },
@@ -384,7 +384,7 @@ pub(super) fn abstract_call_node<
             data:_
         ]) => {
             let head = abstract_(head);
-            let part = abstractGroupNode(part);
+            let part = abstract_group_node(part);
 
             Ast::call2(head, part.args, data)
         },
@@ -410,7 +410,7 @@ pub(super) fn abstract_call_node<
             );
 
             let head = abstract_(head);
-            let part = abstractGroupNode(part);
+            let part = abstract_group_node(part);
 
             Ast::call2(head, part.args, data)
         },
@@ -423,7 +423,7 @@ pub(super) fn abstract_call_node<
             data:_
         ]) => {
             let head = abstract_(head);
-            let part = abstractGroupNode(part);
+            let part = abstract_group_node(part);
 
             Ast::call2(head, part.args, data)
         },
@@ -449,7 +449,7 @@ pub(super) fn abstract_call_node<
             );
 
             let head = abstract_(head);
-            let part = abstractGroupNode(part);
+            let part = abstract_group_node(part);
 
             Ast::call2(head, part.args, data)
         },
@@ -462,7 +462,7 @@ pub(super) fn abstract_call_node<
             data:_
         ]) => {
             let head = abstract_(head);
-            let part = abstractGroupNode(part);
+            let part = abstract_group_node(part);
 
             Ast::call2(head, part.args, data)
         },
@@ -481,7 +481,7 @@ pub(super) fn abstract_call_node<
             src: data,
         } if OK_CALL_BOX_KINDS.contains(&head.kind) => {
             let head = abstract_(Cst::from(head));
-            let part = abstractGroupNode(part);
+            let part = abstract_group_node(part);
 
             Ast::call2(head, part.args, data)
         },
@@ -513,7 +513,7 @@ pub(super) fn abstract_call_node<
             );
 
             let head = abstract_(Cst::from(head));
-            let part = abstractGroupNode(part);
+            let part = abstract_group_node(part);
 
             Ast::call2(head, part.args, data)
         },
@@ -541,7 +541,7 @@ pub(super) fn abstract_call_node<
             );
 
             let head = abstract_(head);
-            let part = abstractGroupNode(part);
+            let part = abstract_group_node(part);
 
             Ast::call2(head, part.args, data)
         },
@@ -558,7 +558,7 @@ pub(super) fn abstract_call_node<
             data:_
         ]) => {
             let head = abstract_(head);
-            let part = abstractGroupNode(part);
+            let part = abstract_group_node(part);
 
             Ast::call2(
                 Ast::call(st::TypeSpecifier, vec![head], AstMetadata::empty()),
@@ -588,7 +588,7 @@ pub(super) fn abstract_call_node<
             );
 
             let head = abstract_(head);
-            let part = abstractGroupNode(part);
+            let part = abstract_group_node(part);
 
             Ast::call2(
                 Ast::call(st::TypeSpecifier, vec![head], AstMetadata::empty()),
@@ -778,7 +778,7 @@ pub(super) fn abstract_call_node<
             //-----------------------------------------
 
             let head = abstract_(head);
-            let part = abstractGroupNode(part);
+            let part = abstract_group_node(part);
 
             // {head} ~Join~ (part[[2]])
             let args = prepend(part.args, head);
@@ -809,7 +809,7 @@ pub(super) fn abstract_call_node<
             let head = abstract_(head);
 
             let (_, children, _) =
-                abstractGroupNode_GroupMissingCloserNode(part);
+                abstract_group_node_group_missing_closer_node(part);
 
             Ast::call_missing_closer(head, children, data)
         },
@@ -821,10 +821,10 @@ pub(super) fn abstract_call_node<
             let head = abstract_(head);
 
             let (_, children, _) =
-                abstractGroupNode_GroupMissingCloserNode(part);
+                abstract_group_node_group_missing_closer_node(part);
 
             /* TODO: Port this issue joining logic
-                part = abstractGroupNode[part];
+                part = abstract_group_node[part];
                 partData = part[[3]];
 
                 issues = Lookup[partData, AbstractSyntaxIssues, {}] ~Join~ issues;
@@ -849,10 +849,10 @@ pub(super) fn abstract_call_node<
             let head = abstract_(head);
 
             let (_, children, _) =
-                abstractGroupNode_GroupMissingCloserNode(part);
+                abstract_group_node_group_missing_closer_node(part);
 
             /* TODO: Port this issue joining logic
-                part = abstractGroupNode[part];
+                part = abstract_group_node[part];
                 partData = part[[3]];
 
                 issues = Lookup[partData, AbstractSyntaxIssues, {}] ~Join~ issues;

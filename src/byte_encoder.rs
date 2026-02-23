@@ -2,7 +2,7 @@ use std::fmt::{self, Write};
 
 use crate::read::code_point::CodePoint::{self, Char, *};
 
-pub(crate) fn encodeBytes(
+pub(crate) fn encode_bytes(
     stream: &mut fmt::Formatter,
     val: CodePoint,
 ) -> Result<(), fmt::Error> {
@@ -74,7 +74,7 @@ pub(crate) fn size(val: CodePoint) -> usize {
 
     if val <= 0xffff {
         assert!(val != CODEPOINT_BOM as i32);
-        assert!(!utils::isStraySurrogate(val));
+        assert!(!utils::is_stray_surrogate(val));
 
         return 3;
     }
@@ -84,7 +84,7 @@ pub(crate) fn size(val: CodePoint) -> usize {
     return 4;
 }
 
-pub(crate) fn encodeBytes(stream: &mut fmt::Formatter, val: CodePoint) -> Result<(), fmt::Error> {
+pub(crate) fn encode_bytes(stream: &mut fmt::Formatter, val: CodePoint) -> Result<(), fmt::Error> {
     match val {
         Special(CRLF) => {
             stream.write_char('\r')?;
@@ -145,7 +145,7 @@ pub(crate) fn encodeBytes(stream: &mut fmt::Formatter, val: CodePoint) -> Result
         //
 
         assert!(val != CODEPOINT_BOM as i32);
-        assert!(!utils::isStraySurrogate(val));
+        assert!(!utils::is_stray_surrogate(val));
 
         let firstByte = to_byte(((val >> 12) & 0x0f) | 0xe0);
         let secondByte = to_byte(((val >> 6) & 0x3f) | 0x80);
@@ -175,7 +175,7 @@ pub(crate) fn encodeBytes(stream: &mut fmt::Formatter, val: CodePoint) -> Result
     stream.write_char(fourthByte);
 }
 
-fn encodeBytes_to_array(arr: [u8; 4], val: CodePoint) {
+fn encode_bytes_to_array(arr: [u8; 4], val: CodePoint) {
     match val {
         Special(CRLF) => {
             arr[0] = '\r';
@@ -236,7 +236,7 @@ fn encodeBytes_to_array(arr: [u8; 4], val: CodePoint) {
         //
 
         assert!(val != CODEPOINT_BOM as i32);
-        assert!(!utils::isStraySurrogate(val));
+        assert!(!utils::is_stray_surrogate(val));
 
         let firstByte = to_byte(((val >> 12) & 0x0f) | 0xe0);
         let secondByte = to_byte(((val >> 6) & 0x3f) | 0x80);

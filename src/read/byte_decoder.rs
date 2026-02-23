@@ -26,11 +26,8 @@
 use std::num::NonZeroU32;
 
 use crate::{
-    issue::{CodeAction, EncodingIssue, IssueTag, Severity},
-    read::{
-        byte_buffer::{ByteBuffer_currentByte, ByteBuffer_nextByte},
-        Reader, SourceManager,
-    },
+    issue::{CodeAction, encoding_issue, IssueTag, Severity},
+    read::{Reader, SourceManager},
     read::{
         code_point::{CodePoint, CODEPOINT_BOM},
         wl_character::{Escape, WLCharacter},
@@ -60,50 +57,51 @@ use crate::{
 //
 // Do not decode unsafe character encodings: incomplete sequences, stray surrogates, or BOM
 //
-pub(super) fn ByteDecoder_nextSourceCharacter(
-    session: &mut Reader,
+impl Reader<'_> {
+pub(crate) fn next_source_character(
+    &mut self,
     policy: NextPolicy,
 ) -> SourceCharacter {
-    let firstByte = ByteBuffer_currentByte(session);
+    let first_byte = self.current_byte();
 
-    if 0x20 <= firstByte && firstByte <= 0x7e {
+    if 0x20 <= first_byte && first_byte <= 0x7e {
         //
         // Valid
         //
 
         incr_diagnostic!(ByteDecoder_PrintableCount);
 
-        ByteBuffer_nextByte(session);
+        self.next_byte();
 
-        session.src().increment();
+        self.src().increment();
 
-        return SourceCharacter::from_u8(firstByte);
+        return SourceCharacter::from_u8(first_byte);
     }
 
-    if firstByte == 0x0a {
+    if first_byte == 0x0a {
         //
         // Handle LF specially
         //
 
         incr_diagnostic!(ByteDecoder_LineFeedCount);
 
-        ByteBuffer_nextByte(session);
+        self.next_byte();
 
-        session.src().newline();
+        self.src().newline();
 
-        return SourceCharacter::from_u8(firstByte);
+        return SourceCharacter::from_u8(first_byte);
     }
 
-    return ByteDecoder_nextSourceCharacter_uncommon(session, policy);
+    return self.next_source_character_uncommon(policy);
 }
 
-fn ByteDecoder_nextSourceCharacter_uncommon(
-    session: &mut Reader,
+fn next_source_character_uncommon(
+    &mut self,
     policy: NextPolicy,
 ) -> SourceCharacter {
-    let firstByte = ByteBuffer_nextByte(session);
+    let first_byte = self.next_byte();
 
-    match firstByte {
+    match first_byte {
         b'\t' => {
 
             //
@@ -112,9 +110,9 @@ fn ByteDecoder_nextSourceCharacter_uncommon(
 
             incr_diagnostic!(ByteDecoder_TabCount);
 
-            session.src().tab();
+            self.src().tab();
 
-            return SourceCharacter::from_u8(firstByte);
+            return SourceCharacter::from_u8(first_byte);
 
         }
             //
@@ -124,18 +122,18 @@ fn ByteDecoder_nextSourceCharacter_uncommon(
 
             incr_diagnostic!(ByteDecoder_CarriageReturnCount);
 
-            if ByteBuffer_currentByte(session) == b'\n' {
+            if self.current_byte() == b'\n' {
 
-                ByteBuffer_nextByte(session);
+                self.next_byte();
 
-                session.src().windowsNewline();
+                self.src().windows_newline();
 
                 return SourceCharacter::from(CodePoint::CRLF);
             }
 
-            session.src().newline();
+            self.src().newline();
 
-            if session.check_issues && policy.contains(ENABLE_CHARACTER_DECODING_ISSUES) {
+            if self.check_issues && policy.contains(ENABLE_CHARACTER_DECODING_ISSUES) {
 
                 //
                 // No CodeAction here
@@ -144,19 +142,19 @@ fn ByteDecoder_nextSourceCharacter_uncommon(
                 //
                 // FIXME: no way to do endOfPreviousLine()
                 //
-                let currentSourceCharacterStartLoc = session.SrcLoc;
+                let current_source_character_start_loc = self.src_loc;
 
-                let I = EncodingIssue(
+                let I = encoding_issue(
                     IssueTag::UnexpectedCarriageReturn,
                     format!("Unexpected ``\\r`` character."),
                     Severity::Warning,
-                    Span::new(currentSourceCharacterStartLoc, session.SrcLoc),
+                    Span::new(current_source_character_start_loc, self.src_loc),
                     1.0,
                     vec![],
                     vec![]
                 );
 
-                session.addIssue(I);
+                self.add_issue(I);
             }
 
             return SourceCharacter::from('\r');
@@ -176,9 +174,9 @@ fn ByteDecoder_nextSourceCharacter_uncommon(
             // Valid
             //
 
-            let firstByte = CodePoint::from(char::from(firstByte));
+            let first_byte = CodePoint::from(char::from(first_byte));
 
-            return ByteDecoder_validStrange(session, firstByte, policy);
+            return self.valid_strange(first_byte, policy);
         }
 
             //
@@ -195,42 +193,42 @@ fn ByteDecoder_nextSourceCharacter_uncommon(
             // Buffer is possibly already pointing to EOF
             //
 
-            let mark = session.mark();
+            let mark = self.mark();
 
-            let tmp = ByteBuffer_nextByte(session);
+            let tmp = self.next_byte();
 
-            if session.wasEOF {
+            if self.was_eof {
 
                 //
                 // EOF
                 //
 
-                return ByteDecoder_incomplete1ByteSequence(session, mark.src_loc, policy);
+                return self.incomplete_1byte_sequence(mark.src_loc, policy);
             }
 
             // Continue
 
-            let secondByte = tmp;
+            let second_byte = tmp;
 
-            if !(0x80 <= secondByte && secondByte <= 0xbf) {
+            if !(0x80 <= second_byte && second_byte <= 0xbf) {
 
                 //
                 // Incomplete
                 //
 
-                session.seek(mark);
+                self.seek(mark);
 
-                return ByteDecoder_incomplete1ByteSequence(session, mark.src_loc, policy);
+                return self.incomplete_1byte_sequence(mark.src_loc, policy);
             }
 
             //
             // Valid
             //
 
-            let decoded = ((u32::from(firstByte) & 0x1f) << 6) | (u32::from(secondByte) & 0x3f);
+            let decoded = ((u32::from(first_byte) & 0x1f) << 6) | (u32::from(second_byte) & 0x3f);
             let decoded = CodePoint::from_u32(decoded).unwrap();
 
-            return ByteDecoder_validMB(session, decoded, policy);
+            return self.valid_mb(decoded, policy);
         }
             //
             // 3 byte UTF-8 sequence
@@ -243,62 +241,62 @@ fn ByteDecoder_nextSourceCharacter_uncommon(
             // Buffer is possibly already pointing to EOF
             //
 
-            let mut mark = session.mark();
+            let mut mark = self.mark();
 
-            let mut tmp = ByteBuffer_nextByte(session);
+            let mut tmp = self.next_byte();
 
-            if session.wasEOF {
-
-                //
-                // EOF
-                //
-
-                return ByteDecoder_incomplete1ByteSequence(session, mark.src_loc, policy);
-            }
-
-            // Continue
-
-            let secondByte = tmp;
-
-            if !(0xa0 <= secondByte && secondByte <= 0xbf) {
-
-                //
-                // Incomplete
-                //
-
-                session.seek(mark);
-
-                return ByteDecoder_incomplete1ByteSequence(session, mark.src_loc, policy);
-            }
-
-            mark = session.mark();
-
-            tmp = ByteBuffer_nextByte(session);
-
-            if session.wasEOF {
+            if self.was_eof {
 
                 //
                 // EOF
                 //
 
-                session.seek(mark);
-
-                return ByteDecoder_incomplete2ByteSequence(session, mark.src_loc, policy);
+                return self.incomplete_1byte_sequence(mark.src_loc, policy);
             }
 
             // Continue
 
-            let thirdByte = tmp;
+            let second_byte = tmp;
 
-            if !(0x80 <= thirdByte && thirdByte <= 0xbf) {
+            if !(0xa0 <= second_byte && second_byte <= 0xbf) {
 
                 //
                 // Incomplete
                 //
 
-                session.seek(mark);
+                self.seek(mark);
 
-                return ByteDecoder_incomplete2ByteSequence(session, mark.src_loc, policy);
+                return self.incomplete_1byte_sequence(mark.src_loc, policy);
+            }
+
+            mark = self.mark();
+
+            tmp = self.next_byte();
+
+            if self.was_eof {
+
+                //
+                // EOF
+                //
+
+                self.seek(mark);
+
+                return self.incomplete_2byte_sequence(mark.src_loc, policy);
+            }
+
+            // Continue
+
+            let third_byte = tmp;
+
+            if !(0x80 <= third_byte && third_byte <= 0xbf) {
+
+                //
+                // Incomplete
+                //
+
+                self.seek(mark);
+
+                return self.incomplete_2byte_sequence(mark.src_loc, policy);
             }
 
             //
@@ -306,12 +304,12 @@ fn ByteDecoder_nextSourceCharacter_uncommon(
             //
 
             let decoded =
-                ((u32::from(firstByte) & 0x0f) << 12)
-                | ((u32::from(secondByte) & 0x3f) << 6)
-                | (u32::from(thirdByte) & 0x3f);
+                ((u32::from(first_byte) & 0x0f) << 12)
+                | ((u32::from(second_byte) & 0x3f) << 6)
+                | (u32::from(third_byte) & 0x3f);
             let decoded = CodePoint::from_u32(decoded).unwrap();
 
-            return ByteDecoder_validMB(session, decoded, policy);
+            return self.valid_mb(decoded, policy);
         }
             //
             // 3 byte UTF-8 sequence
@@ -325,62 +323,62 @@ fn ByteDecoder_nextSourceCharacter_uncommon(
             // Buffer is possibly already pointing to EOF
             //
 
-            let mut mark = session.mark();
+            let mut mark = self.mark();
 
-            let mut tmp = ByteBuffer_nextByte(session);
+            let mut tmp = self.next_byte();
 
-            if session.wasEOF {
-
-                //
-                // EOF
-                //
-
-                return ByteDecoder_incomplete1ByteSequence(session, mark.src_loc, policy);
-            }
-
-            // Continue
-
-            let secondByte = tmp;
-
-            if !(0x80 <= secondByte && secondByte <= 0xbf) {
-
-                //
-                // Incomplete
-                //
-
-                session.seek(mark);
-
-                return ByteDecoder_incomplete1ByteSequence(session, mark.src_loc, policy);
-            }
-
-            mark = session.mark();
-
-            tmp = ByteBuffer_nextByte(session);
-
-            if session.wasEOF {
+            if self.was_eof {
 
                 //
                 // EOF
                 //
 
-                session.seek(mark);
-
-                return ByteDecoder_incomplete2ByteSequence(session, mark.src_loc, policy);
+                return self.incomplete_1byte_sequence(mark.src_loc, policy);
             }
 
             // Continue
 
-            let thirdByte = tmp;
+            let second_byte = tmp;
 
-            if !(0x80 <= thirdByte && thirdByte <= 0xbf) {
+            if !(0x80 <= second_byte && second_byte <= 0xbf) {
 
                 //
                 // Incomplete
                 //
 
-                session.seek(mark);
+                self.seek(mark);
 
-                return ByteDecoder_incomplete2ByteSequence(session, mark.src_loc, policy);
+                return self.incomplete_1byte_sequence(mark.src_loc, policy);
+            }
+
+            mark = self.mark();
+
+            tmp = self.next_byte();
+
+            if self.was_eof {
+
+                //
+                // EOF
+                //
+
+                self.seek(mark);
+
+                return self.incomplete_2byte_sequence(mark.src_loc, policy);
+            }
+
+            // Continue
+
+            let third_byte = tmp;
+
+            if !(0x80 <= third_byte && third_byte <= 0xbf) {
+
+                //
+                // Incomplete
+                //
+
+                self.seek(mark);
+
+                return self.incomplete_2byte_sequence(mark.src_loc, policy);
             }
 
             //
@@ -388,17 +386,17 @@ fn ByteDecoder_nextSourceCharacter_uncommon(
             //
 
             let decoded =
-                ((u32::from(firstByte) & 0x0f) << 12)
-                | ((u32::from(secondByte) & 0x3f) << 6)
-                | (u32::from(thirdByte) & 0x3f);
+                ((u32::from(first_byte) & 0x0f) << 12)
+                | ((u32::from(second_byte) & 0x3f) << 6)
+                | (u32::from(third_byte) & 0x3f);
 
-            if utils::isStraySurrogate(decoded) {
+            if utils::is_stray_surrogate(decoded) {
 
                 //
                 // Stray surrogate
                 //
 
-                return ByteDecoder_straySurrogate(session, mark.src_loc, policy);
+                return self.stray_surrogate(mark.src_loc, policy);
             }
 
             let decoded = CodePoint::from_u32(decoded).unwrap();
@@ -409,10 +407,10 @@ fn ByteDecoder_nextSourceCharacter_uncommon(
                 // BOM
                 //
 
-                return ByteDecoder_bom(session, mark.src_loc, policy);
+                return self.bom(mark.src_loc, policy);
             }
 
-            return ByteDecoder_validMB(session, decoded, policy);
+            return self.valid_mb(decoded, policy);
         }
             //
             // 4 byte UTF-8 sequence
@@ -425,92 +423,92 @@ fn ByteDecoder_nextSourceCharacter_uncommon(
             // Buffer is possibly already pointing to EOF
             //
 
-            let mut mark = session.mark();
+            let mut mark = self.mark();
 
-            let mut tmp = ByteBuffer_nextByte(session);
+            let mut tmp = self.next_byte();
 
-            if session.wasEOF {
-
-                //
-                // EOF
-                //
-
-                return ByteDecoder_incomplete1ByteSequence(session, mark.src_loc, policy);
-            }
-
-            // Continue
-
-            let secondByte = tmp;
-
-            if !(0x90 <= secondByte && secondByte <= 0xbf) {
-
-                //
-                // Incomplete
-                //
-
-                session.seek(mark);
-
-                return ByteDecoder_incomplete1ByteSequence(session, mark.src_loc, policy);
-            }
-
-            mark = session.mark();
-
-            tmp = ByteBuffer_nextByte(session);
-
-            if session.wasEOF {
+            if self.was_eof {
 
                 //
                 // EOF
                 //
 
-                session.seek(mark);
-
-                return ByteDecoder_incomplete2ByteSequence(session, mark.src_loc, policy);
+                return self.incomplete_1byte_sequence(mark.src_loc, policy);
             }
 
             // Continue
 
-            let thirdByte = tmp;
+            let second_byte = tmp;
 
-            if !(0x80 <= thirdByte && thirdByte <= 0xbf) {
+            if !(0x90 <= second_byte && second_byte <= 0xbf) {
 
                 //
                 // Incomplete
                 //
 
-                session.seek(mark);
+                self.seek(mark);
 
-                return ByteDecoder_incomplete2ByteSequence(session, mark.src_loc, policy);
+                return self.incomplete_1byte_sequence(mark.src_loc, policy);
             }
 
-            mark = session.mark();
+            mark = self.mark();
 
-            tmp = ByteBuffer_nextByte(session);
+            tmp = self.next_byte();
 
-            if session.wasEOF {
+            if self.was_eof {
 
                 //
                 // EOF
                 //
 
-                session.seek(mark);
+                self.seek(mark);
 
-                return ByteDecoder_incomplete3ByteSequence(session, mark.src_loc, policy);
+                return self.incomplete_2byte_sequence(mark.src_loc, policy);
             }
 
             // Continue
 
-            let fourthByte = tmp;
+            let third_byte = tmp;
 
-            if !(0x80 <= fourthByte && fourthByte <= 0xbf) {
+            if !(0x80 <= third_byte && third_byte <= 0xbf) {
 
                 //
                 // Incomplete
                 //
 
-                session.seek(mark);
+                self.seek(mark);
 
-                return ByteDecoder_incomplete3ByteSequence(session, mark.src_loc, policy);
+                return self.incomplete_2byte_sequence(mark.src_loc, policy);
+            }
+
+            mark = self.mark();
+
+            tmp = self.next_byte();
+
+            if self.was_eof {
+
+                //
+                // EOF
+                //
+
+                self.seek(mark);
+
+                return self.incomplete_3byte_sequence(mark.src_loc, policy);
+            }
+
+            // Continue
+
+            let fourth_byte = tmp;
+
+            if !(0x80 <= fourth_byte && fourth_byte <= 0xbf) {
+
+                //
+                // Incomplete
+                //
+
+                self.seek(mark);
+
+                return self.incomplete_3byte_sequence(mark.src_loc, policy);
             }
 
             //
@@ -518,13 +516,13 @@ fn ByteDecoder_nextSourceCharacter_uncommon(
             //
 
             let decoded =
-                ((u32::from(firstByte) & 0x07) << 18)
-                | ((u32::from(secondByte) & 0x3f) << 12)
-                | ((u32::from(thirdByte) & 0x3f) << 6)
-                | ((u32::from(fourthByte) & 0x3f));
+                ((u32::from(first_byte) & 0x07) << 18)
+                | ((u32::from(second_byte) & 0x3f) << 12)
+                | ((u32::from(third_byte) & 0x3f) << 6)
+                | ((u32::from(fourth_byte) & 0x3f));
             let decoded = CodePoint::from_u32(decoded).unwrap();
 
-            return ByteDecoder_validMB(session, decoded, policy);
+            return self.valid_mb(decoded, policy);
         }
             //
             // 4 byte UTF-8 sequence
@@ -537,92 +535,92 @@ fn ByteDecoder_nextSourceCharacter_uncommon(
             // Buffer is possibly already pointing to EOF
             //
 
-            let mut mark = session.mark();
+            let mut mark = self.mark();
 
-            let mut tmp = ByteBuffer_nextByte(session);
+            let mut tmp = self.next_byte();
 
-            if session.wasEOF {
-
-                //
-                // EOF
-                //
-
-                return ByteDecoder_incomplete1ByteSequence(session, mark.src_loc, policy);
-            }
-
-            // Continue
-
-            let secondByte = tmp;
-
-            if !(0x80 <= secondByte && secondByte <= 0xbf) {
-
-                //
-                // Incomplete
-                //
-
-                session.seek(mark);
-
-                return ByteDecoder_incomplete1ByteSequence(session, mark.src_loc, policy);
-            }
-
-            mark = session.mark();
-
-            tmp = ByteBuffer_nextByte(session);
-
-            if session.wasEOF {
+            if self.was_eof {
 
                 //
                 // EOF
                 //
 
-                session.seek(mark);
-
-                return ByteDecoder_incomplete2ByteSequence(session, mark.src_loc, policy);
+                return self.incomplete_1byte_sequence(mark.src_loc, policy);
             }
 
             // Continue
 
-            let thirdByte = tmp;
+            let second_byte = tmp;
 
-            if !(0x80 <= thirdByte && thirdByte <= 0xbf) {
+            if !(0x80 <= second_byte && second_byte <= 0xbf) {
 
                 //
                 // Incomplete
                 //
 
-                session.seek(mark);
+                self.seek(mark);
 
-                return ByteDecoder_incomplete2ByteSequence(session, mark.src_loc, policy);
+                return self.incomplete_1byte_sequence(mark.src_loc, policy);
             }
 
-            mark = session.mark();
+            mark = self.mark();
 
-            tmp = ByteBuffer_nextByte(session);
+            tmp = self.next_byte();
 
-            if session.wasEOF {
+            if self.was_eof {
 
                 //
                 // EOF
                 //
 
-                session.seek(mark);
+                self.seek(mark);
 
-                return ByteDecoder_incomplete3ByteSequence(session, mark.src_loc, policy);
+                return self.incomplete_2byte_sequence(mark.src_loc, policy);
             }
 
             // Continue
 
-            let fourthByte = tmp;
+            let third_byte = tmp;
 
-            if !(0x80 <= fourthByte && fourthByte <= 0xbf) {
+            if !(0x80 <= third_byte && third_byte <= 0xbf) {
 
                 //
                 // Incomplete
                 //
 
-                session.seek(mark);
+                self.seek(mark);
 
-                return ByteDecoder_incomplete3ByteSequence(session, mark.src_loc, policy);
+                return self.incomplete_2byte_sequence(mark.src_loc, policy);
+            }
+
+            mark = self.mark();
+
+            tmp = self.next_byte();
+
+            if self.was_eof {
+
+                //
+                // EOF
+                //
+
+                self.seek(mark);
+
+                return self.incomplete_3byte_sequence(mark.src_loc, policy);
+            }
+
+            // Continue
+
+            let fourth_byte = tmp;
+
+            if !(0x80 <= fourth_byte && fourth_byte <= 0xbf) {
+
+                //
+                // Incomplete
+                //
+
+                self.seek(mark);
+
+                return self.incomplete_3byte_sequence(mark.src_loc, policy);
             }
 
             //
@@ -630,13 +628,13 @@ fn ByteDecoder_nextSourceCharacter_uncommon(
             //
 
             let decoded: u32 =
-                ( (u32::from(firstByte) & 0x07) << 18)
-                | ((u32::from(secondByte) & 0x3f) << 12)
-                | ((u32::from(thirdByte) & 0x3f) << 6)
-                | ((u32::from(fourthByte) & 0x3f));
+                ( (u32::from(first_byte) & 0x07) << 18)
+                | ((u32::from(second_byte) & 0x3f) << 12)
+                | ((u32::from(third_byte) & 0x3f) << 6)
+                | ((u32::from(fourth_byte) & 0x3f));
             let decoded = CodePoint::from_u32(decoded).unwrap();
 
-            return ByteDecoder_validMB(session, decoded, policy);
+            return self.valid_mb(decoded, policy);
         }
             //
             // 4 byte UTF-8 sequence
@@ -649,105 +647,105 @@ fn ByteDecoder_nextSourceCharacter_uncommon(
             // Buffer is possibly already pointing to EOF
             //
 
-            let mut mark = session.mark();
+            let mut mark = self.mark();
 
-            let mut tmp = ByteBuffer_nextByte(session);
+            let mut tmp = self.next_byte();
 
-            if session.wasEOF {
-
-                //
-                // EOF
-                //
-
-                return ByteDecoder_incomplete1ByteSequence(session, mark.src_loc, policy);
-            }
-
-            // Continue
-
-            let secondByte = tmp;
-
-            if !(0x80 <= secondByte && secondByte <= 0x8f) {
-
-                //
-                // Incomplete
-                //
-
-                session.seek(mark);
-
-                return ByteDecoder_incomplete1ByteSequence(session, mark.src_loc, policy);
-            }
-
-            mark = session.mark();
-
-            tmp = ByteBuffer_nextByte(session);
-
-            if session.wasEOF {
+            if self.was_eof {
 
                 //
                 // EOF
                 //
 
-                session.seek(mark);
-
-                return ByteDecoder_incomplete2ByteSequence(session, mark.src_loc, policy);
+                return self.incomplete_1byte_sequence(mark.src_loc, policy);
             }
 
             // Continue
 
-            let thirdByte = tmp;
+            let second_byte = tmp;
 
-            if !(0x80 <= thirdByte && thirdByte <= 0xbf) {
+            if !(0x80 <= second_byte && second_byte <= 0x8f) {
 
                 //
                 // Incomplete
                 //
 
-                session.seek(mark);
+                self.seek(mark);
 
-                return ByteDecoder_incomplete2ByteSequence(session, mark.src_loc, policy);
+                return self.incomplete_1byte_sequence(mark.src_loc, policy);
             }
 
-            mark = session.mark();
+            mark = self.mark();
 
-            tmp = ByteBuffer_nextByte(session);
+            tmp = self.next_byte();
 
-            if session.wasEOF {
+            if self.was_eof {
 
                 //
                 // EOF
                 //
 
-                session.seek(mark);
+                self.seek(mark);
 
-                return ByteDecoder_incomplete3ByteSequence(session, mark.src_loc, policy);
+                return self.incomplete_2byte_sequence(mark.src_loc, policy);
             }
 
             // Continue
 
-            let fourthByte = tmp;
+            let third_byte = tmp;
 
-            if !(0x80 <= fourthByte && fourthByte <= 0xbf) {
+            if !(0x80 <= third_byte && third_byte <= 0xbf) {
 
                 //
                 // Incomplete
                 //
 
-                session.seek(mark);
+                self.seek(mark);
 
-                return ByteDecoder_incomplete3ByteSequence(session, mark.src_loc, policy);
+                return self.incomplete_2byte_sequence(mark.src_loc, policy);
+            }
+
+            mark = self.mark();
+
+            tmp = self.next_byte();
+
+            if self.was_eof {
+
+                //
+                // EOF
+                //
+
+                self.seek(mark);
+
+                return self.incomplete_3byte_sequence(mark.src_loc, policy);
+            }
+
+            // Continue
+
+            let fourth_byte = tmp;
+
+            if !(0x80 <= fourth_byte && fourth_byte <= 0xbf) {
+
+                //
+                // Incomplete
+                //
+
+                self.seek(mark);
+
+                return self.incomplete_3byte_sequence(mark.src_loc, policy);
             }
 
             //
             // Valid
             //
 
-            let decoded: u32 = ((u32::from(firstByte) & 0x07) << 18)
-                | ((u32::from(secondByte) & 0x3f) << 12)
-                | ((u32::from(thirdByte) & 0x3f) << 6)
-                | ((u32::from(fourthByte) & 0x3f));
+            let decoded: u32 = ((u32::from(first_byte) & 0x07) << 18)
+                | ((u32::from(second_byte) & 0x3f) << 12)
+                | ((u32::from(third_byte) & 0x3f) << 6)
+                | ((u32::from(fourth_byte) & 0x3f));
             let decoded = CodePoint::from_u32(decoded).unwrap();
 
-            return ByteDecoder_validMB(session, decoded, policy);
+            return self.valid_mb(decoded, policy);
         }
             //
             // Not a valid UTF-8 start, handle specially
@@ -756,7 +754,7 @@ fn ByteDecoder_nextSourceCharacter_uncommon(
 
             incr_diagnostic!(ByteDecoder_FFCount);
 
-            if session.wasEOF {
+            if self.was_eof {
 
                 //
                 // Do not increment Column
@@ -769,7 +767,7 @@ fn ByteDecoder_nextSourceCharacter_uncommon(
             // Incomplete
             //
 
-            return ByteDecoder_incomplete1ByteSequence(session, session.SrcLoc, policy);
+            return self.incomplete_1byte_sequence(self.src_loc, policy);
         }
             //
             // Not a valid UTF-8 start
@@ -782,55 +780,55 @@ fn ByteDecoder_nextSourceCharacter_uncommon(
             // Incomplete
             //
 
-            return ByteDecoder_incomplete1ByteSequence(session, session.SrcLoc, policy);
+            return self.incomplete_1byte_sequence(self.src_loc, policy);
         }
     }
 }
 
-fn ByteDecoder_strangeWarning(
-    session: &mut Reader,
+fn strange_warning(
+    &mut self,
     decoded: CodePoint,
-    currentSourceCharacterStartLoc: Location,
+    current_source_character_start_loc: Location,
     policy: NextPolicy,
 ) {
-    let currentSourceCharacterEndLoc = session.SrcLoc;
+    let current_source_character_end_loc = self.src_loc;
 
-    let safeAndGraphicalStr = decoded.safeAndGraphicalString();
-    let graphicalStr = decoded.graphicalString();
+    let safe_and_graphical_str = decoded.safe_and_graphical_string();
+    let graphical_str = decoded.graphical_string();
 
-    let Src =
-        Span::new(currentSourceCharacterStartLoc, currentSourceCharacterEndLoc);
+    let src_span =
+        Span::new(current_source_character_start_loc, current_source_character_end_loc);
 
-    let mut Actions: Vec<CodeAction> = Vec::new();
+    let mut actions: Vec<CodeAction> = Vec::new();
 
     let c = WLCharacter::new_with_escape(decoded, Escape::None);
 
-    let certainCharacterActions =
-        utils::certainCharacterReplacementActions(c, Src);
+    let certain_character_actions =
+        utils::certain_character_replacement_actions(c, src_span);
 
-    for A in certainCharacterActions {
-        Actions.push(A);
+    for A in certain_character_actions {
+        actions.push(A);
     }
 
     //
     // graphical version
     //
-    Actions.push(CodeAction::replace_text(
-        format!("Replace with ``{graphicalStr}``"),
-        Src,
-        graphicalStr,
+    actions.push(CodeAction::replace_text(
+        format!("Replace with ``{graphical_str}``"),
+        src_span,
+        graphical_str,
     ));
 
     //
     // any ASCII replacements
     //
-    for r in crate::long_names::asciiReplacements(decoded) {
-        Actions.push(CodeAction::replace_text(
+    for r in crate::long_names::ascii_replacements(decoded) {
+        actions.push(CodeAction::replace_text(
             format!(
                 "Replace with ``{}``",
-                crate::long_names::replacementGraphical(r.clone())
+                crate::long_names::replacement_graphical(r.clone())
             ),
-            Src,
+            src_span,
             r,
         ));
     }
@@ -840,94 +838,93 @@ fn ByteDecoder_strangeWarning(
         // reduce severity of unexpected characters inside strings or comments
         //
 
-        let I = EncodingIssue(
+        let I = encoding_issue(
             IssueTag::UnexpectedCharacter,
-            format!("Unexpected character: ``{safeAndGraphicalStr}``."),
+            format!("Unexpected character: ``{safe_and_graphical_str}``."),
             Severity::Remark,
-            Src,
+            src_span,
             0.95,
-            Actions,
+            actions,
             Vec::new(),
         );
 
-        session.addIssue(I);
-    } else if c.isStrangeWhitespace() || c.isMBStrangeWhitespace() {
+        self.add_issue(I);
+    } else if c.is_strange_whitespace() || c.is_mb_strange_whitespace() {
 
         // Do nothing.
     } else {
-        let I = EncodingIssue(
+        let I = encoding_issue(
             IssueTag::UnexpectedCharacter,
-            format!("Unexpected character: ``{safeAndGraphicalStr}``."),
+            format!("Unexpected character: ``{safe_and_graphical_str}``."),
             Severity::Warning,
-            Src,
+            src_span,
             0.95,
-            Actions,
+            actions,
             Vec::new(),
         );
 
-        session.addIssue(I);
+        self.add_issue(I);
     }
 }
 
-fn ByteDecoder_nonASCIIWarning(
-    session: &mut Reader,
+fn non_ascii_warning(
+    &mut self,
     decoded: CodePoint,
-    currentSourceCharacterStartLoc: Location,
+    current_source_character_start_loc: Location,
 ) {
-    let currentSourceCharacterEndLoc = session.SrcLoc;
+    let current_source_character_end_loc = self.src_loc;
 
-    let safeAndGraphicalStr = decoded.safeAndGraphicalString();
-    let graphicalStr = decoded.graphicalString();
+    let safe_and_graphical_str = decoded.safe_and_graphical_string();
+    let graphical_str = decoded.graphical_string();
 
-    let Src =
-        Span::new(currentSourceCharacterStartLoc, currentSourceCharacterEndLoc);
+    let src_span =
+        Span::new(current_source_character_start_loc, current_source_character_end_loc);
 
-    let mut Actions: Vec<CodeAction> = Vec::new();
+    let mut actions: Vec<CodeAction> = Vec::new();
 
-    Actions.push(CodeAction::replace_text(
-        format!("Replace with ``{graphicalStr}``"),
-        Src,
-        graphicalStr,
+    actions.push(CodeAction::replace_text(
+        format!("Replace with ``{graphical_str}``"),
+        src_span,
+        graphical_str,
     ));
 
-    for r in crate::long_names::asciiReplacements(decoded) {
-        Actions.push(CodeAction::replace_text(
+    for r in crate::long_names::ascii_replacements(decoded) {
+        actions.push(CodeAction::replace_text(
             format!(
                 "Replace with ``{}``",
-                crate::long_names::replacementGraphical(r.clone())
+                crate::long_names::replacement_graphical(r.clone())
             ),
-            Src,
+            src_span,
             r,
         ));
     }
 
-    let I = EncodingIssue(
+    let I = encoding_issue(
         IssueTag::NonASCIICharacter,
-        format!("Non-ASCII character: ``{safeAndGraphicalStr}``."),
+        format!("Non-ASCII character: ``{safe_and_graphical_str}``."),
         Severity::Remark,
-        Src,
+        src_span,
         1.0,
-        Actions,
+        actions,
         Vec::new(),
     );
 
-    session.addIssue(I);
+    self.add_issue(I);
 }
 
-fn ByteDecoder_validStrange(
-    session: &mut Reader,
+fn valid_strange(
+    &mut self,
     decoded: CodePoint,
     policy: NextPolicy,
 ) -> SourceCharacter {
-    session.src().increment();
+    self.src().increment();
 
-    if session.check_issues {
-        let currentSourceCharacterStartLoc = session.SrcLoc.previous();
+    if self.check_issues {
+        let current_source_character_start_loc = self.src_loc.previous();
 
-        ByteDecoder_strangeWarning(
-            session,
+        self.strange_warning(
             decoded,
-            currentSourceCharacterStartLoc,
+            current_source_character_start_loc,
             policy,
         );
     }
@@ -935,28 +932,26 @@ fn ByteDecoder_validStrange(
     return decoded;
 }
 
-fn ByteDecoder_validMB(
-    session: &mut Reader,
+fn valid_mb(
+    &mut self,
     decoded: CodePoint,
     policy: NextPolicy,
 ) -> SourceCharacter {
-    session.src().increment();
+    self.src().increment();
 
-    if session.check_issues {
-        let currentSourceCharacterStartLoc = session.SrcLoc.previous();
+    if self.check_issues {
+        let current_source_character_start_loc = self.src_loc.previous();
 
-        if crate::utils::isMBStrange(decoded) {
-            ByteDecoder_strangeWarning(
-                session,
+        if crate::utils::is_mb_strange(decoded) {
+            self.strange_warning(
                 decoded,
-                currentSourceCharacterStartLoc,
+                current_source_character_start_loc,
                 policy,
             );
-        } else if session.encoding_mode == EncodingMode::Normal {
-            ByteDecoder_nonASCIIWarning(
-                session,
+        } else if self.encoding_mode == EncodingMode::Normal {
+            self.non_ascii_warning(
                 decoded,
-                currentSourceCharacterStartLoc,
+                current_source_character_start_loc,
             );
         }
     }
@@ -964,65 +959,62 @@ fn ByteDecoder_validMB(
     return decoded;
 }
 
-fn ByteDecoder_incomplete1ByteSequence(
-    session: &mut Reader,
-    errSrcLoc: Location,
+fn incomplete_1byte_sequence(
+    &mut self,
+    err_src_loc: Location,
     _policy: NextPolicy,
 ) -> SourceCharacter {
-    ByteDecoder_incompleteByteSequence(
-        session,
-        errSrcLoc,
+    self.incomplete_byte_sequence(
+        err_src_loc,
         CodePoint::Unsafe1ByteUtf8Sequence,
     )
 }
 
-fn ByteDecoder_incomplete2ByteSequence(
-    session: &mut Reader,
-    errSrcLoc: Location,
+fn incomplete_2byte_sequence(
+    &mut self,
+    err_src_loc: Location,
     _policy: NextPolicy,
 ) -> SourceCharacter {
-    ByteDecoder_incompleteByteSequence(
-        session,
-        errSrcLoc,
+    self.incomplete_byte_sequence(
+        err_src_loc,
         CodePoint::Unsafe2ByteUtf8Sequence,
     )
 }
 
-fn ByteDecoder_incomplete3ByteSequence(
-    session: &mut Reader,
-    errSrcLoc: Location,
+fn incomplete_3byte_sequence(
+    &mut self,
+    err_src_loc: Location,
     _policy: NextPolicy,
 ) -> SourceCharacter {
-    ByteDecoder_incompleteByteSequence(
-        session,
-        errSrcLoc,
+    self.incomplete_byte_sequence(
+        err_src_loc,
         CodePoint::Unsafe3ByteUtf8Sequence,
     )
 }
 
-fn ByteDecoder_incompleteByteSequence(
-    session: &mut Reader,
-    errSrcLoc: Location,
-    errChar: SourceCharacter,
+fn incomplete_byte_sequence(
+    &mut self,
+    err_src_loc: Location,
+    err_char: SourceCharacter,
 ) -> SourceCharacter {
-    session.src().increment();
+    self.src().increment();
 
-    if session.check_issues {
+    if self.check_issues {
         //
         // No CodeAction here
         //
 
-        let I = EncodingIssue(
+        let I = encoding_issue(
             IssueTag::IncompleteUTF8Sequence,
             "Incomplete UTF-8 sequence.".into(),
             Severity::Fatal,
-            Span::new(errSrcLoc, errSrcLoc.next()),
+            Span::new(err_src_loc, err_src_loc.next()),
             1.0,
             vec![],
             vec![],
         );
 
-        session.addIssue(I);
+        self.add_issue(I);
     }
 
     //
@@ -1032,39 +1024,39 @@ fn ByteDecoder_incompleteByteSequence(
     // Related bugs: 366106, 376155
     //
 
-    session.setUnsafeCharacterEncodingFlag(
+    self.set_unsafe_character_encoding_flag(
         UnsafeCharacterEncoding::IncompleteUTF8Sequence,
     );
 
-    return errChar;
+    return err_char;
 }
 
 //
 // Related bugs: 376155
 //
-fn ByteDecoder_straySurrogate(
-    session: &mut Reader,
-    errSrcLoc: Location,
+fn stray_surrogate(
+    &mut self,
+    err_src_loc: Location,
     _policy: NextPolicy,
 ) -> SourceCharacter {
-    session.src().increment();
+    self.src().increment();
 
-    if session.check_issues {
+    if self.check_issues {
         //
         // No CodeAction here
         //
 
-        let I = EncodingIssue(
+        let I = encoding_issue(
             IssueTag::StraySurrogate,
             "Stray surrogate.".into(),
             Severity::Fatal,
-            Span::new(errSrcLoc, errSrcLoc.next()),
+            Span::new(err_src_loc, err_src_loc.next()),
             1.0,
             vec![],
             vec![],
         );
 
-        session.addIssue(I);
+        self.add_issue(I);
     }
 
     //
@@ -1074,45 +1066,46 @@ fn ByteDecoder_straySurrogate(
     // Related bugs: 366106, 376155
     //
 
-    session.setUnsafeCharacterEncodingFlag(
+    self.set_unsafe_character_encoding_flag(
         UnsafeCharacterEncoding::StraySurrogate,
     );
 
     return CodePoint::from(CodePoint::Unsafe3ByteUtf8Sequence);
 }
 
-fn ByteDecoder_bom(
-    session: &mut Reader,
-    errSrcLoc: Location,
+fn bom(
+    &mut self,
+    err_src_loc: Location,
     _policy: NextPolicy,
 ) -> SourceCharacter {
-    session.src().increment();
+    self.src().increment();
 
-    if session.check_issues {
+    if self.check_issues {
         //
         // No CodeAction here
         //
 
-        let I = EncodingIssue(
+        let I = encoding_issue(
             IssueTag::BOM,
             "BOM.".into(),
             Severity::Fatal,
-            Span::new(errSrcLoc, errSrcLoc.next()),
+            Span::new(err_src_loc, err_src_loc.next()),
             1.0,
             vec![],
             vec![],
         );
 
-        session.addIssue(I);
+        self.add_issue(I);
     }
 
-    session.setUnsafeCharacterEncodingFlag(UnsafeCharacterEncoding::BOM);
+    self.set_unsafe_character_encoding_flag(UnsafeCharacterEncoding::BOM);
 
     return SourceCharacter::from(CodePoint::Unsafe3ByteUtf8Sequence);
 }
+}
 
 impl SourceConvention {
-    pub fn newSourceLocation(&self) -> Location {
+    pub fn new_source_location(&self) -> Location {
         match self {
             SourceConvention::LineColumn => Location::LineColumn(LineColumn(
                 NonZeroU32::MIN,
@@ -1137,7 +1130,7 @@ impl<'t> SourceManager<'t> {
         }
     }
 
-    fn windowsNewline(&mut self) {
+    fn windows_newline(&mut self) {
         match self.loc {
             Location::LineColumn(LineColumn(line, column)) => {
                 *line = non_zero_u32_incr(*line);
@@ -1152,11 +1145,11 @@ impl<'t> SourceManager<'t> {
     fn tab(&mut self) {
         match self.loc {
             Location::LineColumn(LineColumn(_, column)) => {
-                let currentTabStop =
+                let current_tab_stop =
                     self.tab_width * ((column.get() - 1) / self.tab_width) + 1;
 
                 *column =
-                    NonZeroU32::new(currentTabStop + self.tab_width).unwrap();
+                    NonZeroU32::new(current_tab_stop + self.tab_width).unwrap();
             },
             Location::CharacterIndex(index) => {
                 *index += 1;

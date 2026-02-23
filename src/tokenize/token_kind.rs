@@ -895,7 +895,7 @@ impl TokenKind {
     //         Mask off 0b1_1111_1000 (0x1f8)
     // And test against 0b0_0000_1000 (0x08)
     //
-    pub const fn isTrivia(self) -> bool {
+    pub const fn is_trivia(self) -> bool {
         return (self.bits() & 0x1f8) == 0x08;
     }
 
@@ -905,27 +905,27 @@ impl TokenKind {
     //         Mask off 0b1_1111_1100 (0x1fc)
     // And test against 0b0_0000_1000 (0x08)
     //
-    pub const fn isTriviaButNotToplevelNewline(self) -> bool {
+    pub const fn is_trivia_but_not_toplevel_newline(self) -> bool {
         return (self.bits() & 0x1fc) == 0x08;
     }
 
-    pub const fn isPossibleBeginning(self) -> bool {
+    pub const fn is_possible_beginning(self) -> bool {
         return self.bits() & Group1::MASK == Group1::PossibleBeginning as u16;
     }
 
-    pub const fn isCloser(self) -> bool {
+    pub const fn is_closer(self) -> bool {
         return self.bits() & Group1::MASK == Group1::Closer as u16;
     }
 
-    pub const fn isError(self) -> bool {
+    pub const fn is_error(self) -> bool {
         return self.bits() & Group1::MASK == Group1::Error as u16;
     }
 
-    pub const fn isUnterminated(self) -> bool {
+    pub const fn is_unterminated(self) -> bool {
         return self.bits() & Group2::MASK == Group2::Unterminated as u16;
     }
 
-    pub const fn isEmpty(self) -> bool {
+    pub const fn is_empty(self) -> bool {
         return self.bits() & Group2::MASK == Group2::Empty as u16;
     }
 }
@@ -980,7 +980,7 @@ pub enum Closer {
 //======================================
 
 #[rustfmt::skip]
-pub(crate) const fn GroupOpenerToCloser(token: TokenKind) -> Closer {
+pub(crate) const fn group_opener_to_closer(token: TokenKind) -> Closer {
     match token {
         TokenKind::ColonColonOpenSquare => Closer::CloseSquare,
         TokenKind::LongName_LeftAngleBracket => Closer::LongName_RightAngleBracket,
@@ -1001,7 +1001,7 @@ pub(crate) const fn GroupOpenerToCloser(token: TokenKind) -> Closer {
 }
 
 #[rustfmt::skip]
-pub(crate) fn TokenToCloser(token: TokenKind) -> Closer {
+pub(crate) fn token_to_closer(token: TokenKind) -> Closer {
     match token {
         TokenKind::BarGreater => Closer::BarGreater,
         TokenKind::CloseCurly => Closer::CloseCurly,
@@ -1024,7 +1024,7 @@ pub(crate) fn TokenToCloser(token: TokenKind) -> Closer {
 // Verify some TokenKind properties
 //======================================
 
-const _: () = assert!(TokenKind::EndOfFile.isEmpty());
+const _: () = assert!(TokenKind::EndOfFile.is_empty());
 
 #[test]
 fn test_newline_policy() {
@@ -1076,10 +1076,10 @@ fn test_token_kind_is_trivia() {
     for variant in TokenKind::VARIANTS {
         let id = variant.id();
 
-        if variant.isTrivia() {
+        if variant.is_trivia() {
             assert!(
                 id >= 8 && id <= 16,
-                "unexpected isTrivia() id: {id}, variant = {variant:?}"
+                "unexpected is_trivia() id: {id}, variant = {variant:?}"
             );
 
             match variant {
@@ -1092,17 +1092,17 @@ fn test_token_kind_is_trivia() {
                 | TokenKind::Buffer3
                 | TokenKind::Buffer4 => (),
                 _ => panic!(
-                    "unexpected TokenKind isTrivia() == true: {variant:?}"
+                    "unexpected TokenKind is_trivia() == true: {variant:?}"
                 ),
             }
         } else {
             assert!(id < 8 || id >= 16, "id: {id}, variant = {variant:?}");
         }
 
-        if variant.isTriviaButNotToplevelNewline() {
+        if variant.is_trivia_but_not_toplevel_newline() {
             assert!(
                 id >= 8 && id <= 16,
-                "unexpected isTrivia() id: {id}, variant = {variant:?}"
+                "unexpected is_trivia() id: {id}, variant = {variant:?}"
             );
 
             match variant {
@@ -1114,7 +1114,7 @@ fn test_token_kind_is_trivia() {
                 | TokenKind::Buffer3
                 | TokenKind::Buffer4 => (),
                 _ => panic!(
-                    "unexpected TokenKind isTrivia() == true: {variant:?}"
+                    "unexpected TokenKind is_trivia() == true: {variant:?}"
                 ),
             }
         } else {

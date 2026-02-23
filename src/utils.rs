@@ -10,7 +10,7 @@ use crate::{
     source::Span,
 };
 
-pub fn isStrange(point: CodePoint) -> bool {
+pub fn is_strange(point: CodePoint) -> bool {
     match point {
             //
             // C0 control characters
@@ -31,7 +31,7 @@ pub fn isStrange(point: CodePoint) -> bool {
     }
 }
 
-pub fn isMBStrange(point: CodePoint) -> bool {
+pub fn is_mb_strange(point: CodePoint) -> bool {
     //
     // Reject if ASCII, should use isStrange()
     //
@@ -183,7 +183,7 @@ pub fn isMBStrange(point: CodePoint) -> bool {
     return false;
 }
 
-pub fn isStraySurrogate(point: u32) -> bool {
+pub fn is_stray_surrogate(point: u32) -> bool {
     if 0xd800 <= point && point <= 0xdfff {
         return true;
     }
@@ -230,13 +230,13 @@ const DIGIT_LOOKUP: [u8; 256] = [
 ];
 
 /// Convert val to the digit that it represents
-pub fn toDigit(val: u8) -> u8 {
+pub fn to_digit(val: u8) -> u8 {
     return DIGIT_LOOKUP[usize::from(val)];
 }
 
 // if c is an ASCII WLCharacter, then compare to test
 // TODO: Make these two types the same
-pub fn ifASCIIWLCharacter(c_byte: u8, test: u8) -> bool {
+pub fn if_ascii_wl_character(c_byte: u8, test: u8) -> bool {
     if c_byte > 0x7f {
         return true;
     }
@@ -272,7 +272,7 @@ pub fn ifASCIIWLCharacter(c_byte: u8, test: u8) -> bool {
 // \:29F4 -> \[RuleDelayed]
 // \:200B -> \[InvisibleSpace]
 //
-pub fn certainCharacterReplacementActions(
+pub fn certain_character_replacement_actions(
     c: WLCharacter,
     src: Span,
 ) -> Vec<CodeAction> {
@@ -281,8 +281,8 @@ pub fn certainCharacterReplacementActions(
     match c.to_point() {
         Char(CODEPOINT_LONGNAME_COMPATIBILITYNOBREAK) => {
 
-            let safeAndGraphicalStr1 = c.safeAndGraphicalString();
-            let safeAndGraphicalStr2 = WLCharacter::new(CODEPOINT_LONGNAME_NOBREAK).safeAndGraphicalString();
+            let safeAndGraphicalStr1 = c.safe_and_graphical_string();
+            let safeAndGraphicalStr2 = WLCharacter::new(CODEPOINT_LONGNAME_NOBREAK).safe_and_graphical_string();
 
             //
             // UTF-8 bytes for U+2060 (\[NoBreak])
@@ -300,8 +300,8 @@ pub fn certainCharacterReplacementActions(
             //
         Char(CODEPOINT_TRIANGLEHEADEDRIGHTWARDSARROW) => {
 
-            let safeAndGraphicalStr1 = c.safeAndGraphicalString();
-            let safeAndGraphicalStr2 = WLCharacter::new(CODEPOINT_LONGNAME_RULE).safeAndGraphicalString();
+            let safeAndGraphicalStr1 = c.safe_and_graphical_string();
+            let safeAndGraphicalStr2 = WLCharacter::new(CODEPOINT_LONGNAME_RULE).safe_and_graphical_string();
 
             //
             // UTF-8 bytes for U+F522 (\[Rule])
@@ -314,8 +314,8 @@ pub fn certainCharacterReplacementActions(
         }
         Char(CODEPOINT_RULEDELAYED) => {
 
-            let safeAndGraphicalStr1 = c.safeAndGraphicalString();
-            let safeAndGraphicalStr2 = WLCharacter::new(CODEPOINT_LONGNAME_RULEDELAYED).safeAndGraphicalString();
+            let safeAndGraphicalStr1 = c.safe_and_graphical_string();
+            let safeAndGraphicalStr2 = WLCharacter::new(CODEPOINT_LONGNAME_RULEDELAYED).safe_and_graphical_string();
 
             //
             // UTF-8 bytes for U+F51F (\[RuleDelayed])
@@ -328,8 +328,8 @@ pub fn certainCharacterReplacementActions(
         }
         Char(CODEPOINT_FUNCTIONAPPLICATION) => {
 
-            let safeAndGraphicalStr1 = c.safeAndGraphicalString();
-            let safeAndGraphicalStr2 = WLCharacter::new(CODEPOINT_LONGNAME_INVISIBLEAPPLICATION).safeAndGraphicalString();
+            let safeAndGraphicalStr1 = c.safe_and_graphical_string();
+            let safeAndGraphicalStr2 = WLCharacter::new(CODEPOINT_LONGNAME_INVISIBLEAPPLICATION).safe_and_graphical_string();
 
             //
             // UTF-8 bytes for U+F76D (\[InvisibleApplication])
@@ -347,8 +347,8 @@ pub fn certainCharacterReplacementActions(
         },
         Char(CODEPOINT_INVISIBLESEPARATOR) => {
 
-            let safeAndGraphicalStr1 = c.safeAndGraphicalString();
-            let safeAndGraphicalStr2 = WLCharacter::new(CODEPOINT_LONGNAME_INVISIBLECOMMA).safeAndGraphicalString();
+            let safeAndGraphicalStr1 = c.safe_and_graphical_string();
+            let safeAndGraphicalStr2 = WLCharacter::new(CODEPOINT_LONGNAME_INVISIBLECOMMA).safe_and_graphical_string();
 
             //
             // UTF-8 bytes for U+F765 (\[InvisibleComma])
@@ -361,8 +361,8 @@ pub fn certainCharacterReplacementActions(
         },
         Char(CODEPOINT_INVISIBLEPLUS) => {
 
-            let safeAndGraphicalStr1 = c.safeAndGraphicalString();
-            let safeAndGraphicalStr2 = WLCharacter::new(CODEPOINT_LONGNAME_IMPLICITPLUS).safeAndGraphicalString();
+            let safeAndGraphicalStr1 = c.safe_and_graphical_string();
+            let safeAndGraphicalStr2 = WLCharacter::new(CODEPOINT_LONGNAME_IMPLICITPLUS).safe_and_graphical_string();
 
             //
             // UTF-8 bytes for U+F39E (\[ImplicitPlus])
@@ -375,8 +375,8 @@ pub fn certainCharacterReplacementActions(
         },
         Char(CODEPOINT_ZEROWIDTHSPACE) => {
 
-            let safeAndGraphicalStr1 = c.safeAndGraphicalString();
-            let safeAndGraphicalStr2 = WLCharacter::new(CODEPOINT_LONGNAME_INVISIBLESPACE).safeAndGraphicalString();
+            let safeAndGraphicalStr1 = c.safe_and_graphical_string();
+            let safeAndGraphicalStr2 = WLCharacter::new(CODEPOINT_LONGNAME_INVISIBLESPACE).safe_and_graphical_string();
 
             //
             // UTF-8 bytes for U+F360 (\[InvisibleSpace])

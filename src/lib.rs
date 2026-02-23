@@ -232,8 +232,8 @@ use crate::{
     source::{Source, SourceConvention, DEFAULT_TAB_WIDTH},
     tokenize::{
         tokenizer::{
-            Tokenizer_nextToken_stringifyAsFile,
-            Tokenizer_nextToken_stringifyAsTag, TrackedSourceLocations,
+            tokenizer_next_token_stringify_as_file,
+            tokenizer_next_token_stringify_as_tag, TrackedSourceLocations,
         },
         Token, TokenKind, TokenStr, Tokenizer,
     },
@@ -495,7 +495,7 @@ pub fn tokenize_bytes<'i>(
     let mut tokens = Vec::new();
 
     loop {
-        if feature::CHECK_ABORT && crate::abortQ() {
+        if feature::CHECK_ABORT && crate::should_abort() {
             break;
         }
 
@@ -783,10 +783,10 @@ pub fn parse_to_token<'i>(
     let token = match mode {
         StringifyMode::Normal => tokenizer.next_token(),
         StringifyMode::Tag => {
-            Tokenizer_nextToken_stringifyAsTag(&mut tokenizer)
+            tokenizer_next_token_stringify_as_tag(&mut tokenizer)
         },
         StringifyMode::File => {
-            Tokenizer_nextToken_stringifyAsFile(&mut tokenizer)
+            tokenizer_next_token_stringify_as_file(&mut tokenizer)
         },
     };
 
@@ -810,7 +810,7 @@ pub fn safe_string<'i>(
     loop {
         let char = tokenizer.next_source_char(TOPLEVEL);
 
-        if char.isEndOfFile() {
+        if char.is_end_of_file() {
             break;
         }
     } // while (true)
@@ -836,7 +836,7 @@ pub fn safe_string<'i>(
 }
 
 // TODO(cleanup): This doesn't need to be a method on ParserSession.
-pub(crate) fn abortQ() -> bool {
+pub(crate) fn should_abort() -> bool {
     // if self.libData.is_null() {
     //     return false;
     // }
@@ -917,7 +917,7 @@ impl TryFrom<i32> for SourceConvention {
 
 macro_rules! panic_if_aborted {
     () => {
-        if crate::feature::CHECK_ABORT && crate::abortQ() {
+        if crate::feature::CHECK_ABORT && crate::should_abort() {
             panic!("aborting parsing by panicking")
         }
     };
