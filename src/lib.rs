@@ -192,6 +192,8 @@ pub mod cst;
 
 pub mod abstract_cst;
 
+pub mod box_parse;
+
 #[doc(hidden)]
 pub mod fmt_as_expr;
 

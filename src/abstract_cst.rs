@@ -2922,8 +2922,21 @@ fn abstract_box_node<I: TokenInput + Debug, S: TokenSource + Debug>(
         //
         // BoxNode[RowBox, {a_}, data_]
         BoxKind::RowBox => {
-            todo!("RowBox[..] abstracting logic")
-            // BoxNode[RowBox, {abstract /@ a}, data]
+            let BoxNode {
+                children: NodeSeq(children),
+                src: data,
+                ..
+            } = box_node;
+            let abstracted: Vec<Ast> =
+                children.into_iter().map(abstract_).collect();
+            if abstracted.len() == 1 {
+                return abstracted.into_iter().next().unwrap();
+            }
+            return Ast::Box {
+                kind: BoxKind::RowBox,
+                args: abstracted,
+                data: data.into(),
+            };
         },
         //
         // `a` is a List of Lists

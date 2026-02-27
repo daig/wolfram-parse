@@ -15,6 +15,7 @@ mod test_paclet_decoder;
 mod test_file_parsing;
 mod test_fuzz;
 mod test_precedence;
+mod test_box_parse;
 
 use pretty_assertions::assert_eq;
 
