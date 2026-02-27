@@ -1012,134 +1012,124 @@ impl BoxPosition {
         }
 
         //------------------------------
-        // Normalize lengths
+        // Extract paths from each position
         //------------------------------
 
-        let (start, end) = match (start, end) {
-            // TID:231110/1 - BoxPosition::between for start/end tokens at different depths
-            //     Test case: BoxPosition::between(&src!({1, 1}), &src!({1, 2, 1, 2}))
-            (BoxPosition::At(start), BoxPosition::At(end))
-                if end.len() == start.len() + 2 =>
-            {
-                let normalized_end = &end[..end.len() - 2];
-
-                debug_assert_eq!(start.len(), normalized_end.len());
-
-                let start_most = most_slice(start);
-                let end_most = most_slice(normalized_end);
-
-                if start_most.is_some() && start_most == end_most {
-                    // If the original start and end were {1, 1} and {1, 2, 1, 2},
-                    // the new start and end are {1, 1} and {1, 2} -- we've
-                    // normalized the end location to make them the same
-                    // length.
-                    //
-                    // The correctness of this assumes that the position
-                    // represented by the dropped indexs in `end` were the last
-                    // expressions at their respective depth -- which should
-                    // always be the case when these positions are the start/end
-                    // source location of a well-formed Cst node.
-                    (
-                        BoxPosition::At(start.to_vec()),
-                        BoxPosition::At(normalized_end.to_vec()),
-                    )
-                } else {
-                    (
-                        BoxPosition::At(start.to_vec()),
-                        BoxPosition::At(end.to_vec()),
-                    )
-                }
-            },
-            (start, end) => (start.clone(), end.clone()),
-        };
-
-        //------------------------------
-        // Compare and extract common prefix
-        //------------------------------
-
-        let (common, (start_pos, end_pos)) = match (start, end) {
+        // Get the index path from each position, plus any trailing span info.
+        let (start_path, end_path, end_span_suffix) = match (start, end) {
             (
                 BoxPosition::At(start) | BoxPosition::Before(start),
                 BoxPosition::At(end) | BoxPosition::After(end),
-            ) => match (start.split_last(), end.split_last()) {
-                (
-                    Some((start_last, start_most)),
-                    Some((end_last, end_most)),
-                ) => 'ret: {
-                    if start_most == end_most {
-                        break 'ret (
-                            start_most.to_vec(),
-                            (Pos::Index(*start_last), Pos::Index(*end_last)),
-                        );
-                    }
-
-                    todo();
-                },
-
-                (None, None) => return Some(BoxPosition::At(vec![])),
-
-                (None, Some(_)) | (Some(_), None) => return None,
-            },
-
-            // Occurs when the start position is the head of a CallNode and the
-            // end Spanning position is the source of the CallBody::Group.
-            //
-            // Test case: start = {1, 1, 1}, end = {1, 1, 2 ;; 4}
-            //
-            // TID:231031/1: Synthetic box source for process plus pair
-            // TID:231110/2: Plus pair synthetic "between" BoxPosition
-            //
+            ) => (start.clone(), end.clone(), None),
             (
-                BoxPosition::At(start),
+                BoxPosition::At(start) | BoxPosition::Before(start),
                 BoxPosition::Spanning {
                     index: end,
                     span: end_span,
                 },
-            ) => {
-                let Some((start_last, start_most)) = start.split_last() else {
-                    // TODO: Test
-                    return None;
-                };
-
-                if start_most != end {
-                    return None;
-                }
-
-                (
-                    start_most.to_vec(),
-                    (Pos::Index(*start_last), Pos::Span(end_span)),
-                )
-            },
-
+            ) => (start.clone(), end.clone(), Some(*end_span)),
             (_, _) => {
                 todo();
             },
         };
 
         //------------------------------
-        // Compare last elements in each box position
+        // Find the deepest common ancestor
         //------------------------------
 
-        let combined = match (start_pos, end_pos) {
-            // TID:231108/1: Computed box source position for PostfixNode with GroupNode
-            (Pos::Index(1), Pos::Index(_) | Pos::Span((2, _))) => {
-                match most_slice(&common) {
-                    Some(parent_box_pos) => {
-                        BoxPosition::At(parent_box_pos.to_vec())
-                    },
-                    None => todo(),
-                }
-            },
+        // Find the longest common prefix of the two paths.
+        let common_len = start_path
+            .iter()
+            .zip(end_path.iter())
+            .take_while(|(a, b)| a == b)
+            .count();
 
-            (Pos::Index(2), Pos::Index(end_pos)) => BoxPosition::Spanning {
-                index: common,
-                span: (2, end_pos),
-            },
+        // If both paths are the same length and share all-but-last as
+        // a common prefix, produce a precise span at that level.
+        if start_path.len() == end_path.len()
+            && common_len == start_path.len() - 1
+        {
+            let common = start_path[..common_len].to_vec();
+            let start_last = start_path[common_len];
+            let end_last = end_path[common_len];
 
-            (_, _) => todo(),
-        };
+            // Combine with any trailing span from the end position.
+            let end_pos = match end_span_suffix {
+                Some(span) => Pos::Span(span),
+                None => Pos::Index(end_last),
+            };
 
-        Some(combined)
+            let (common, (start_pos, end_pos)) = (
+                common,
+                (Pos::Index(start_last), end_pos),
+            );
+
+            // Fall through to the combining stage below
+            let combined = match (start_pos, end_pos) {
+                // TID:231108/1: Computed box source position for PostfixNode with GroupNode
+                (Pos::Index(1), Pos::Index(_) | Pos::Span((2, _))) => {
+                    match most_slice(&common) {
+                        Some(parent_box_pos) => {
+                            BoxPosition::At(parent_box_pos.to_vec())
+                        },
+                        None => todo(),
+                    }
+                },
+
+                (Pos::Index(start_idx), Pos::Index(end_idx))
+                    if start_idx == end_idx =>
+                {
+                    BoxPosition::At(
+                        common
+                            .iter()
+                            .copied()
+                            .chain(std::iter::once(start_idx))
+                            .collect(),
+                    )
+                },
+
+                (Pos::Index(start_idx), Pos::Index(end_idx)) => {
+                    BoxPosition::Spanning {
+                        index: common,
+                        span: (start_idx, end_idx),
+                    }
+                },
+
+                (Pos::Index(start_idx), Pos::Span(end_span)) => {
+                    BoxPosition::Spanning {
+                        index: common,
+                        span: (start_idx, end_span.1),
+                    }
+                },
+
+                (_, _) => todo(),
+            };
+
+            return Some(combined);
+        }
+
+        // Different depths or shorter common prefix: return the deepest
+        // common ancestor. This is the parent node that contains both
+        // start and end positions.
+        //
+        // E.g. between({3, 9, 9, 1}, {3, 9, 9}) with common_len=3:
+        //   common ancestor = {3, 9, 9}[..2] = {3, 9}
+        //   but since one path IS a prefix of the other (plus extra),
+        //   the ancestor that contains both is at the shorter path's
+        //   parent level.
+        //
+        // E.g. between({1, 1}, {1, 2, 1, 2}) with common_len=1:
+        //   common ancestor = {} (the root)
+        //
+        // General rule: go up to most_slice of the common prefix.
+        let ancestor = &start_path[..common_len];
+
+        // If the common prefix itself is non-empty, go up one level
+        // to get the containing node.
+        match most_slice(ancestor) {
+            Some(parent) => Some(BoxPosition::At(parent.to_vec())),
+            None => Some(BoxPosition::At(vec![])),
+        }
     }
 }
 

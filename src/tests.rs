@@ -16,6 +16,7 @@ mod test_file_parsing;
 mod test_fuzz;
 mod test_precedence;
 mod test_box_parse;
+mod test_nb_parsing;
 
 use pretty_assertions::assert_eq;
 

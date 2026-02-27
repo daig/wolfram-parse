@@ -321,6 +321,209 @@ impl Ast {
             data: data.into(),
         }
     }
+
+    //==================================
+    // Conversion to wolfram_expr::Expr
+    //==================================
+
+    /// Convert this AST node to a `wolfram_expr::Expr`.
+    ///
+    /// This is the first step in the MakeExpression pipeline for notebook
+    /// files: text-parse a .nb file to get an AST, then convert to `Expr`
+    /// so that box contents (e.g. `RowBox[{...}]`) can be fed to
+    /// [`parse_box_expr`][crate::box_parse::parse_box_expr].
+    ///
+    /// # Leaf conversion
+    ///
+    /// - `Integer` → `Expr::from(i64)` (falls back to `Expr::string` for
+    ///   overflow or base-notation)
+    /// - `Real` → `Expr::string` (preserves exact text)
+    /// - `String` → `Expr::string` with surrounding quotes stripped
+    /// - `Symbol` → `Expr::from(Symbol::new(...))`
+    /// - Other leaf kinds → `Expr::string` of the raw token text
+    ///
+    /// # Compound nodes
+    ///
+    /// - `Call` / `CallMissingCloser` → `Expr::normal(head.to_expr(), args)`
+    /// - `Group` → converts the body (middle child)
+    /// - Error/SyntaxError nodes → best-effort conversion of first child
+    /// - `Box` → `Expr::normal` with the BoxKind symbol as head
+    pub fn to_expr(&self) -> Expr {
+        match self {
+            Ast::Leaf { kind, input, .. } => {
+                leaf_to_expr(*kind, input.to_str())
+            },
+            Ast::Error { input, .. } => {
+                let s = input.to_str();
+                if s.is_empty() {
+                    Expr::from(Symbol::new("System`Null"))
+                } else {
+                    Expr::string(s)
+                }
+            },
+            Ast::Call { head, args, .. }
+            | Ast::CallMissingCloser { head, args, .. } => {
+                let head_expr = head.to_expr();
+                let arg_exprs: Vec<Expr> =
+                    args.iter().map(|a| a.to_expr()).collect();
+                // head_expr should be a Symbol for normal function calls
+                match head_expr.kind() {
+                    wolfram_expr::ExprKind::Symbol(sym) => {
+                        Expr::normal(sym.clone(), arg_exprs)
+                    },
+                    _ => {
+                        // Non-symbol head: wrap as f[args]
+                        // Use a synthetic head
+                        Expr::normal(
+                            Symbol::new("System`Head"),
+                            std::iter::once(head_expr)
+                                .chain(arg_exprs)
+                                .collect(),
+                        )
+                    },
+                }
+            },
+            Ast::Group { children, .. } => {
+                // Group { (opener, body, closer) } — convert the body
+                children.1.to_expr()
+            },
+            Ast::GroupMissingCloser { children, .. }
+            | Ast::GroupMissingOpener { children, .. } => {
+                if let Some(first) = children.first() {
+                    first.to_expr()
+                } else {
+                    Expr::from(Symbol::new("System`Null"))
+                }
+            },
+            Ast::SyntaxError { children, .. } => {
+                if let Some(first) = children.first() {
+                    first.to_expr()
+                } else {
+                    Expr::from(Symbol::new("System`Null"))
+                }
+            },
+            Ast::AbstractSyntaxError { args, .. } => {
+                if let Some(first) = args.first() {
+                    first.to_expr()
+                } else {
+                    Expr::from(Symbol::new("System`Null"))
+                }
+            },
+            Ast::Box { kind, args, .. } => {
+                let head_sym = match kind {
+                    BoxKind::RowBox => Symbol::new("System`RowBox"),
+                    BoxKind::GridBox => Symbol::new("System`GridBox"),
+                    BoxKind::TagBox => Symbol::new("System`TagBox"),
+                    BoxKind::TemplateBox => {
+                        Symbol::new("System`TemplateBox")
+                    },
+                    BoxKind::InterpretationBox => {
+                        Symbol::new("System`InterpretationBox")
+                    },
+                    BoxKind::SubscriptBox => {
+                        Symbol::new("System`SubscriptBox")
+                    },
+                    BoxKind::SuperscriptBox => {
+                        Symbol::new("System`SuperscriptBox")
+                    },
+                    BoxKind::StyleBox => Symbol::new("System`StyleBox"),
+                    BoxKind::NamespaceBox => {
+                        Symbol::new("System`NamespaceBox")
+                    },
+                    BoxKind::OverscriptBox => {
+                        Symbol::new("System`OverscriptBox")
+                    },
+                    BoxKind::SubsuperscriptBox => {
+                        Symbol::new("System`SubsuperscriptBox")
+                    },
+                    BoxKind::GraphicsBox => {
+                        Symbol::new("System`GraphicsBox")
+                    },
+                    BoxKind::Other(sym) => sym.clone(),
+                };
+                let arg_exprs: Vec<Expr> =
+                    args.iter().map(|a| a.to_expr()).collect();
+                Expr::normal(head_sym, arg_exprs)
+            },
+            Ast::Code { first, .. } => first.clone(),
+            Ast::TagBox_GroupParen { group, .. } => {
+                // Convert the body (middle element of the group triple)
+                group.1.to_expr()
+            },
+            Ast::PrefixNode_PrefixLinearSyntaxBang(children, _) => {
+                children[1].to_expr()
+            },
+        }
+    }
+}
+
+/// Convert a leaf token to `wolfram_expr::Expr`.
+fn leaf_to_expr(kind: TokenKind, input: &str) -> Expr {
+    match kind {
+        TokenKind::Integer => {
+            // Try to parse as i64; fall back to string for overflow or
+            // base-notation like 16^^ff
+            match input.parse::<i64>() {
+                Ok(n) => Expr::from(n),
+                Err(_) => Expr::string(input),
+            }
+        },
+        TokenKind::Real => {
+            // Preserve exact text representation
+            Expr::string(input)
+        },
+        TokenKind::String => {
+            // Strip surrounding quotes: "hello" → hello
+            let unquoted = if input.starts_with('"') && input.ends_with('"')
+            {
+                &input[1..input.len() - 1]
+            } else {
+                input
+            };
+            Expr::string(unquoted)
+        },
+        TokenKind::Symbol => {
+            // Strip line continuations (backslash-newline) that the
+            // tokenizer preserves in the raw token text.
+            let clean: std::borrow::Cow<str> =
+                if input.contains("\\\n") {
+                    input.replace("\\\n", "").into()
+                } else {
+                    input.into()
+                };
+
+            // Symbol::new requires a context-qualified name like "System`Foo".
+            // AST leaf symbols may be unqualified (e.g. "ToBoxes").
+            let qualified = if clean.contains('`') {
+                clean.into_owned()
+            } else {
+                format!("System`{clean}")
+            };
+
+            // Fall back to string for names Symbol::try_new rejects
+            // (e.g. line continuations, unusual escapes).
+            match Symbol::try_new(&qualified) {
+                Some(sym) => Expr::from(sym),
+                None => Expr::string(input),
+            }
+        },
+        // Synthetic tokens
+        TokenKind::Fake_ImplicitNull => {
+            Expr::from(Symbol::new("System`Null"))
+        },
+        TokenKind::Fake_ImplicitOne => Expr::from(1_i64),
+        TokenKind::Fake_ImplicitAll => {
+            Expr::from(Symbol::new("System`All"))
+        },
+        _ => {
+            // Other leaf kinds (whitespace, comments, operators as leaves)
+            if input.is_empty() {
+                Expr::from(Symbol::new("System`Null"))
+            } else {
+                Expr::string(input)
+            }
+        },
+    }
 }
 
 impl AstMetadata {
@@ -407,7 +610,7 @@ impl AbstractSyntaxError {
 // Macros
 //======================================
 
-use wolfram_expr::{symbol::SymbolRef, Expr};
+use wolfram_expr::{symbol::SymbolRef, Expr, Symbol};
 
 //======================================
 // Format Impls
