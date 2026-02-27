@@ -8,7 +8,8 @@ use crate::{
     box_parse::parse_box_expr,
     cst::{
         BinaryNode, BoxKind, BoxNode, CallBody, CallHead, CallNode, Cst,
-        GroupNode, InfixNode, OperatorNode, PostfixNode, PrefixNode,
+        GroupMissingCloserNode, GroupMissingOpenerNode, GroupNode, InfixNode,
+        OperatorNode, PostfixNode, PrefixNode,
     },
     parse::operators::{
         BinaryOperator, CallOperator, GroupOperator, InfixOperator,
@@ -63,6 +64,16 @@ fn assert_prefix_op(cst: &Cst<TokenString, Source>, expected: PrefixOperator) {
             assert_eq!(*op, expected, "Expected prefix op {:?}, got {:?}", expected, op);
         },
         other => panic!("Expected PrefixNode, got: {:?}", other),
+    }
+}
+
+/// Check that the resulting CST is a GroupNode with the given operator.
+fn assert_group_op(cst: &Cst<TokenString, Source>, expected: GroupOperator) {
+    match cst {
+        Cst::Group(GroupNode(OperatorNode { op, .. })) => {
+            assert_eq!(*op, expected, "Expected group op {:?}, got {:?}", expected, op);
+        },
+        other => panic!("Expected GroupNode, got: {:?}", other),
     }
 }
 
@@ -575,6 +586,197 @@ fn test_postfix_increment() {
     let expr = row_box(vec![s("x"), s("++")]);
     let cst = parse_box_expr(&expr);
     assert_postfix_op(&cst, PostfixOperator::Increment);
+}
+
+//==========================================================
+// Phase 2: New group types
+//==========================================================
+
+#[test]
+fn test_group_ceiling() {
+    // RowBox[{"\u2308", "x", "\u2309"}]
+    let expr = row_box(vec![s("\u{2308}"), s("x"), s("\u{2309}")]);
+    let cst = parse_box_expr(&expr);
+    assert_group_op(&cst, GroupOperator::Ceiling);
+}
+
+#[test]
+fn test_group_floor() {
+    // RowBox[{"\u230a", "x", "\u230b"}]
+    let expr = row_box(vec![s("\u{230a}"), s("x"), s("\u{230b}")]);
+    let cst = parse_box_expr(&expr);
+    assert_group_op(&cst, GroupOperator::Floor);
+}
+
+#[test]
+fn test_group_angle_bracket() {
+    // RowBox[{"\u2329", "x", "\u232a"}]
+    let expr = row_box(vec![s("\u{2329}"), s("x"), s("\u{232a}")]);
+    let cst = parse_box_expr(&expr);
+    assert_group_op(&cst, GroupOperator::AngleBracket);
+}
+
+#[test]
+fn test_group_bracketing_bar() {
+    // RowBox[{"\uf603", "x", "\uf604"}]
+    let expr = row_box(vec![s("\u{f603}"), s("x"), s("\u{f604}")]);
+    let cst = parse_box_expr(&expr);
+    assert_group_op(&cst, GroupOperator::BracketingBar);
+}
+
+#[test]
+fn test_group_double_bracketing_bar() {
+    // RowBox[{"\uf605", "x", "\uf606"}]
+    let expr = row_box(vec![s("\u{f605}"), s("x"), s("\u{f606}")]);
+    let cst = parse_box_expr(&expr);
+    assert_group_op(&cst, GroupOperator::DoubleBracketingBar);
+}
+
+#[test]
+fn test_group_comment() {
+    // RowBox[{"(*", "comment", "*)"}]
+    let expr = row_box(vec![s("(*"), s("comment"), s("*)")]);
+    let cst = parse_box_expr(&expr);
+    assert_group_op(&cst, GroupOperator::CodeParser_Comment);
+}
+
+#[test]
+fn test_group_unicode_association() {
+    // RowBox[{"\uf113", "x", "\uf114"}]
+    let expr = row_box(vec![s("\u{f113}"), s("x"), s("\u{f114}")]);
+    let cst = parse_box_expr(&expr);
+    assert_group_op(&cst, GroupOperator::Association);
+}
+
+#[test]
+fn test_group_association_missing_closer() {
+    // RowBox[{"<|", "x"}] → GroupMissingCloser[Association]
+    let expr = row_box(vec![s("<|"), s("x")]);
+    let cst = parse_box_expr(&expr);
+    match &cst {
+        Cst::GroupMissingCloser(GroupMissingCloserNode(OperatorNode { op, .. })) => {
+            assert_eq!(*op, GroupOperator::Association);
+        },
+        other => panic!("Expected GroupMissingCloserNode, got: {:?}", other),
+    }
+}
+
+#[test]
+fn test_group_association_missing_opener() {
+    // RowBox[{"x", "|>"}] → GroupMissingOpener[Association]
+    let expr = row_box(vec![s("x"), s("|>")]);
+    let cst = parse_box_expr(&expr);
+    match &cst {
+        Cst::GroupMissingOpener(GroupMissingOpenerNode(OperatorNode { op, .. })) => {
+            assert_eq!(*op, GroupOperator::Association);
+        },
+        other => panic!("Expected GroupMissingOpenerNode, got: {:?}", other),
+    }
+}
+
+//==========================================================
+// Phase 2: New operator mappings
+//==========================================================
+
+#[test]
+fn test_binary_two_way_rule() {
+    // RowBox[{"a", "<->", "b"}]
+    let expr = row_box(vec![s("a"), s("<->"), s("b")]);
+    let cst = parse_box_expr(&expr);
+    assert_binary_op(&cst, BinaryOperator::TwoWayRule);
+}
+
+#[test]
+fn test_binary_function_shorthand() {
+    // RowBox[{"x", "|->", "body"}]
+    let expr = row_box(vec![s("x"), s("|->"), s("body")]);
+    let cst = parse_box_expr(&expr);
+    assert_binary_op(&cst, BinaryOperator::Function);
+}
+
+#[test]
+fn test_binary_apply_to() {
+    // RowBox[{"x", "//=", "f"}]
+    let expr = row_box(vec![s("x"), s("//="), s("f")]);
+    let cst = parse_box_expr(&expr);
+    assert_binary_op(&cst, BinaryOperator::ApplyTo);
+}
+
+#[test]
+fn test_infix_composition() {
+    // RowBox[{"f", "@*", "g", "@*", "h"}]
+    let expr = row_box(vec![s("f"), s("@*"), s("g"), s("@*"), s("h")]);
+    let cst = parse_box_expr(&expr);
+    assert_infix_op(&cst, InfixOperator::Composition);
+}
+
+#[test]
+fn test_infix_right_composition() {
+    // RowBox[{"f", "/*", "g", "/*", "h"}]
+    let expr = row_box(vec![s("f"), s("/*"), s("g"), s("/*"), s("h")]);
+    let cst = parse_box_expr(&expr);
+    assert_infix_op(&cst, InfixOperator::RightComposition);
+}
+
+#[test]
+fn test_prefix_get() {
+    // RowBox[{"<<", "file"}]
+    let expr = row_box(vec![s("<<"), s("file")]);
+    let cst = parse_box_expr(&expr);
+    assert_prefix_op(&cst, PrefixOperator::Get);
+}
+
+#[test]
+fn test_prefix_integral() {
+    // RowBox[{"\u222b", "f"}] — \[Integral] f
+    let expr = row_box(vec![s("\u{222b}"), s("f")]);
+    let cst = parse_box_expr(&expr);
+    assert_prefix_op(&cst, PrefixOperator::Integral);
+}
+
+//==========================================================
+// Phase 2: Call patterns
+//==========================================================
+
+#[test]
+fn test_call_missing_closer() {
+    // RowBox[{"f", "[", "x"}] → CallNode with GroupMissingCloser body
+    let expr = row_box(vec![s("f"), s("["), s("x")]);
+    let cst = parse_box_expr(&expr);
+    match &cst {
+        Cst::Call(CallNode { body, .. }) => {
+            match body {
+                CallBody::GroupMissingCloser(GroupMissingCloserNode(OperatorNode {
+                    op,
+                    ..
+                })) => {
+                    assert_eq!(*op, CallOperator::CodeParser_GroupSquare);
+                },
+                other => panic!("Expected GroupMissingCloser body, got: {:?}", other),
+            }
+        },
+        other => panic!("Expected CallNode, got: {:?}", other),
+    }
+}
+
+#[test]
+fn test_colon_pattern() {
+    // RowBox[{"x", ":", "Integer"}] → BinaryNode[Pattern, ...]
+    let expr = row_box(vec![s("x"), s(":"), s("Integer")]);
+    let cst = parse_box_expr(&expr);
+    assert_binary_op(&cst, BinaryOperator::Pattern);
+}
+
+#[test]
+fn test_unicode_bracket_classification() {
+    // Verify Unicode bracket tokens are correctly classified
+    let expr = row_box(vec![s("\u{2308}")]);
+    let cst = parse_box_expr(&expr);
+    assert_eq!(token_kind(&cst), Some(TK::LongName_LeftCeiling));
+
+    let expr = row_box(vec![s("\u{230a}")]);
+    let cst = parse_box_expr(&expr);
+    assert_eq!(token_kind(&cst), Some(TK::LongName_LeftFloor));
 }
 
 //==========================================================

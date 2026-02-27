@@ -133,9 +133,17 @@ fn classify_string(
         // Other operators
         "/:" => TK::SlashColon,
         "::" => TK::ColonColon,
+        ":" => TK::Colon,
         "**" => TK::StarStar,
         "@*" => TK::AtStar,
         "/*" => TK::SlashStar,
+        "<->" => TK::LessMinusGreater,
+        "|->" => TK::BarMinusGreater,
+        "//=" => TK::SlashSlashEqual,
+
+        // Box comment delimiters
+        "(*" => TK::Boxes_OpenParenStar,
+        "*)" => TK::Boxes_StarCloseParen,
 
         // Delimiters
         "[" => TK::OpenSquare,
@@ -175,6 +183,20 @@ fn classify_string(
         "\u{f3c8}" => TK::LongName_RightDoubleBracket,
         "\u{f4a1}" => TK::LongName_InvisibleApplication,
 
+        // Unicode group brackets
+        "\u{2308}" => TK::LongName_LeftCeiling,
+        "\u{2309}" => TK::LongName_RightCeiling,
+        "\u{230a}" => TK::LongName_LeftFloor,
+        "\u{230b}" => TK::LongName_RightFloor,
+        "\u{2329}" => TK::LongName_LeftAngleBracket,
+        "\u{232a}" => TK::LongName_RightAngleBracket,
+        "\u{f113}" => TK::LongName_LeftAssociation,
+        "\u{f114}" => TK::LongName_RightAssociation,
+        "\u{f603}" => TK::LongName_LeftBracketingBar,
+        "\u{f604}" => TK::LongName_RightBracketingBar,
+        "\u{f605}" => TK::LongName_LeftDoubleBracketingBar,
+        "\u{f606}" => TK::LongName_RightDoubleBracketingBar,
+
         _ => {
             return classify_string_fallback(s, pos);
         },
@@ -188,8 +210,17 @@ fn classify_string_fallback(
     s: &str,
     pos: Source,
 ) -> Cst<TokenString, Source> {
-    // Check for whitespace (spaces/tabs)
-    if !s.is_empty() && s.chars().all(|c| c == ' ' || c == '\t') {
+    // Check for whitespace (spaces/tabs/Unicode whitespace)
+    if !s.is_empty()
+        && s.chars().all(|c| {
+            c == ' '
+                || c == '\t'
+                || c == '\u{00a0}' // NonBreakingSpace
+                || c == '\u{2009}' // ThinSpace
+                || c == '\u{205f}' // MediumSpace
+                || c == '\u{2005}' // FourPerEmSpace (MediumMathematicalSpace)
+        })
+    {
         return make_token(TK::Boxes_MultiWhitespace, s, pos);
     }
 
@@ -555,23 +586,53 @@ fn try_call(
     _pos: &Source,
 ) -> Option<Cst<TokenString, Source>> {
     let agg_count = agg.len();
-    if agg_count < 3 {
+    if agg_count < 2 {
         return None;
     }
 
-    // Check if second agg child is OpenSquare and last is CloseSquare
     let second_tok = token_kind_of(agg[1])?;
+
+    // Check if second agg child is an opener
+    let is_opener = matches!(
+        second_tok,
+        TK::OpenSquare
+            | TK::LongName_LeftDoubleBracket
+            | TK::ColonColonOpenSquare
+    );
+    if !is_opener {
+        return None;
+    }
+
     let last_tok = token_kind_of(agg[agg_count - 1])?;
 
-    let call_op = match (second_tok, last_tok) {
+    let (call_op, missing_closer) = match (second_tok, last_tok) {
         (TK::OpenSquare, TK::CloseSquare) => {
-            CallOperator::CodeParser_GroupSquare
+            (CallOperator::CodeParser_GroupSquare, false)
         },
         (TK::LongName_LeftDoubleBracket, TK::LongName_RightDoubleBracket) => {
-            CallOperator::CodeParser_GroupDoubleBracket
+            (CallOperator::CodeParser_GroupDoubleBracket, false)
+        },
+        (TK::ColonColonOpenSquare, TK::CloseSquare) => {
+            (CallOperator::CodeParser_GroupTypeSpecifier, false)
+        },
+        // Missing closer variants
+        (TK::OpenSquare, _) => {
+            (CallOperator::CodeParser_GroupSquare, true)
+        },
+        (TK::LongName_LeftDoubleBracket, _) => {
+            (CallOperator::CodeParser_GroupDoubleBracket, true)
+        },
+        (TK::ColonColonOpenSquare, _) => {
+            (CallOperator::CodeParser_GroupTypeSpecifier, true)
         },
         _ => return None,
     };
+
+    // Need at least 3 agg children for a well-formed call (head + opener + closer)
+    // but missing-closer needs only 2
+    if !missing_closer && agg_count < 3 {
+        return None;
+    }
 
     // Split: head is everything up to the bracket opener (in original indices),
     // body is the bracket group
@@ -588,10 +649,17 @@ fn try_call(
         CallHead::Concrete(NodeSeq(head_children))
     };
 
-    let body = CallBody::Group(GroupNode(OperatorNode {
-        op: call_op,
-        children: NodeSeq(body_children),
-    }));
+    let body = if missing_closer {
+        CallBody::GroupMissingCloser(GroupMissingCloserNode(OperatorNode {
+            op: call_op,
+            children: NodeSeq(body_children),
+        }))
+    } else {
+        CallBody::Group(GroupNode(OperatorNode {
+            op: call_op,
+            children: NodeSeq(body_children),
+        }))
+    };
 
     Some(Cst::Call(CallNode { head, body }))
 }
@@ -613,6 +681,32 @@ fn try_group(
         (TK::OpenSquare, TK::CloseSquare) => {
             GroupOperator::CodeParser_GroupSquare
         },
+        (TK::LongName_LeftCeiling, TK::LongName_RightCeiling) => {
+            GroupOperator::Ceiling
+        },
+        (TK::LongName_LeftFloor, TK::LongName_RightFloor) => {
+            GroupOperator::Floor
+        },
+        (TK::LongName_LeftAngleBracket, TK::LongName_RightAngleBracket) => {
+            GroupOperator::AngleBracket
+        },
+        (TK::LongName_LeftBracketingBar, TK::LongName_RightBracketingBar) => {
+            GroupOperator::BracketingBar
+        },
+        (
+            TK::LongName_LeftDoubleBracketingBar,
+            TK::LongName_RightDoubleBracketingBar,
+        ) => GroupOperator::DoubleBracketingBar,
+        (TK::LongName_LeftAssociation, TK::LongName_RightAssociation) => {
+            GroupOperator::Association
+        },
+        (
+            TK::LongName_LeftDoubleBracket,
+            TK::LongName_RightDoubleBracket,
+        ) => GroupOperator::CodeParser_GroupDoubleBracket,
+        (TK::Boxes_OpenParenStar, TK::Boxes_StarCloseParen) => {
+            GroupOperator::CodeParser_Comment
+        },
         // Missing closer
         (TK::OpenCurly, _) => {
             return Some(Cst::GroupMissingCloser(GroupMissingCloserNode(
@@ -630,6 +724,14 @@ fn try_group(
                 },
             )));
         },
+        (TK::LessBar, _) => {
+            return Some(Cst::GroupMissingCloser(GroupMissingCloserNode(
+                OperatorNode {
+                    op: GroupOperator::Association,
+                    children: NodeSeq(all.to_vec()),
+                },
+            )));
+        },
         // Missing opener
         (_, TK::CloseCurly) => {
             return Some(Cst::GroupMissingOpener(GroupMissingOpenerNode(
@@ -643,6 +745,14 @@ fn try_group(
             return Some(Cst::GroupMissingOpener(GroupMissingOpenerNode(
                 OperatorNode {
                     op: GroupOperator::CodeParser_GroupParen,
+                    children: NodeSeq(all.to_vec()),
+                },
+            )));
+        },
+        (_, TK::BarGreater) => {
+            return Some(Cst::GroupMissingOpener(GroupMissingOpenerNode(
+                OperatorNode {
+                    op: GroupOperator::Association,
                     children: NodeSeq(all.to_vec()),
                 },
             )));
@@ -783,6 +893,10 @@ fn infix_op_for(tok: TK) -> Option<InfixOperator> {
         TK::LongName_CircleTimes => InfixOperator::CircleTimes,
         TK::LongName_Equivalent => InfixOperator::Equivalent,
 
+        // Composition
+        TK::AtStar => InfixOperator::Composition,
+        TK::SlashStar => InfixOperator::RightComposition,
+
         _ => return None,
     };
     Some(op)
@@ -830,6 +944,14 @@ fn binary_op_for(tok: TK) -> Option<BinaryOperator> {
         TK::LongName_CircleMinus => BinaryOperator::CircleMinus,
         TK::LongName_Function => BinaryOperator::Function,
 
+        // Colon (Pattern in binary context)
+        TK::Colon => BinaryOperator::Pattern,
+
+        // ASCII multi-char operators
+        TK::LessMinusGreater => BinaryOperator::TwoWayRule,
+        TK::BarMinusGreater => BinaryOperator::Function,
+        TK::SlashSlashEqual => BinaryOperator::ApplyTo,
+
         _ => return None,
     };
     Some(op)
@@ -854,6 +976,14 @@ fn prefix_op_for(tok: TK) -> Option<PrefixOperator> {
         TK::LongName_Exists => PrefixOperator::Exists,
         TK::LongName_NotExists => PrefixOperator::NotExists,
         TK::LongName_CircleTimes => PrefixOperator::CircleTimes,
+
+        // Get, calculus operators
+        TK::LessLess => PrefixOperator::Get,
+        TK::LongName_Sum => PrefixOperator::Sum,
+        TK::LongName_Product => PrefixOperator::Product,
+        TK::LongName_Integral => PrefixOperator::Integral,
+        TK::LongName_CubeRoot => PrefixOperator::CubeRoot,
+
         _ => return None,
     };
     Some(op)
@@ -895,6 +1025,8 @@ fn is_pure_infix_operator(tok: TK) -> bool {
             | TK::LessGreater
             | TK::TildeTilde
             | TK::Comma
+            | TK::AtStar
+            | TK::SlashStar
     )
 }
 
