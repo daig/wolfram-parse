@@ -545,7 +545,7 @@ fn abstract_<I: TokenInput + Debug, S: TokenSource + Debug>(
                                     AstMetadata::empty(),
                                 ),
                                 vec![abstractedBody],
-                                AstMetadata::empty(),
+                                data,
                             )
                         },
                         // PostfixNode[Derivative, {rand_, LeafNode[Token`Boxes`MultiSingleQuote, quoteStr_, _]}, data_]
@@ -563,7 +563,7 @@ fn abstract_<I: TokenInput + Debug, S: TokenSource + Debug>(
                                     AstMetadata::empty(),
                                 ),
                                 vec![abstract_(operand)],
-                                AstMetadata::empty(),
+                                data,
                             )
                         },
                         _ => unhandled(),
@@ -3310,6 +3310,13 @@ fn is_expected_separator<I, S>(
     if let Some(sep) = debug_expected_separator {
         match child {
             Cst::Token(Token { tok, .. }) if *tok == sep => true,
+            // Fake_ImplicitTimes is a synthetic separator for implicit multiplication
+            Cst::Token(Token { tok, .. })
+                if *tok == TokenKind::Fake_ImplicitTimes
+                    && sep == TokenKind::Star =>
+            {
+                true
+            },
             _ => false,
         }
     } else {

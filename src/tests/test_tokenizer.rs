@@ -490,3 +490,34 @@ fn test_tokenize_jpeg_string() {
         ])
     )
 }
+
+#[test]
+fn test_underscore_tokenization() {
+    use crate::tokenize::TokenKind as TK;
+    
+    // Test single underscore
+    {
+        let mut tokenizer = Tokenizer::new(b"_", &ParseOptions::default());
+        let tok1 = tokenizer.peek_token();
+        assert_eq!(tok1.tok, TK::Under, "Single _ should be Under");
+        tok1.skip(&mut tokenizer);
+    }
+    
+    // Test double underscore
+    {
+        let mut tokenizer = Tokenizer::new(b"__", &ParseOptions::default());
+        let tok1 = tokenizer.peek_token();
+        eprintln!("Double underscore token: {:?}", tok1.tok);
+        assert_eq!(tok1.tok, TK::UnderUnder, "Double __ should be UnderUnder, got {:?}", tok1.tok);
+        tok1.skip(&mut tokenizer);
+    }
+    
+    // Test triple underscore
+    {
+        let mut tokenizer = Tokenizer::new(b"___", &ParseOptions::default());
+        let tok1 = tokenizer.peek_token();
+        eprintln!("Triple underscore token: {:?}", tok1.tok);
+        assert_eq!(tok1.tok, TK::UnderUnderUnder, "Triple ___ should be UnderUnderUnder, got {:?}", tok1.tok);
+        tok1.skip(&mut tokenizer);
+    }
+}
