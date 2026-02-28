@@ -118,6 +118,18 @@ fn test_implicit_times() {
     assert_eq!(full_form("a b"), "Times[a, b]");
 }
 
+#[test]
+fn test_negative_literals() {
+    // The parser folds prefix-minus into the literal (not Times[-1, n]).
+    // Only -x (non-literal operand) produces Times[-1, x].
+    assert_eq!(full_form("-5"), "-5");
+    assert_eq!(full_form("-3.14"), "-3.14");
+    assert_eq!(full_form("-0"), "0"); // special case: -0 folds to 0
+    assert_eq!(full_form("f[-5]"), "f[-5]");
+    assert_eq!(full_form("-5 + 3"), "Plus[-5, 3]");
+    assert_eq!(full_form("1 - 5"), "Plus[1, -5]");
+}
+
 // ============================================================================
 // Property-based tests (proptest)
 // ============================================================================
@@ -148,11 +160,41 @@ mod proptest_full_form {
             .boxed()
     }
 
+    fn arb_negative_integer() -> BoxedStrategy<Ast> {
+        (1u32..1000) // exclude 0: -0 normalizes to 0
+            .prop_map(|n| Ast::Leaf {
+                kind: TokenKind::Integer,
+                input: TokenString::from_string(format!("-{n}")),
+                data: AstMetadata::empty(),
+            })
+            .boxed()
+    }
+
     fn arb_real() -> BoxedStrategy<Ast> {
         (0u32..1000, 1u32..1000)
             .prop_map(|(int, frac)| Ast::Leaf {
                 kind: TokenKind::Real,
                 input: TokenString::from_string(format!("{int}.{frac}")),
+                data: AstMetadata::empty(),
+            })
+            .boxed()
+    }
+
+    fn arb_negative_real() -> BoxedStrategy<Ast> {
+        (0u32..1000, 1u32..1000)
+            .prop_map(|(int, frac)| Ast::Leaf {
+                kind: TokenKind::Real,
+                input: TokenString::from_string(format!("-{int}.{frac}")),
+                data: AstMetadata::empty(),
+            })
+            .boxed()
+    }
+
+    fn arb_rational() -> BoxedStrategy<Ast> {
+        (1u32..100, 1u32..10)
+            .prop_map(|(mantissa, exp)| Ast::Leaf {
+                kind: TokenKind::Rational,
+                input: TokenString::from_string(format!("{mantissa}*^-{exp}")),
                 data: AstMetadata::empty(),
             })
             .boxed()
@@ -199,7 +241,10 @@ mod proptest_full_form {
         prop_oneof![
             3 => arb_symbol(),
             2 => arb_integer(),
+            1 => arb_negative_integer(),
             1 => arb_real(),
+            1 => arb_negative_real(),
+            1 => arb_rational(),
             1 => arb_string_literal(),
             1 => arb_fake_implicit_null(),
             1 => arb_fake_implicit_one(),
@@ -245,6 +290,22 @@ mod proptest_full_form {
             .boxed()
     }
 
+    fn arb_negative_integer_str() -> BoxedStrategy<String> {
+        (1u32..1000).prop_map(|n| format!("-{n}")).boxed()
+    }
+
+    fn arb_negative_real_str() -> BoxedStrategy<String> {
+        (0u32..1000, 1u32..1000)
+            .prop_map(|(int, frac)| format!("-{int}.{frac}"))
+            .boxed()
+    }
+
+    fn arb_rational_str() -> BoxedStrategy<String> {
+        (1u32..100, 1u32..10)
+            .prop_map(|(m, e)| format!("{m}*^-{e}"))
+            .boxed()
+    }
+
     fn arb_string_literal_str() -> BoxedStrategy<String> {
         "[a-zA-Z0-9 ]{0,10}"
             .prop_map(|s| format!("\"{s}\""))
@@ -255,7 +316,10 @@ mod proptest_full_form {
         prop_oneof![
             3 => arb_symbol_str(),
             2 => arb_integer_str(),
+            1 => arb_negative_integer_str(),
             1 => arb_real_str(),
+            1 => arb_negative_real_str(),
+            1 => arb_rational_str(),
             1 => arb_string_literal_str(),
         ]
         .boxed()
