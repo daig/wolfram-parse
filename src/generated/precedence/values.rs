@@ -182,7 +182,8 @@ impl Precedence {
 	pub const CALL: Precedence = Precedence::new(176); // prec: 88, assoc: Associativity`NonRight
 	pub const INFIX_QUESTION: Precedence = Precedence::new(178); // prec: 89, assoc: Associativity`NonRight
 	pub const LINEARSYNTAX_BANG: Precedence = Precedence::new(180); // prec: 90, assoc: Associativity`NonRight
-	pub const LESSLESS: Precedence = Precedence::new(182); // prec: 91, assoc: Associativity`NonRight
+	pub const PREFIX_QUESTION: Precedence = Precedence::new(182); // prec: 91 (same as LessLess)
+pub const LESSLESS: Precedence = Precedence::new(182); // prec: 91, assoc: Associativity`NonRight
 	pub const COLONCOLON: Precedence = Precedence::new(184); // prec: 92, assoc: Associativity`NonRight
 	pub const LONGNAME_INVISIBLEPREFIXSCRIPTBASE: Precedence = Precedence::new(186); // prec: 93, assoc: Associativity`NonRight
 	pub const LONGNAME_INVISIBLEPOSTFIXSCRIPTBASE: Precedence = Precedence::new(186); // prec: 93, assoc: Associativity`NonRight

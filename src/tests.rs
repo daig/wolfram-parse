@@ -414,13 +414,13 @@ fn test_unterminated_group_reparse() {
         // <| ?
         // 123456
         //   ^ \t
+        // ? is now a valid prefix operator (Information), so no Error_ExpectedOperand before it
         parse_cst("<|\t?", &ParseOptions::default().tab_width(1)).syntax,
         assert_src!(1:1-5 => Cst::GroupMissingCloser(GroupMissingCloserNode(OperatorNode {
             op: GroupOperator::Association,
             children: NodeSeq(vec![
                 NVToken(token![LessBar, "<|", src!(1:1-1:3)]),
                 NVToken(token![Whitespace, "\t", src!(1:3-1:4)]),
-                NVToken(token![Error_ExpectedOperand, "", src!(1:4-1:4)]),
                 NVToken(token![Question, "?", src!(1:4-1:5)]),
                 NVToken(token![Error_ExpectedOperand, "", src!(1:5-1:5)]),
             ]),
@@ -439,7 +439,6 @@ fn test_unterminated_group_reparse() {
                 children: NodeSeq(vec![
                     NVToken(token![LessBar, "<|", src!(1:1-1:3)]),
                     NVToken(token![Whitespace, "\t", src!(1:3-1:5)]),
-                    NVToken(token![Error_ExpectedOperand, "", src!(1:5-1:5)]),
                     NVToken(token![Question, "?", src!(1:5-1:6)]),
                     NVToken(token![Error_ExpectedOperand, "", src!(1:6-1:6)])
                 ]),

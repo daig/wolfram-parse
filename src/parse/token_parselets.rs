@@ -54,6 +54,8 @@ pub(crate) const PREFIX_LONGNAME_EXPECTATIONE: PrefixOperatorParselet = PrefixOp
 pub(crate) const PREFIX_LONGNAME_CUBEROOT: PrefixOperatorParselet = PrefixOperatorParselet::new(Precedence::LONGNAME_CUBEROOT, PrefixOperator::CubeRoot);
 pub(crate) const PREFIX_LONGNAME_PROBABILITYPR: PrefixOperatorParselet = PrefixOperatorParselet::new(Precedence::LONGNAME_PROBABILITYPR, PrefixOperator::ProbabilityPr);
 
+pub(crate) const PREFIX_QUESTION: PrefixOperatorParselet = PrefixOperatorParselet::new(Precedence::PREFIX_QUESTION, PrefixOperator::Information);
+
 pub(crate) const PREFIX_LINEARSYNTAX_BANG: PrefixOperatorParselet = PrefixOperatorParselet::new(Precedence::LINEARSYNTAX_BANG, PrefixOperator::CodeParser_PrefixLinearSyntaxBang);
 
 // Group parselets
@@ -272,6 +274,8 @@ macro_rules! token_kind_to_prefix_parselet {
         // stringify next token (as a file]
         TK::LessLess => &LessLessParselet {},
 
+        // ?symbol → Information[symbol]
+        TK::Question => &crate::parse::token_parselets::PREFIX_QUESTION,
 
         TK::QuestionQuestion => &PrefixUnsupportedTokenParselet {},
 

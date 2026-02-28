@@ -3024,3 +3024,60 @@ fn test_regressions() {
         })
     );
 }
+
+#[test]
+fn test_prefix_question_information() {
+    // ?z → Prefix(Information, [?, z])
+    assert_eq!(
+        parse_cst("?z", &Default::default()).syntax,
+        Prefix(PrefixNode(OperatorNode {
+            op: PrefixOp::Information,
+            children: NodeSeq(vec![
+                Token(token!(Question, "?", 1:1-2)),
+                Token(token!(Symbol, "z", 1:2-3)),
+            ])
+        }))
+    );
+
+    // ?z → AST: Call { head: Information, args: [z] }
+    let agg = aggregate_cst(parse_cst("?z", &Default::default()).syntax).unwrap();
+    assert_eq!(
+        abstract_cst(agg, QuirkSettings::default()),
+        Ast::Call {
+            head: Box::new(leaf!(Symbol, "Information", <||>)),
+            args: vec![leaf!(Symbol, "z", 1:2-3)],
+            data: src!(1:1-3).into(),
+        }
+    );
+
+    // a?b still produces PatternTest (infix unchanged)
+    assert_eq!(
+        parse_cst("a?b", &Default::default()).syntax,
+        Binary(BinaryNode(OperatorNode {
+            op: BinaryOp::PatternTest,
+            children: NodeSeq(vec![
+                Token(token!(Symbol, "a", 1:1-2)),
+                Token(token!(Question, "?", 1:2-3)),
+                Token(token!(Symbol, "b", 1:3-4)),
+            ])
+        }))
+    );
+
+    // x; ?z → CompoundExpression containing Information
+    let agg = aggregate_cst(parse_cst("x; ?z", &Default::default()).syntax).unwrap();
+    assert_eq!(
+        abstract_cst(agg, QuirkSettings::default()),
+        Ast::Call {
+            head: Box::new(leaf!(Symbol, "CompoundExpression", <||>)),
+            args: vec![
+                leaf!(Symbol, "x", 1:1-2),
+                Ast::Call {
+                    head: Box::new(leaf!(Symbol, "Information", <||>)),
+                    args: vec![leaf!(Symbol, "z", 1:5-6)],
+                    data: src!(1:4-6).into(),
+                },
+            ],
+            data: src!(1:1-6).into(),
+        }
+    );
+}

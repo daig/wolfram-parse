@@ -61,6 +61,7 @@ const POSSIBLE_BEGINNING: &[&str] = &[
     "MinusMinus",
     "PlusPlus",
     "BangBang",
+    "Question",
     //
     // Openers
     //
