@@ -1,6 +1,6 @@
 //! Abstract syntax trees.
 
-use std::fmt::Debug;
+use std::fmt::{self, Debug, Write};
 
 use crate::{
     cst::{BoxKind, CodeNode},
@@ -602,6 +602,148 @@ impl AbstractSyntaxError {
             AbstractSyntaxError::LinearSyntaxBang => "LinearSyntaxBang",
             AbstractSyntaxError::ExpectedTilde => "ExpectedTilde",
             // NOTE: When adding a case here, also update from_str().
+        }
+    }
+}
+
+//======================================
+// ToFullFormString
+//======================================
+
+/// Error returned by [`Ast::to_full_form_string`] for AST nodes that cannot
+/// be serialized to Wolfram Language full form.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ToFullFormError {
+    ErrorNode,
+    SyntaxError,
+    BoxNode,
+    CodeNode,
+    LinearSyntax,
+}
+
+impl fmt::Display for ToFullFormError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            ToFullFormError::ErrorNode => {
+                write!(f, "cannot convert ErrorNode to full form")
+            },
+            ToFullFormError::SyntaxError => {
+                write!(f, "cannot convert SyntaxErrorNode to full form")
+            },
+            ToFullFormError::BoxNode => {
+                write!(f, "cannot convert BoxNode to full form")
+            },
+            ToFullFormError::CodeNode => {
+                write!(f, "cannot convert CodeNode to full form")
+            },
+            ToFullFormError::LinearSyntax => {
+                write!(f, "cannot convert linear syntax to full form")
+            },
+        }
+    }
+}
+
+impl std::error::Error for ToFullFormError {}
+
+impl Ast {
+    /// Serialize this AST node to a Wolfram Language full form string.
+    ///
+    /// Full form uses unambiguous `Head[arg1, arg2, ...]` notation that
+    /// `wolframscript` can always parse. For example, `1 + 2` becomes
+    /// `Plus[1, 2]`.
+    ///
+    /// Returns an error for nodes that cannot be meaningfully serialized
+    /// (error nodes, syntax errors, box nodes, code nodes, linear syntax).
+    pub fn to_full_form_string(&self) -> Result<String, ToFullFormError> {
+        let mut buf = String::new();
+        self.write_full_form(&mut buf)?;
+        Ok(buf)
+    }
+
+    fn write_full_form(
+        &self,
+        buf: &mut String,
+    ) -> Result<(), ToFullFormError> {
+        match self {
+            Ast::Leaf { kind, input, .. } => {
+                let s = input.to_str();
+                match kind {
+                    TokenKind::Fake_ImplicitNull => buf.write_str("Null"),
+                    TokenKind::Fake_ImplicitOne => buf.write_str("1"),
+                    TokenKind::Fake_ImplicitAll => buf.write_str("All"),
+                    _ => buf.write_str(s),
+                }
+                .unwrap();
+                Ok(())
+            },
+
+            Ast::Error { .. } => Err(ToFullFormError::ErrorNode),
+
+            Ast::Call { head, args, data: _ }
+            | Ast::CallMissingCloser { head, args, data: _ } => {
+                // Negative-literal head needs parens: (-1)[a]
+                let needs_parens = matches!(
+                    head.as_ref(),
+                    Ast::Leaf {
+                        kind: TokenKind::Integer | TokenKind::Real,
+                        input,
+                        ..
+                    } if input.to_str().starts_with('-')
+                );
+
+                if needs_parens {
+                    buf.push('(');
+                }
+                head.write_full_form(buf)?;
+                if needs_parens {
+                    buf.push(')');
+                }
+
+                buf.push('[');
+                for (i, arg) in args.iter().enumerate() {
+                    if i > 0 {
+                        buf.write_str(", ").unwrap();
+                    }
+                    arg.write_full_form(buf)?;
+                }
+                buf.push(']');
+                Ok(())
+            },
+
+            Ast::SyntaxError { .. }
+            | Ast::AbstractSyntaxError { .. } => {
+                Err(ToFullFormError::SyntaxError)
+            },
+
+            Ast::Box { .. } => Err(ToFullFormError::BoxNode),
+
+            Ast::Code { .. } => Err(ToFullFormError::CodeNode),
+
+            Ast::Group { children, .. } => {
+                // Group (opener, body, closer) — serialize the body
+                children.1.write_full_form(buf)
+            },
+
+            Ast::GroupMissingCloser { children, .. }
+            | Ast::GroupMissingOpener { children, .. } => {
+                // Best-effort: serialize children joined with ", "
+                for (i, child) in children.iter().enumerate() {
+                    if i > 0 {
+                        buf.write_str(", ").unwrap();
+                    }
+                    child.write_full_form(buf)?;
+                }
+                Ok(())
+            },
+
+            Ast::TagBox_GroupParen { group, .. } => {
+                // Serialize the group body (middle element)
+                group.1.write_full_form(buf)
+            },
+
+            Ast::PrefixNode_PrefixLinearSyntaxBang(_, _) => {
+                Err(ToFullFormError::LinearSyntax)
+            },
         }
     }
 }
