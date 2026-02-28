@@ -1,0 +1,8703 @@
+[
+  {
+    "name": "RawTab",
+    "category": "raw",
+    "codepoint": 9
+  },
+  {
+    "name": "NewLine",
+    "category": "raw",
+    "codepoint": 10
+  },
+  {
+    "name": "RawReturn",
+    "category": "raw",
+    "codepoint": 13
+  },
+  {
+    "name": "RawEscape",
+    "category": "raw",
+    "codepoint": 27
+  },
+  {
+    "name": "RawSpace",
+    "category": "raw",
+    "codepoint": 32
+  },
+  {
+    "name": "RawExclamation",
+    "category": "raw",
+    "codepoint": 33
+  },
+  {
+    "name": "RawDoubleQuote",
+    "category": "raw",
+    "codepoint": "StringMeta_DoubleQuote"
+  },
+  {
+    "name": "RawNumberSign",
+    "category": "raw",
+    "codepoint": 35
+  },
+  {
+    "name": "RawDollar",
+    "category": "raw",
+    "codepoint": 36
+  },
+  {
+    "name": "RawPercent",
+    "category": "raw",
+    "codepoint": 37
+  },
+  {
+    "name": "RawAmpersand",
+    "category": "raw",
+    "codepoint": 38
+  },
+  {
+    "name": "RawQuote",
+    "category": "raw",
+    "codepoint": 39
+  },
+  {
+    "name": "RawLeftParenthesis",
+    "category": "raw",
+    "codepoint": 40
+  },
+  {
+    "name": "RawRightParenthesis",
+    "category": "raw",
+    "codepoint": 41
+  },
+  {
+    "name": "RawStar",
+    "category": "raw",
+    "codepoint": 42
+  },
+  {
+    "name": "RawPlus",
+    "category": "raw",
+    "codepoint": 43
+  },
+  {
+    "name": "RawComma",
+    "category": "raw",
+    "codepoint": 44
+  },
+  {
+    "name": "RawDash",
+    "category": "raw",
+    "codepoint": 45
+  },
+  {
+    "name": "RawDot",
+    "category": "raw",
+    "codepoint": 46
+  },
+  {
+    "name": "RawSlash",
+    "category": "raw",
+    "codepoint": 47
+  },
+  {
+    "name": "RawColon",
+    "category": "raw",
+    "codepoint": 58
+  },
+  {
+    "name": "RawSemicolon",
+    "category": "raw",
+    "codepoint": 59
+  },
+  {
+    "name": "RawLess",
+    "category": "raw",
+    "codepoint": 60
+  },
+  {
+    "name": "RawEqual",
+    "category": "raw",
+    "codepoint": 61
+  },
+  {
+    "name": "RawGreater",
+    "category": "raw",
+    "codepoint": 62
+  },
+  {
+    "name": "RawQuestion",
+    "category": "raw",
+    "codepoint": 63
+  },
+  {
+    "name": "RawAt",
+    "category": "raw",
+    "codepoint": 64
+  },
+  {
+    "name": "RawLeftBracket",
+    "category": "raw",
+    "codepoint": 91
+  },
+  {
+    "name": "RawBackslash",
+    "category": "raw",
+    "codepoint": "StringMeta_Backslash"
+  },
+  {
+    "name": "RawRightBracket",
+    "category": "raw",
+    "codepoint": 93
+  },
+  {
+    "name": "RawWedge",
+    "category": "raw",
+    "codepoint": 94
+  },
+  {
+    "name": "RawUnderscore",
+    "category": "raw",
+    "codepoint": 95
+  },
+  {
+    "name": "RawBackquote",
+    "category": "raw",
+    "codepoint": 96
+  },
+  {
+    "name": "RawLeftBrace",
+    "category": "raw",
+    "codepoint": 123
+  },
+  {
+    "name": "RawVerticalBar",
+    "category": "raw",
+    "codepoint": 124
+  },
+  {
+    "name": "RawRightBrace",
+    "category": "raw",
+    "codepoint": 125
+  },
+  {
+    "name": "RawTilde",
+    "category": "raw",
+    "codepoint": 126
+  },
+  {
+    "name": "NonBreakingSpace",
+    "category": "whitespace",
+    "codepoint": 160,
+    "ascii": [
+      " "
+    ]
+  },
+  {
+    "name": "DownExclamation",
+    "category": "letterlike",
+    "codepoint": 161
+  },
+  {
+    "name": "Cent",
+    "category": "letterlike",
+    "codepoint": 162,
+    "ascii": [
+      "c"
+    ]
+  },
+  {
+    "name": "Sterling",
+    "category": "letterlike",
+    "codepoint": 163
+  },
+  {
+    "name": "Currency",
+    "category": "letterlike",
+    "codepoint": 164
+  },
+  {
+    "name": "Yen",
+    "category": "letterlike",
+    "codepoint": 165
+  },
+  {
+    "name": "Section",
+    "category": "letterlike",
+    "codepoint": 167
+  },
+  {
+    "name": "DoubleDot",
+    "category": "letterlike",
+    "codepoint": 168,
+    "ascii": [
+      ".."
+    ]
+  },
+  {
+    "name": "Copyright",
+    "category": "letterlike",
+    "codepoint": 169,
+    "ascii": [
+      "(c)"
+    ]
+  },
+  {
+    "name": "LeftGuillemet",
+    "category": "letterlike",
+    "codepoint": 171,
+    "ascii": [
+      "<<",
+      "\""
+    ]
+  },
+  {
+    "name": "Not",
+    "category": "punctuation",
+    "codepoint": 172,
+    "ascii": [
+      "!"
+    ],
+    "extra": [
+      "comparison"
+    ]
+  },
+  {
+    "name": "DiscretionaryHyphen",
+    "category": "letterlike",
+    "codepoint": 173,
+    "ascii": [
+      "-"
+    ]
+  },
+  {
+    "name": "RegisteredTrademark",
+    "category": "letterlike",
+    "codepoint": 174,
+    "ascii": [
+      "(R)"
+    ]
+  },
+  {
+    "name": "Degree",
+    "category": "letterlike",
+    "codepoint": 176,
+    "ascii": [
+      "Degree"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "special"
+    ]
+  },
+  {
+    "name": "PlusMinus",
+    "category": "punctuation",
+    "codepoint": 177,
+    "ascii": [
+      "+-"
+    ]
+  },
+  {
+    "name": "Micro",
+    "category": "letterlike",
+    "codepoint": 181,
+    "ascii": [
+      "u"
+    ]
+  },
+  {
+    "name": "Paragraph",
+    "category": "letterlike",
+    "codepoint": 182
+  },
+  {
+    "name": "CenterDot",
+    "category": "punctuation",
+    "codepoint": 183,
+    "ascii": [
+      "."
+    ]
+  },
+  {
+    "name": "Cedilla",
+    "category": "letterlike",
+    "codepoint": 184,
+    "ascii": [
+      ","
+    ]
+  },
+  {
+    "name": "RightGuillemet",
+    "category": "letterlike",
+    "codepoint": 187,
+    "ascii": [
+      ">>",
+      "\""
+    ]
+  },
+  {
+    "name": "DownQuestion",
+    "category": "letterlike",
+    "codepoint": 191
+  },
+  {
+    "name": "CapitalAGrave",
+    "category": "letterlike",
+    "codepoint": 192,
+    "ascii": [
+      "A`",
+      "A"
+    ]
+  },
+  {
+    "name": "CapitalAAcute",
+    "category": "letterlike",
+    "codepoint": 193,
+    "ascii": [
+      "A'",
+      "A"
+    ]
+  },
+  {
+    "name": "CapitalAHat",
+    "category": "letterlike",
+    "codepoint": 194,
+    "ascii": [
+      "A^",
+      "A"
+    ]
+  },
+  {
+    "name": "CapitalATilde",
+    "category": "letterlike",
+    "codepoint": 195,
+    "ascii": [
+      "A~",
+      "A"
+    ]
+  },
+  {
+    "name": "CapitalADoubleDot",
+    "category": "letterlike",
+    "codepoint": 196,
+    "ascii": [
+      "A\"",
+      "AE",
+      "A"
+    ]
+  },
+  {
+    "name": "CapitalARing",
+    "category": "letterlike",
+    "codepoint": 197,
+    "ascii": [
+      "Ao",
+      "A"
+    ]
+  },
+  {
+    "name": "CapitalAE",
+    "category": "letterlike",
+    "codepoint": 198,
+    "ascii": [
+      "AE"
+    ]
+  },
+  {
+    "name": "CapitalCCedilla",
+    "category": "letterlike",
+    "codepoint": 199,
+    "ascii": [
+      "C,",
+      "C"
+    ]
+  },
+  {
+    "name": "CapitalEGrave",
+    "category": "letterlike",
+    "codepoint": 200,
+    "ascii": [
+      "E`",
+      "E"
+    ]
+  },
+  {
+    "name": "CapitalEAcute",
+    "category": "letterlike",
+    "codepoint": 201,
+    "ascii": [
+      "E'",
+      "E"
+    ]
+  },
+  {
+    "name": "CapitalEHat",
+    "category": "letterlike",
+    "codepoint": 202,
+    "ascii": [
+      "E^",
+      "E"
+    ]
+  },
+  {
+    "name": "CapitalEDoubleDot",
+    "category": "letterlike",
+    "codepoint": 203,
+    "ascii": [
+      "E\"",
+      "E"
+    ]
+  },
+  {
+    "name": "CapitalIGrave",
+    "category": "letterlike",
+    "codepoint": 204,
+    "ascii": [
+      "I`",
+      "I"
+    ]
+  },
+  {
+    "name": "CapitalIAcute",
+    "category": "letterlike",
+    "codepoint": 205,
+    "ascii": [
+      "I'",
+      "I"
+    ]
+  },
+  {
+    "name": "CapitalIHat",
+    "category": "letterlike",
+    "codepoint": 206,
+    "ascii": [
+      "I^",
+      "I"
+    ]
+  },
+  {
+    "name": "CapitalIDoubleDot",
+    "category": "letterlike",
+    "codepoint": 207,
+    "ascii": [
+      "I\"",
+      "I"
+    ]
+  },
+  {
+    "name": "CapitalEth",
+    "category": "letterlike",
+    "codepoint": 208,
+    "ascii": [
+      "Eth"
+    ]
+  },
+  {
+    "name": "CapitalNTilde",
+    "category": "letterlike",
+    "codepoint": 209,
+    "ascii": [
+      "N~",
+      "N"
+    ]
+  },
+  {
+    "name": "CapitalOGrave",
+    "category": "letterlike",
+    "codepoint": 210,
+    "ascii": [
+      "O`",
+      "O"
+    ]
+  },
+  {
+    "name": "CapitalOAcute",
+    "category": "letterlike",
+    "codepoint": 211,
+    "ascii": [
+      "O'",
+      "O"
+    ]
+  },
+  {
+    "name": "CapitalOHat",
+    "category": "letterlike",
+    "codepoint": 212,
+    "ascii": [
+      "O^",
+      "O"
+    ]
+  },
+  {
+    "name": "CapitalOTilde",
+    "category": "letterlike",
+    "codepoint": 213,
+    "ascii": [
+      "O~",
+      "O"
+    ]
+  },
+  {
+    "name": "CapitalODoubleDot",
+    "category": "letterlike",
+    "codepoint": 214,
+    "ascii": [
+      "O\"",
+      "OE",
+      "O"
+    ]
+  },
+  {
+    "name": "Times",
+    "category": "punctuation",
+    "codepoint": 215,
+    "ascii": [
+      "*",
+      "x"
+    ],
+    "extra": [
+      "arithmetic"
+    ]
+  },
+  {
+    "name": "CapitalOSlash",
+    "category": "letterlike",
+    "codepoint": 216,
+    "ascii": [
+      "O/",
+      "O"
+    ]
+  },
+  {
+    "name": "CapitalUGrave",
+    "category": "letterlike",
+    "codepoint": 217,
+    "ascii": [
+      "U`",
+      "U"
+    ]
+  },
+  {
+    "name": "CapitalUAcute",
+    "category": "letterlike",
+    "codepoint": 218,
+    "ascii": [
+      "U'",
+      "U"
+    ]
+  },
+  {
+    "name": "CapitalUHat",
+    "category": "letterlike",
+    "codepoint": 219,
+    "ascii": [
+      "U^",
+      "U"
+    ]
+  },
+  {
+    "name": "CapitalUDoubleDot",
+    "category": "letterlike",
+    "codepoint": 220,
+    "ascii": [
+      "U\"",
+      "UE",
+      "U"
+    ]
+  },
+  {
+    "name": "CapitalYAcute",
+    "category": "letterlike",
+    "codepoint": 221,
+    "ascii": [
+      "Y'",
+      "Y"
+    ]
+  },
+  {
+    "name": "CapitalThorn",
+    "category": "letterlike",
+    "codepoint": 222,
+    "ascii": [
+      "Th"
+    ]
+  },
+  {
+    "name": "SZ",
+    "category": "letterlike",
+    "codepoint": 223,
+    "ascii": [
+      "sz"
+    ]
+  },
+  {
+    "name": "AGrave",
+    "category": "letterlike",
+    "codepoint": 224,
+    "ascii": [
+      "a`",
+      "a"
+    ]
+  },
+  {
+    "name": "AAcute",
+    "category": "letterlike",
+    "codepoint": 225,
+    "ascii": [
+      "a'",
+      "a"
+    ]
+  },
+  {
+    "name": "AHat",
+    "category": "letterlike",
+    "codepoint": 226,
+    "ascii": [
+      "a^",
+      "a"
+    ]
+  },
+  {
+    "name": "ATilde",
+    "category": "letterlike",
+    "codepoint": 227,
+    "ascii": [
+      "a~",
+      "a"
+    ]
+  },
+  {
+    "name": "ADoubleDot",
+    "category": "letterlike",
+    "codepoint": 228,
+    "ascii": [
+      "a\"",
+      "ae",
+      "a"
+    ]
+  },
+  {
+    "name": "ARing",
+    "category": "letterlike",
+    "codepoint": 229,
+    "ascii": [
+      "ao",
+      "a"
+    ]
+  },
+  {
+    "name": "AE",
+    "category": "letterlike",
+    "codepoint": 230,
+    "ascii": [
+      "ae",
+      "a"
+    ]
+  },
+  {
+    "name": "CCedilla",
+    "category": "letterlike",
+    "codepoint": 231,
+    "ascii": [
+      "c,",
+      "c"
+    ]
+  },
+  {
+    "name": "EGrave",
+    "category": "letterlike",
+    "codepoint": 232,
+    "ascii": [
+      "e`",
+      "e"
+    ]
+  },
+  {
+    "name": "EAcute",
+    "category": "letterlike",
+    "codepoint": 233,
+    "ascii": [
+      "e'",
+      "e"
+    ]
+  },
+  {
+    "name": "EHat",
+    "category": "letterlike",
+    "codepoint": 234,
+    "ascii": [
+      "e^",
+      "e"
+    ]
+  },
+  {
+    "name": "EDoubleDot",
+    "category": "letterlike",
+    "codepoint": 235,
+    "ascii": [
+      "e\"",
+      "e"
+    ]
+  },
+  {
+    "name": "IGrave",
+    "category": "letterlike",
+    "codepoint": 236,
+    "ascii": [
+      "i`",
+      "i"
+    ]
+  },
+  {
+    "name": "IAcute",
+    "category": "letterlike",
+    "codepoint": 237,
+    "ascii": [
+      "i'",
+      "i"
+    ]
+  },
+  {
+    "name": "IHat",
+    "category": "letterlike",
+    "codepoint": 238,
+    "ascii": [
+      "i^",
+      "i"
+    ]
+  },
+  {
+    "name": "IDoubleDot",
+    "category": "letterlike",
+    "codepoint": 239,
+    "ascii": [
+      "i\"",
+      "i"
+    ]
+  },
+  {
+    "name": "Eth",
+    "category": "letterlike",
+    "codepoint": 240,
+    "ascii": [
+      "eth"
+    ]
+  },
+  {
+    "name": "NTilde",
+    "category": "letterlike",
+    "codepoint": 241,
+    "ascii": [
+      "n~",
+      "n"
+    ]
+  },
+  {
+    "name": "OGrave",
+    "category": "letterlike",
+    "codepoint": 242,
+    "ascii": [
+      "o`",
+      "o"
+    ]
+  },
+  {
+    "name": "OAcute",
+    "category": "letterlike",
+    "codepoint": 243,
+    "ascii": [
+      "o'",
+      "o"
+    ]
+  },
+  {
+    "name": "OHat",
+    "category": "letterlike",
+    "codepoint": 244,
+    "ascii": [
+      "o^",
+      "o"
+    ]
+  },
+  {
+    "name": "OTilde",
+    "category": "letterlike",
+    "codepoint": 245,
+    "ascii": [
+      "o~",
+      "o"
+    ]
+  },
+  {
+    "name": "ODoubleDot",
+    "category": "letterlike",
+    "codepoint": 246,
+    "ascii": [
+      "o\"",
+      "oe",
+      "o"
+    ]
+  },
+  {
+    "name": "Divide",
+    "category": "punctuation",
+    "codepoint": 247,
+    "ascii": [
+      "/"
+    ],
+    "extra": [
+      "arithmetic"
+    ]
+  },
+  {
+    "name": "OSlash",
+    "category": "letterlike",
+    "codepoint": 248,
+    "ascii": [
+      "o/",
+      "o"
+    ]
+  },
+  {
+    "name": "UGrave",
+    "category": "letterlike",
+    "codepoint": 249,
+    "ascii": [
+      "u`",
+      "u"
+    ]
+  },
+  {
+    "name": "UAcute",
+    "category": "letterlike",
+    "codepoint": 250,
+    "ascii": [
+      "u'",
+      "u"
+    ]
+  },
+  {
+    "name": "UHat",
+    "category": "letterlike",
+    "codepoint": 251,
+    "ascii": [
+      "u^",
+      "u"
+    ]
+  },
+  {
+    "name": "UDoubleDot",
+    "category": "letterlike",
+    "codepoint": 252,
+    "ascii": [
+      "u\"",
+      "ue",
+      "u"
+    ]
+  },
+  {
+    "name": "YAcute",
+    "category": "letterlike",
+    "codepoint": 253,
+    "ascii": [
+      "y'",
+      "y"
+    ]
+  },
+  {
+    "name": "Thorn",
+    "category": "letterlike",
+    "codepoint": 254,
+    "ascii": [
+      "th"
+    ]
+  },
+  {
+    "name": "YDoubleDot",
+    "category": "letterlike",
+    "codepoint": 255,
+    "ascii": [
+      "y\"",
+      "y"
+    ]
+  },
+  {
+    "name": "CapitalABar",
+    "category": "letterlike",
+    "codepoint": 256,
+    "ascii": [
+      "A-",
+      "A"
+    ]
+  },
+  {
+    "name": "ABar",
+    "category": "letterlike",
+    "codepoint": 257,
+    "ascii": [
+      "a-",
+      "a"
+    ]
+  },
+  {
+    "name": "CapitalACup",
+    "category": "letterlike",
+    "codepoint": 258,
+    "ascii": [
+      "Au",
+      "A"
+    ]
+  },
+  {
+    "name": "ACup",
+    "category": "letterlike",
+    "codepoint": 259,
+    "ascii": [
+      "au",
+      "a"
+    ]
+  },
+  {
+    "name": "CapitalCAcute",
+    "category": "letterlike",
+    "codepoint": 262,
+    "ascii": [
+      "C'",
+      "C"
+    ]
+  },
+  {
+    "name": "CAcute",
+    "category": "letterlike",
+    "codepoint": 263,
+    "ascii": [
+      "c'",
+      "c"
+    ]
+  },
+  {
+    "name": "CapitalCHacek",
+    "category": "letterlike",
+    "codepoint": 268,
+    "ascii": [
+      "Cv",
+      "C"
+    ]
+  },
+  {
+    "name": "CHacek",
+    "category": "letterlike",
+    "codepoint": 269,
+    "ascii": [
+      "cv",
+      "c"
+    ]
+  },
+  {
+    "name": "CapitalDHacek",
+    "category": "letterlike",
+    "codepoint": 270,
+    "ascii": [
+      "Dv",
+      "D"
+    ]
+  },
+  {
+    "name": "DHacek",
+    "category": "letterlike",
+    "codepoint": 271,
+    "ascii": [
+      "dv",
+      "d"
+    ]
+  },
+  {
+    "name": "CapitalEBar",
+    "category": "letterlike",
+    "codepoint": 274,
+    "ascii": [
+      "E-",
+      "E"
+    ]
+  },
+  {
+    "name": "EBar",
+    "category": "letterlike",
+    "codepoint": 275,
+    "ascii": [
+      "e-",
+      "e"
+    ]
+  },
+  {
+    "name": "CapitalECup",
+    "category": "letterlike",
+    "codepoint": 276,
+    "ascii": [
+      "Eu",
+      "E"
+    ]
+  },
+  {
+    "name": "ECup",
+    "category": "letterlike",
+    "codepoint": 277,
+    "ascii": [
+      "eu",
+      "e"
+    ]
+  },
+  {
+    "name": "CapitalEHacek",
+    "category": "letterlike",
+    "codepoint": 282,
+    "ascii": [
+      "Ev",
+      "E"
+    ]
+  },
+  {
+    "name": "EHacek",
+    "category": "letterlike",
+    "codepoint": 283,
+    "ascii": [
+      "ev",
+      "e"
+    ]
+  },
+  {
+    "name": "CapitalICup",
+    "category": "letterlike",
+    "codepoint": 300,
+    "ascii": [
+      "Iu",
+      "I"
+    ]
+  },
+  {
+    "name": "ICup",
+    "category": "letterlike",
+    "codepoint": 301,
+    "ascii": [
+      "iu",
+      "i"
+    ]
+  },
+  {
+    "name": "DotlessI",
+    "category": "letterlike",
+    "codepoint": 305,
+    "ascii": [
+      "i"
+    ]
+  },
+  {
+    "name": "CapitalLSlash",
+    "category": "letterlike",
+    "codepoint": 321,
+    "ascii": [
+      "L/",
+      "L"
+    ]
+  },
+  {
+    "name": "LSlash",
+    "category": "letterlike",
+    "codepoint": 322,
+    "ascii": [
+      "l/",
+      "l"
+    ]
+  },
+  {
+    "name": "CapitalNHacek",
+    "category": "letterlike",
+    "codepoint": 327,
+    "ascii": [
+      "Nv",
+      "N"
+    ]
+  },
+  {
+    "name": "NHacek",
+    "category": "letterlike",
+    "codepoint": 328,
+    "ascii": [
+      "nv",
+      "n"
+    ]
+  },
+  {
+    "name": "CapitalODoubleAcute",
+    "category": "letterlike",
+    "codepoint": 336,
+    "ascii": [
+      "O''",
+      "O"
+    ]
+  },
+  {
+    "name": "ODoubleAcute",
+    "category": "letterlike",
+    "codepoint": 337,
+    "ascii": [
+      "o''",
+      "o"
+    ]
+  },
+  {
+    "name": "CapitalOE",
+    "category": "letterlike",
+    "codepoint": 338,
+    "ascii": [
+      "OE"
+    ]
+  },
+  {
+    "name": "OE",
+    "category": "letterlike",
+    "codepoint": 339,
+    "ascii": [
+      "oe"
+    ]
+  },
+  {
+    "name": "CapitalRHacek",
+    "category": "letterlike",
+    "codepoint": 344,
+    "ascii": [
+      "Rv",
+      "R"
+    ]
+  },
+  {
+    "name": "RHacek",
+    "category": "letterlike",
+    "codepoint": 345,
+    "ascii": [
+      "rv",
+      "r"
+    ]
+  },
+  {
+    "name": "CapitalSHacek",
+    "category": "letterlike",
+    "codepoint": 352,
+    "ascii": [
+      "Sv",
+      "S"
+    ]
+  },
+  {
+    "name": "SHacek",
+    "category": "letterlike",
+    "codepoint": 353,
+    "ascii": [
+      "sv",
+      "s"
+    ]
+  },
+  {
+    "name": "CapitalTHacek",
+    "category": "letterlike",
+    "codepoint": 356,
+    "ascii": [
+      "Tv",
+      "T"
+    ]
+  },
+  {
+    "name": "THacek",
+    "category": "letterlike",
+    "codepoint": 357,
+    "ascii": [
+      "tv",
+      "t"
+    ]
+  },
+  {
+    "name": "CapitalURing",
+    "category": "letterlike",
+    "codepoint": 366,
+    "ascii": [
+      "Uo",
+      "U"
+    ]
+  },
+  {
+    "name": "URing",
+    "category": "letterlike",
+    "codepoint": 367,
+    "ascii": [
+      "uo",
+      "u"
+    ]
+  },
+  {
+    "name": "CapitalUDoubleAcute",
+    "category": "letterlike",
+    "codepoint": 368,
+    "ascii": [
+      "U''",
+      "U"
+    ]
+  },
+  {
+    "name": "UDoubleAcute",
+    "category": "letterlike",
+    "codepoint": 369,
+    "ascii": [
+      "u''",
+      "u"
+    ]
+  },
+  {
+    "name": "CapitalZHacek",
+    "category": "letterlike",
+    "codepoint": 381,
+    "ascii": [
+      "Zv",
+      "Z"
+    ]
+  },
+  {
+    "name": "ZHacek",
+    "category": "letterlike",
+    "codepoint": 382,
+    "ascii": [
+      "zv",
+      "z"
+    ]
+  },
+  {
+    "name": "Florin",
+    "category": "letterlike",
+    "codepoint": 402,
+    "ascii": [
+      "f"
+    ]
+  },
+  {
+    "name": "Hacek",
+    "category": "letterlike",
+    "codepoint": 711,
+    "ascii": [
+      "v"
+    ]
+  },
+  {
+    "name": "Breve",
+    "category": "letterlike",
+    "codepoint": 728
+  },
+  {
+    "name": "CapitalAlpha",
+    "category": "letterlike",
+    "codepoint": 913,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CapitalBeta",
+    "category": "letterlike",
+    "codepoint": 914,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CapitalGamma",
+    "category": "letterlike",
+    "codepoint": 915,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CapitalDelta",
+    "category": "letterlike",
+    "codepoint": 916,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CapitalEpsilon",
+    "category": "letterlike",
+    "codepoint": 917,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CapitalZeta",
+    "category": "letterlike",
+    "codepoint": 918,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CapitalEta",
+    "category": "letterlike",
+    "codepoint": 919,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CapitalTheta",
+    "category": "letterlike",
+    "codepoint": 920,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CapitalIota",
+    "category": "letterlike",
+    "codepoint": 921,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CapitalKappa",
+    "category": "letterlike",
+    "codepoint": 922,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CapitalLambda",
+    "category": "letterlike",
+    "codepoint": 923,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CapitalMu",
+    "category": "letterlike",
+    "codepoint": 924,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CapitalNu",
+    "category": "letterlike",
+    "codepoint": 925,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CapitalXi",
+    "category": "letterlike",
+    "codepoint": 926,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CapitalOmicron",
+    "category": "letterlike",
+    "codepoint": 927,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CapitalPi",
+    "category": "letterlike",
+    "codepoint": 928,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CapitalRho",
+    "category": "letterlike",
+    "codepoint": 929,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CapitalSigma",
+    "category": "letterlike",
+    "codepoint": 931,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CapitalTau",
+    "category": "letterlike",
+    "codepoint": 932,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CapitalUpsilon",
+    "category": "letterlike",
+    "codepoint": 933,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CapitalPhi",
+    "category": "letterlike",
+    "codepoint": 934,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CapitalChi",
+    "category": "letterlike",
+    "codepoint": 935,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CapitalPsi",
+    "category": "letterlike",
+    "codepoint": 936,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CapitalOmega",
+    "category": "letterlike",
+    "codepoint": 937,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "Alpha",
+    "category": "letterlike",
+    "codepoint": 945,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "Beta",
+    "category": "letterlike",
+    "codepoint": 946,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "Gamma",
+    "category": "letterlike",
+    "codepoint": 947,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "Delta",
+    "category": "letterlike",
+    "codepoint": 948,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CurlyEpsilon",
+    "category": "letterlike",
+    "codepoint": 949,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "Zeta",
+    "category": "letterlike",
+    "codepoint": 950,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "Eta",
+    "category": "letterlike",
+    "codepoint": 951,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "Theta",
+    "category": "letterlike",
+    "codepoint": 952,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "Iota",
+    "category": "letterlike",
+    "codepoint": 953,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "Kappa",
+    "category": "letterlike",
+    "codepoint": 954,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "Lambda",
+    "category": "letterlike",
+    "codepoint": 955,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "Mu",
+    "category": "letterlike",
+    "codepoint": 956,
+    "ascii": [
+      "u"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "Nu",
+    "category": "letterlike",
+    "codepoint": 957,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "Xi",
+    "category": "letterlike",
+    "codepoint": 958,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "Omicron",
+    "category": "letterlike",
+    "codepoint": 959,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "Pi",
+    "category": "letterlike",
+    "codepoint": 960,
+    "extra": [
+      "not_strange_letterlike",
+      "special"
+    ]
+  },
+  {
+    "name": "Rho",
+    "category": "letterlike",
+    "codepoint": 961,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "FinalSigma",
+    "category": "letterlike",
+    "codepoint": 962,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "Sigma",
+    "category": "letterlike",
+    "codepoint": 963,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "Tau",
+    "category": "letterlike",
+    "codepoint": 964,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "Upsilon",
+    "category": "letterlike",
+    "codepoint": 965,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CurlyPhi",
+    "category": "letterlike",
+    "codepoint": 966,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "Chi",
+    "category": "letterlike",
+    "codepoint": 967,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "Psi",
+    "category": "letterlike",
+    "codepoint": 968,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "Omega",
+    "category": "letterlike",
+    "codepoint": 969,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CurlyTheta",
+    "category": "letterlike",
+    "codepoint": 977,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CurlyCapitalUpsilon",
+    "category": "letterlike",
+    "codepoint": 978,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "Phi",
+    "category": "letterlike",
+    "codepoint": 981,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CurlyPi",
+    "category": "letterlike",
+    "codepoint": 982,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CapitalStigma",
+    "category": "letterlike",
+    "codepoint": 986,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "Stigma",
+    "category": "letterlike",
+    "codepoint": 987,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CapitalDigamma",
+    "category": "letterlike",
+    "codepoint": 988,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "Digamma",
+    "category": "letterlike",
+    "codepoint": 989,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CapitalKoppa",
+    "category": "letterlike",
+    "codepoint": 990,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "Koppa",
+    "category": "letterlike",
+    "codepoint": 991,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CapitalSampi",
+    "category": "letterlike",
+    "codepoint": 992,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "Sampi",
+    "category": "letterlike",
+    "codepoint": 993,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CurlyKappa",
+    "category": "letterlike",
+    "codepoint": 1008,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "CurlyRho",
+    "category": "letterlike",
+    "codepoint": 1009,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "Epsilon",
+    "category": "letterlike",
+    "codepoint": 1013,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ThickSpace",
+    "category": "whitespace",
+    "codepoint": 8197,
+    "ascii": [
+      " "
+    ]
+  },
+  {
+    "name": "ThinSpace",
+    "category": "whitespace",
+    "codepoint": 8201,
+    "ascii": [
+      " "
+    ]
+  },
+  {
+    "name": "VeryThinSpace",
+    "category": "whitespace",
+    "codepoint": 8202,
+    "ascii": [
+      " "
+    ]
+  },
+  {
+    "name": "Hyphen",
+    "category": "letterlike",
+    "codepoint": 8208,
+    "ascii": [
+      "-"
+    ]
+  },
+  {
+    "name": "Dash",
+    "category": "letterlike",
+    "codepoint": 8211,
+    "ascii": [
+      "-"
+    ]
+  },
+  {
+    "name": "LongDash",
+    "category": "letterlike",
+    "codepoint": 8212,
+    "ascii": [
+      "--",
+      "-"
+    ]
+  },
+  {
+    "name": "OpenCurlyQuote",
+    "category": "punctuation",
+    "codepoint": 8216,
+    "ascii": [
+      "'"
+    ],
+    "extra": [
+      "group"
+    ]
+  },
+  {
+    "name": "CloseCurlyQuote",
+    "category": "punctuation",
+    "codepoint": 8217,
+    "ascii": [
+      "'"
+    ],
+    "extra": [
+      "group"
+    ]
+  },
+  {
+    "name": "OpenCurlyDoubleQuote",
+    "category": "punctuation",
+    "codepoint": 8220,
+    "ascii": [
+      "\""
+    ],
+    "extra": [
+      "group"
+    ]
+  },
+  {
+    "name": "CloseCurlyDoubleQuote",
+    "category": "punctuation",
+    "codepoint": 8221,
+    "ascii": [
+      "\""
+    ],
+    "extra": [
+      "group"
+    ]
+  },
+  {
+    "name": "Dagger",
+    "category": "letterlike",
+    "codepoint": 8224,
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "DoubleDagger",
+    "category": "letterlike",
+    "codepoint": 8225
+  },
+  {
+    "name": "Bullet",
+    "category": "letterlike",
+    "codepoint": 8226
+  },
+  {
+    "name": "Ellipsis",
+    "category": "letterlike",
+    "codepoint": 8230,
+    "ascii": [
+      "..."
+    ]
+  },
+  {
+    "name": "LineSeparator",
+    "category": "newline",
+    "codepoint": 8232,
+    "ascii": [
+      "\\n"
+    ]
+  },
+  {
+    "name": "ParagraphSeparator",
+    "category": "newline",
+    "codepoint": 8233,
+    "ascii": [
+      "\\n\\n"
+    ]
+  },
+  {
+    "name": "Prime",
+    "category": "letterlike",
+    "codepoint": 8242,
+    "ascii": [
+      "'"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "DoublePrime",
+    "category": "letterlike",
+    "codepoint": 8243,
+    "ascii": [
+      "''",
+      "\""
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ReversePrime",
+    "category": "letterlike",
+    "codepoint": 8245,
+    "ascii": [
+      "`"
+    ]
+  },
+  {
+    "name": "ReverseDoublePrime",
+    "category": "letterlike",
+    "codepoint": 8246,
+    "ascii": [
+      "``",
+      "\""
+    ]
+  },
+  {
+    "name": "SkeletonIndicator",
+    "category": "uninterpretable",
+    "codepoint": 8259,
+    "ascii": [
+      "-"
+    ]
+  },
+  {
+    "name": "MediumSpace",
+    "category": "whitespace",
+    "codepoint": 8287,
+    "ascii": [
+      " "
+    ]
+  },
+  {
+    "name": "NoBreak",
+    "category": "whitespace",
+    "codepoint": 8288
+  },
+  {
+    "name": "InvisibleTimes",
+    "category": "punctuation",
+    "codepoint": 8290,
+    "ascii": [
+      "*",
+      "x",
+      ""
+    ],
+    "extra": [
+      "arithmetic"
+    ]
+  },
+  {
+    "name": "Euro",
+    "category": "letterlike",
+    "codepoint": 8364
+  },
+  {
+    "name": "Rupee",
+    "category": "letterlike",
+    "codepoint": 8377
+  },
+  {
+    "name": "ScriptG",
+    "category": "letterlike",
+    "codepoint": 8458,
+    "ascii": [
+      "g"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptCapitalH",
+    "category": "letterlike",
+    "codepoint": 8459,
+    "ascii": [
+      "H"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "GothicCapitalH",
+    "category": "letterlike",
+    "codepoint": 8460,
+    "ascii": [
+      "H"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "HBar",
+    "category": "letterlike",
+    "codepoint": 8463,
+    "ascii": [
+      "h"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptCapitalI",
+    "category": "letterlike",
+    "codepoint": 8464,
+    "ascii": [
+      "I"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "GothicCapitalI",
+    "category": "letterlike",
+    "codepoint": 8465,
+    "ascii": [
+      "I"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptCapitalL",
+    "category": "letterlike",
+    "codepoint": 8466,
+    "ascii": [
+      "L"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptL",
+    "category": "letterlike",
+    "codepoint": 8467,
+    "ascii": [
+      "l"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "WeierstrassP",
+    "category": "letterlike",
+    "codepoint": 8472,
+    "ascii": [
+      "p"
+    ]
+  },
+  {
+    "name": "ScriptCapitalR",
+    "category": "letterlike",
+    "codepoint": 8475,
+    "ascii": [
+      "R"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "GothicCapitalR",
+    "category": "letterlike",
+    "codepoint": 8476,
+    "ascii": [
+      "R"
+    ]
+  },
+  {
+    "name": "Trademark",
+    "category": "letterlike",
+    "codepoint": 8482,
+    "ascii": [
+      "(TM)"
+    ]
+  },
+  {
+    "name": "Mho",
+    "category": "letterlike",
+    "codepoint": 8487
+  },
+  {
+    "name": "GothicCapitalZ",
+    "category": "letterlike",
+    "codepoint": 8488,
+    "ascii": [
+      "Z"
+    ]
+  },
+  {
+    "name": "Angstrom",
+    "category": "letterlike",
+    "codepoint": 8491,
+    "ascii": [
+      "A"
+    ]
+  },
+  {
+    "name": "ScriptCapitalB",
+    "category": "letterlike",
+    "codepoint": 8492,
+    "ascii": [
+      "B"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "GothicCapitalC",
+    "category": "letterlike",
+    "codepoint": 8493,
+    "ascii": [
+      "C"
+    ]
+  },
+  {
+    "name": "ScriptE",
+    "category": "letterlike",
+    "codepoint": 8495,
+    "ascii": [
+      "e"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptCapitalE",
+    "category": "letterlike",
+    "codepoint": 8496,
+    "ascii": [
+      "E"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptCapitalF",
+    "category": "letterlike",
+    "codepoint": 8497,
+    "ascii": [
+      "F"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptCapitalM",
+    "category": "letterlike",
+    "codepoint": 8499,
+    "ascii": [
+      "M"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptO",
+    "category": "letterlike",
+    "codepoint": 8500,
+    "ascii": [
+      "o"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "Aleph",
+    "category": "letterlike",
+    "codepoint": 8501
+  },
+  {
+    "name": "Bet",
+    "category": "letterlike",
+    "codepoint": 8502
+  },
+  {
+    "name": "Gimel",
+    "category": "letterlike",
+    "codepoint": 8503
+  },
+  {
+    "name": "Dalet",
+    "category": "letterlike",
+    "codepoint": 8504
+  },
+  {
+    "name": "LeftArrow",
+    "category": "punctuation",
+    "codepoint": 8592,
+    "ascii": [
+      "<-"
+    ]
+  },
+  {
+    "name": "UpArrow",
+    "category": "punctuation",
+    "codepoint": 8593
+  },
+  {
+    "name": "RightArrow",
+    "category": "punctuation",
+    "codepoint": 8594,
+    "ascii": [
+      "->"
+    ]
+  },
+  {
+    "name": "DownArrow",
+    "category": "punctuation",
+    "codepoint": 8595
+  },
+  {
+    "name": "LeftRightArrow",
+    "category": "punctuation",
+    "codepoint": 8596,
+    "ascii": [
+      "<->"
+    ]
+  },
+  {
+    "name": "UpDownArrow",
+    "category": "punctuation",
+    "codepoint": 8597
+  },
+  {
+    "name": "UpperLeftArrow",
+    "category": "punctuation",
+    "codepoint": 8598
+  },
+  {
+    "name": "UpperRightArrow",
+    "category": "punctuation",
+    "codepoint": 8599
+  },
+  {
+    "name": "LowerRightArrow",
+    "category": "punctuation",
+    "codepoint": 8600
+  },
+  {
+    "name": "LowerLeftArrow",
+    "category": "punctuation",
+    "codepoint": 8601
+  },
+  {
+    "name": "LeftTeeArrow",
+    "category": "punctuation",
+    "codepoint": 8612,
+    "ascii": [
+      "<-|"
+    ]
+  },
+  {
+    "name": "UpTeeArrow",
+    "category": "punctuation",
+    "codepoint": 8613
+  },
+  {
+    "name": "RightTeeArrow",
+    "category": "punctuation",
+    "codepoint": 8614,
+    "ascii": [
+      "|->"
+    ]
+  },
+  {
+    "name": "DownTeeArrow",
+    "category": "punctuation",
+    "codepoint": 8615
+  },
+  {
+    "name": "ReturnIndicator",
+    "category": "letterlike",
+    "codepoint": 8629
+  },
+  {
+    "name": "LeftVector",
+    "category": "punctuation",
+    "codepoint": 8636
+  },
+  {
+    "name": "DownLeftVector",
+    "category": "punctuation",
+    "codepoint": 8637
+  },
+  {
+    "name": "RightUpVector",
+    "category": "punctuation",
+    "codepoint": 8638
+  },
+  {
+    "name": "LeftUpVector",
+    "category": "punctuation",
+    "codepoint": 8639
+  },
+  {
+    "name": "RightVector",
+    "category": "punctuation",
+    "codepoint": 8640
+  },
+  {
+    "name": "DownRightVector",
+    "category": "punctuation",
+    "codepoint": 8641
+  },
+  {
+    "name": "RightDownVector",
+    "category": "punctuation",
+    "codepoint": 8642
+  },
+  {
+    "name": "LeftDownVector",
+    "category": "punctuation",
+    "codepoint": 8643
+  },
+  {
+    "name": "RightArrowLeftArrow",
+    "category": "punctuation",
+    "codepoint": 8644
+  },
+  {
+    "name": "UpArrowDownArrow",
+    "category": "punctuation",
+    "codepoint": 8645
+  },
+  {
+    "name": "LeftArrowRightArrow",
+    "category": "punctuation",
+    "codepoint": 8646
+  },
+  {
+    "name": "ReverseEquilibrium",
+    "category": "punctuation",
+    "codepoint": 8651
+  },
+  {
+    "name": "Equilibrium",
+    "category": "punctuation",
+    "codepoint": 8652
+  },
+  {
+    "name": "DoubleLeftArrow",
+    "category": "punctuation",
+    "codepoint": 8656,
+    "ascii": [
+      "<="
+    ]
+  },
+  {
+    "name": "DoubleUpArrow",
+    "category": "punctuation",
+    "codepoint": 8657
+  },
+  {
+    "name": "DoubleRightArrow",
+    "category": "punctuation",
+    "codepoint": 8658,
+    "ascii": [
+      "=>"
+    ]
+  },
+  {
+    "name": "DoubleDownArrow",
+    "category": "punctuation",
+    "codepoint": 8659
+  },
+  {
+    "name": "DoubleLeftRightArrow",
+    "category": "punctuation",
+    "codepoint": 8660,
+    "ascii": [
+      "<=>"
+    ]
+  },
+  {
+    "name": "DoubleUpDownArrow",
+    "category": "punctuation",
+    "codepoint": 8661
+  },
+  {
+    "name": "LeftArrowBar",
+    "category": "punctuation",
+    "codepoint": 8676,
+    "ascii": [
+      "|<-"
+    ]
+  },
+  {
+    "name": "RightArrowBar",
+    "category": "punctuation",
+    "codepoint": 8677,
+    "ascii": [
+      "->|"
+    ]
+  },
+  {
+    "name": "DownArrowUpArrow",
+    "category": "punctuation",
+    "codepoint": 8693
+  },
+  {
+    "name": "ForAll",
+    "category": "punctuation",
+    "codepoint": 8704
+  },
+  {
+    "name": "PartialD",
+    "category": "punctuation",
+    "codepoint": 8706
+  },
+  {
+    "name": "Exists",
+    "category": "punctuation",
+    "codepoint": 8707
+  },
+  {
+    "name": "NotExists",
+    "category": "punctuation",
+    "codepoint": 8708
+  },
+  {
+    "name": "EmptySet",
+    "category": "letterlike",
+    "codepoint": 8709
+  },
+  {
+    "name": "Del",
+    "category": "punctuation",
+    "codepoint": 8711
+  },
+  {
+    "name": "Element",
+    "category": "punctuation",
+    "codepoint": 8712
+  },
+  {
+    "name": "NotElement",
+    "category": "punctuation",
+    "codepoint": 8713
+  },
+  {
+    "name": "ReverseElement",
+    "category": "punctuation",
+    "codepoint": 8715
+  },
+  {
+    "name": "NotReverseElement",
+    "category": "punctuation",
+    "codepoint": 8716
+  },
+  {
+    "name": "SuchThat",
+    "category": "punctuation",
+    "codepoint": 8717
+  },
+  {
+    "name": "Product",
+    "category": "punctuation",
+    "codepoint": 8719
+  },
+  {
+    "name": "Coproduct",
+    "category": "punctuation",
+    "codepoint": 8720
+  },
+  {
+    "name": "Sum",
+    "category": "punctuation",
+    "codepoint": 8721
+  },
+  {
+    "name": "Minus",
+    "category": "punctuation",
+    "codepoint": 8722,
+    "ascii": [
+      "-"
+    ],
+    "extra": [
+      "arithmetic"
+    ]
+  },
+  {
+    "name": "MinusPlus",
+    "category": "punctuation",
+    "codepoint": 8723,
+    "ascii": [
+      "-+"
+    ]
+  },
+  {
+    "name": "DivisionSlash",
+    "category": "punctuation",
+    "codepoint": 8725,
+    "ascii": [
+      "/"
+    ],
+    "extra": [
+      "arithmetic"
+    ]
+  },
+  {
+    "name": "Backslash",
+    "category": "punctuation",
+    "codepoint": 8726,
+    "ascii": [
+      "\\\\"
+    ]
+  },
+  {
+    "name": "SmallCircle",
+    "category": "punctuation",
+    "codepoint": 8728,
+    "ascii": [
+      "()"
+    ]
+  },
+  {
+    "name": "Sqrt",
+    "category": "punctuation",
+    "codepoint": 8730
+  },
+  {
+    "name": "CubeRoot",
+    "category": "punctuation",
+    "codepoint": 8731,
+    "added": "12.1"
+  },
+  {
+    "name": "Proportional",
+    "category": "punctuation",
+    "codepoint": 8733
+  },
+  {
+    "name": "Infinity",
+    "category": "letterlike",
+    "codepoint": 8734,
+    "ascii": [
+      "Infinity"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "special"
+    ]
+  },
+  {
+    "name": "RightAngle",
+    "category": "letterlike",
+    "codepoint": 8735
+  },
+  {
+    "name": "Angle",
+    "category": "letterlike",
+    "codepoint": 8736
+  },
+  {
+    "name": "MeasuredAngle",
+    "category": "letterlike",
+    "codepoint": 8737
+  },
+  {
+    "name": "SphericalAngle",
+    "category": "letterlike",
+    "codepoint": 8738
+  },
+  {
+    "name": "Divides",
+    "category": "punctuation",
+    "codepoint": 8739,
+    "ascii": [
+      "|"
+    ]
+  },
+  {
+    "name": "DoubleVerticalBar",
+    "category": "punctuation",
+    "codepoint": 8741,
+    "ascii": [
+      "||"
+    ]
+  },
+  {
+    "name": "NotDoubleVerticalBar",
+    "category": "punctuation",
+    "codepoint": 8742,
+    "ascii": [
+      "!||"
+    ]
+  },
+  {
+    "name": "And",
+    "category": "punctuation",
+    "codepoint": 8743,
+    "ascii": [
+      "&&"
+    ],
+    "extra": [
+      "logical"
+    ]
+  },
+  {
+    "name": "Or",
+    "category": "punctuation",
+    "codepoint": 8744,
+    "ascii": [
+      "||"
+    ],
+    "extra": [
+      "logical"
+    ]
+  },
+  {
+    "name": "Integral",
+    "category": "punctuation",
+    "codepoint": 8747
+  },
+  {
+    "name": "ContourIntegral",
+    "category": "punctuation",
+    "codepoint": 8750
+  },
+  {
+    "name": "DoubleContourIntegral",
+    "category": "punctuation",
+    "codepoint": 8751
+  },
+  {
+    "name": "ClockwiseContourIntegral",
+    "category": "punctuation",
+    "codepoint": 8754
+  },
+  {
+    "name": "CounterClockwiseContourIntegral",
+    "category": "punctuation",
+    "codepoint": 8755
+  },
+  {
+    "name": "Therefore",
+    "category": "punctuation",
+    "codepoint": 8756
+  },
+  {
+    "name": "Because",
+    "category": "punctuation",
+    "codepoint": 8757
+  },
+  {
+    "name": "Colon",
+    "category": "punctuation",
+    "codepoint": 8758,
+    "ascii": [
+      ":"
+    ]
+  },
+  {
+    "name": "Proportion",
+    "category": "punctuation",
+    "codepoint": 8759
+  },
+  {
+    "name": "Tilde",
+    "category": "punctuation",
+    "codepoint": 8764,
+    "ascii": [
+      "~"
+    ]
+  },
+  {
+    "name": "VerticalTilde",
+    "category": "punctuation",
+    "codepoint": 8768
+  },
+  {
+    "name": "NotTilde",
+    "category": "punctuation",
+    "codepoint": 8769,
+    "ascii": [
+      "!~"
+    ]
+  },
+  {
+    "name": "EqualTilde",
+    "category": "punctuation",
+    "codepoint": 8770,
+    "ascii": [
+      "=~"
+    ]
+  },
+  {
+    "name": "TildeEqual",
+    "category": "punctuation",
+    "codepoint": 8771,
+    "ascii": [
+      "~="
+    ]
+  },
+  {
+    "name": "NotTildeEqual",
+    "category": "punctuation",
+    "codepoint": 8772,
+    "ascii": [
+      "!~="
+    ]
+  },
+  {
+    "name": "TildeFullEqual",
+    "category": "punctuation",
+    "codepoint": 8773,
+    "ascii": [
+      "~=="
+    ]
+  },
+  {
+    "name": "NotTildeFullEqual",
+    "category": "punctuation",
+    "codepoint": 8775,
+    "ascii": [
+      "!~=="
+    ]
+  },
+  {
+    "name": "TildeTilde",
+    "category": "punctuation",
+    "codepoint": 8776,
+    "ascii": [
+      "~~"
+    ]
+  },
+  {
+    "name": "NotTildeTilde",
+    "category": "punctuation",
+    "codepoint": 8777,
+    "ascii": [
+      "!~~"
+    ]
+  },
+  {
+    "name": "CupCap",
+    "category": "punctuation",
+    "codepoint": 8781
+  },
+  {
+    "name": "HumpDownHump",
+    "category": "punctuation",
+    "codepoint": 8782
+  },
+  {
+    "name": "HumpEqual",
+    "category": "punctuation",
+    "codepoint": 8783
+  },
+  {
+    "name": "DotEqual",
+    "category": "punctuation",
+    "codepoint": 8784
+  },
+  {
+    "name": "NotEqual",
+    "category": "punctuation",
+    "codepoint": 8800,
+    "ascii": [
+      "!="
+    ],
+    "extra": [
+      "comparison"
+    ]
+  },
+  {
+    "name": "Congruent",
+    "category": "punctuation",
+    "codepoint": 8801
+  },
+  {
+    "name": "NotCongruent",
+    "category": "punctuation",
+    "codepoint": 8802
+  },
+  {
+    "name": "LessEqual",
+    "category": "punctuation",
+    "codepoint": 8804,
+    "ascii": [
+      "<="
+    ]
+  },
+  {
+    "name": "GreaterEqual",
+    "category": "punctuation",
+    "codepoint": 8805,
+    "ascii": [
+      ">="
+    ]
+  },
+  {
+    "name": "LessFullEqual",
+    "category": "punctuation",
+    "codepoint": 8806,
+    "ascii": [
+      "<="
+    ]
+  },
+  {
+    "name": "GreaterFullEqual",
+    "category": "punctuation",
+    "codepoint": 8807,
+    "ascii": [
+      ">="
+    ]
+  },
+  {
+    "name": "NotLessFullEqual",
+    "category": "punctuation",
+    "codepoint": 8808,
+    "ascii": [
+      "!<=="
+    ]
+  },
+  {
+    "name": "NotGreaterFullEqual",
+    "category": "punctuation",
+    "codepoint": 8809,
+    "ascii": [
+      "!>=="
+    ]
+  },
+  {
+    "name": "LessLess",
+    "category": "punctuation",
+    "codepoint": 8810,
+    "ascii": [
+      "<<"
+    ]
+  },
+  {
+    "name": "GreaterGreater",
+    "category": "punctuation",
+    "codepoint": 8811,
+    "ascii": [
+      ">>"
+    ]
+  },
+  {
+    "name": "NotCupCap",
+    "category": "punctuation",
+    "codepoint": 8813
+  },
+  {
+    "name": "NotLess",
+    "category": "punctuation",
+    "codepoint": 8814,
+    "ascii": [
+      "!<"
+    ]
+  },
+  {
+    "name": "NotGreater",
+    "category": "punctuation",
+    "codepoint": 8815,
+    "ascii": [
+      "!>"
+    ]
+  },
+  {
+    "name": "NotLessEqual",
+    "category": "punctuation",
+    "codepoint": 8816,
+    "ascii": [
+      "!<="
+    ]
+  },
+  {
+    "name": "NotGreaterEqual",
+    "category": "punctuation",
+    "codepoint": 8817,
+    "ascii": [
+      "!>="
+    ]
+  },
+  {
+    "name": "LessTilde",
+    "category": "punctuation",
+    "codepoint": 8818,
+    "ascii": [
+      "<~"
+    ]
+  },
+  {
+    "name": "GreaterTilde",
+    "category": "punctuation",
+    "codepoint": 8819,
+    "ascii": [
+      ">~"
+    ]
+  },
+  {
+    "name": "NotLessTilde",
+    "category": "punctuation",
+    "codepoint": 8820,
+    "ascii": [
+      "!<~"
+    ]
+  },
+  {
+    "name": "NotGreaterTilde",
+    "category": "punctuation",
+    "codepoint": 8821,
+    "ascii": [
+      "!>~"
+    ]
+  },
+  {
+    "name": "LessGreater",
+    "category": "punctuation",
+    "codepoint": 8822,
+    "ascii": [
+      "<>"
+    ]
+  },
+  {
+    "name": "GreaterLess",
+    "category": "punctuation",
+    "codepoint": 8823,
+    "ascii": [
+      "><"
+    ]
+  },
+  {
+    "name": "NotLessGreater",
+    "category": "punctuation",
+    "codepoint": 8824,
+    "ascii": [
+      "!<>"
+    ]
+  },
+  {
+    "name": "NotGreaterLess",
+    "category": "punctuation",
+    "codepoint": 8825,
+    "ascii": [
+      "!><"
+    ]
+  },
+  {
+    "name": "Precedes",
+    "category": "punctuation",
+    "codepoint": 8826
+  },
+  {
+    "name": "Succeeds",
+    "category": "punctuation",
+    "codepoint": 8827
+  },
+  {
+    "name": "PrecedesSlantEqual",
+    "category": "punctuation",
+    "codepoint": 8828
+  },
+  {
+    "name": "SucceedsSlantEqual",
+    "category": "punctuation",
+    "codepoint": 8829
+  },
+  {
+    "name": "PrecedesTilde",
+    "category": "punctuation",
+    "codepoint": 8830
+  },
+  {
+    "name": "SucceedsTilde",
+    "category": "punctuation",
+    "codepoint": 8831
+  },
+  {
+    "name": "NotPrecedes",
+    "category": "punctuation",
+    "codepoint": 8832
+  },
+  {
+    "name": "NotSucceeds",
+    "category": "punctuation",
+    "codepoint": 8833
+  },
+  {
+    "name": "Subset",
+    "category": "punctuation",
+    "codepoint": 8834
+  },
+  {
+    "name": "Superset",
+    "category": "punctuation",
+    "codepoint": 8835
+  },
+  {
+    "name": "NotSubset",
+    "category": "punctuation",
+    "codepoint": 8836
+  },
+  {
+    "name": "NotSuperset",
+    "category": "punctuation",
+    "codepoint": 8837
+  },
+  {
+    "name": "SubsetEqual",
+    "category": "punctuation",
+    "codepoint": 8838
+  },
+  {
+    "name": "SupersetEqual",
+    "category": "punctuation",
+    "codepoint": 8839
+  },
+  {
+    "name": "NotSubsetEqual",
+    "category": "punctuation",
+    "codepoint": 8840
+  },
+  {
+    "name": "NotSupersetEqual",
+    "category": "punctuation",
+    "codepoint": 8841
+  },
+  {
+    "name": "UnionPlus",
+    "category": "punctuation",
+    "codepoint": 8846
+  },
+  {
+    "name": "SquareSubset",
+    "category": "punctuation",
+    "codepoint": 8847
+  },
+  {
+    "name": "SquareSuperset",
+    "category": "punctuation",
+    "codepoint": 8848
+  },
+  {
+    "name": "SquareSubsetEqual",
+    "category": "punctuation",
+    "codepoint": 8849
+  },
+  {
+    "name": "SquareSupersetEqual",
+    "category": "punctuation",
+    "codepoint": 8850
+  },
+  {
+    "name": "SquareIntersection",
+    "category": "punctuation",
+    "codepoint": 8851
+  },
+  {
+    "name": "SquareUnion",
+    "category": "punctuation",
+    "codepoint": 8852
+  },
+  {
+    "name": "CirclePlus",
+    "category": "punctuation",
+    "codepoint": 8853,
+    "ascii": [
+      "(+)"
+    ]
+  },
+  {
+    "name": "CircleMinus",
+    "category": "punctuation",
+    "codepoint": 8854,
+    "ascii": [
+      "(-)"
+    ]
+  },
+  {
+    "name": "CircleTimes",
+    "category": "punctuation",
+    "codepoint": 8855,
+    "ascii": [
+      "(x)"
+    ]
+  },
+  {
+    "name": "CircleDot",
+    "category": "punctuation",
+    "codepoint": 8857,
+    "ascii": [
+      "(.)"
+    ]
+  },
+  {
+    "name": "RightTee",
+    "category": "punctuation",
+    "codepoint": 8866,
+    "ascii": [
+      "|-"
+    ]
+  },
+  {
+    "name": "LeftTee",
+    "category": "punctuation",
+    "codepoint": 8867,
+    "ascii": [
+      "-|"
+    ]
+  },
+  {
+    "name": "DownTee",
+    "category": "punctuation",
+    "codepoint": 8868
+  },
+  {
+    "name": "UpTee",
+    "category": "punctuation",
+    "codepoint": 8869
+  },
+  {
+    "name": "DoubleRightTee",
+    "category": "punctuation",
+    "codepoint": 8872,
+    "ascii": [
+      "|="
+    ]
+  },
+  {
+    "name": "LeftTriangle",
+    "category": "punctuation",
+    "codepoint": 8882,
+    "ascii": [
+      "<|"
+    ]
+  },
+  {
+    "name": "RightTriangle",
+    "category": "punctuation",
+    "codepoint": 8883,
+    "ascii": [
+      "|>"
+    ]
+  },
+  {
+    "name": "LeftTriangleEqual",
+    "category": "punctuation",
+    "codepoint": 8884,
+    "ascii": [
+      "<|="
+    ]
+  },
+  {
+    "name": "RightTriangleEqual",
+    "category": "punctuation",
+    "codepoint": 8885,
+    "ascii": [
+      "|>="
+    ]
+  },
+  {
+    "name": "Xor",
+    "category": "punctuation",
+    "codepoint": 8891,
+    "extra": [
+      "logical"
+    ]
+  },
+  {
+    "name": "Nand",
+    "category": "punctuation",
+    "codepoint": 8892,
+    "extra": [
+      "logical"
+    ]
+  },
+  {
+    "name": "Nor",
+    "category": "punctuation",
+    "codepoint": 8893,
+    "extra": [
+      "logical"
+    ]
+  },
+  {
+    "name": "Wedge",
+    "category": "punctuation",
+    "codepoint": 8896,
+    "ascii": [
+      "^"
+    ]
+  },
+  {
+    "name": "Vee",
+    "category": "punctuation",
+    "codepoint": 8897
+  },
+  {
+    "name": "Intersection",
+    "category": "punctuation",
+    "codepoint": 8898
+  },
+  {
+    "name": "Union",
+    "category": "punctuation",
+    "codepoint": 8899
+  },
+  {
+    "name": "Diamond",
+    "category": "punctuation",
+    "codepoint": 8900,
+    "ascii": [
+      "<>"
+    ]
+  },
+  {
+    "name": "Star",
+    "category": "punctuation",
+    "codepoint": 8902,
+    "ascii": [
+      "*"
+    ]
+  },
+  {
+    "name": "LessEqualGreater",
+    "category": "punctuation",
+    "codepoint": 8922,
+    "ascii": [
+      "<=>"
+    ]
+  },
+  {
+    "name": "GreaterEqualLess",
+    "category": "punctuation",
+    "codepoint": 8923,
+    "ascii": [
+      ">=<"
+    ]
+  },
+  {
+    "name": "NotPrecedesSlantEqual",
+    "category": "punctuation",
+    "codepoint": 8928
+  },
+  {
+    "name": "NotSucceedsSlantEqual",
+    "category": "punctuation",
+    "codepoint": 8929
+  },
+  {
+    "name": "NotSquareSubsetEqual",
+    "category": "punctuation",
+    "codepoint": 8930
+  },
+  {
+    "name": "NotSquareSupersetEqual",
+    "category": "punctuation",
+    "codepoint": 8931
+  },
+  {
+    "name": "NotPrecedesTilde",
+    "category": "punctuation",
+    "codepoint": 8936
+  },
+  {
+    "name": "NotSucceedsTilde",
+    "category": "punctuation",
+    "codepoint": 8937
+  },
+  {
+    "name": "NotLeftTriangle",
+    "category": "punctuation",
+    "codepoint": 8938,
+    "ascii": [
+      "!<|"
+    ]
+  },
+  {
+    "name": "NotRightTriangle",
+    "category": "punctuation",
+    "codepoint": 8939,
+    "ascii": [
+      "!|>"
+    ]
+  },
+  {
+    "name": "NotLeftTriangleEqual",
+    "category": "punctuation",
+    "codepoint": 8940,
+    "ascii": [
+      "!<|="
+    ]
+  },
+  {
+    "name": "NotRightTriangleEqual",
+    "category": "punctuation",
+    "codepoint": 8941,
+    "ascii": [
+      "!|>="
+    ]
+  },
+  {
+    "name": "VerticalEllipsis",
+    "category": "letterlike",
+    "codepoint": 8942
+  },
+  {
+    "name": "CenterEllipsis",
+    "category": "letterlike",
+    "codepoint": 8943,
+    "ascii": [
+      "..."
+    ]
+  },
+  {
+    "name": "AscendingEllipsis",
+    "category": "letterlike",
+    "codepoint": 8944
+  },
+  {
+    "name": "DescendingEllipsis",
+    "category": "letterlike",
+    "codepoint": 8945
+  },
+  {
+    "name": "Diameter",
+    "category": "letterlike",
+    "codepoint": 8960
+  },
+  {
+    "name": "LeftCeiling",
+    "category": "punctuation",
+    "codepoint": 8968,
+    "extra": [
+      "group"
+    ]
+  },
+  {
+    "name": "RightCeiling",
+    "category": "punctuation",
+    "codepoint": 8969,
+    "extra": [
+      "group"
+    ]
+  },
+  {
+    "name": "LeftFloor",
+    "category": "punctuation",
+    "codepoint": 8970,
+    "extra": [
+      "group"
+    ]
+  },
+  {
+    "name": "RightFloor",
+    "category": "punctuation",
+    "codepoint": 8971,
+    "extra": [
+      "group"
+    ]
+  },
+  {
+    "name": "CloverLeaf",
+    "category": "letterlike",
+    "codepoint": 8984
+  },
+  {
+    "name": "WatchIcon",
+    "category": "letterlike",
+    "codepoint": 8986
+  },
+  {
+    "name": "Cap",
+    "category": "punctuation",
+    "codepoint": 8994
+  },
+  {
+    "name": "Cup",
+    "category": "punctuation",
+    "codepoint": 8995
+  },
+  {
+    "name": "LeftAngleBracket",
+    "category": "punctuation",
+    "codepoint": 9001,
+    "ascii": [
+      "<"
+    ],
+    "extra": [
+      "group"
+    ]
+  },
+  {
+    "name": "RightAngleBracket",
+    "category": "punctuation",
+    "codepoint": 9002,
+    "ascii": [
+      ">"
+    ],
+    "extra": [
+      "group"
+    ]
+  },
+  {
+    "name": "OverBracket",
+    "category": "letterlike",
+    "codepoint": 9140
+  },
+  {
+    "name": "UnderBracket",
+    "category": "letterlike",
+    "codepoint": 9141
+  },
+  {
+    "name": "SpaceIndicator",
+    "category": "whitespace",
+    "codepoint": 9251,
+    "ascii": [
+      " ",
+      "_"
+    ]
+  },
+  {
+    "name": "HorizontalLine",
+    "category": "letterlike",
+    "codepoint": 9472
+  },
+  {
+    "name": "VerticalLine",
+    "category": "letterlike",
+    "codepoint": 9474
+  },
+  {
+    "name": "FilledSquare",
+    "category": "letterlike",
+    "codepoint": 9632
+  },
+  {
+    "name": "EmptySquare",
+    "category": "letterlike",
+    "codepoint": 9633
+  },
+  {
+    "name": "FilledVerySmallSquare",
+    "category": "letterlike",
+    "codepoint": 9642
+  },
+  {
+    "name": "EmptyVerySmallSquare",
+    "category": "letterlike",
+    "codepoint": 9643
+  },
+  {
+    "name": "FilledRectangle",
+    "category": "letterlike",
+    "codepoint": 9646
+  },
+  {
+    "name": "EmptyRectangle",
+    "category": "letterlike",
+    "codepoint": 9647
+  },
+  {
+    "name": "FilledUpTriangle",
+    "category": "letterlike",
+    "codepoint": 9650
+  },
+  {
+    "name": "EmptyUpTriangle",
+    "category": "letterlike",
+    "codepoint": 9651
+  },
+  {
+    "name": "UpPointer",
+    "category": "letterlike",
+    "codepoint": 9652
+  },
+  {
+    "name": "FilledRightTriangle",
+    "category": "letterlike",
+    "codepoint": 9654
+  },
+  {
+    "name": "RightPointer",
+    "category": "letterlike",
+    "codepoint": 9656
+  },
+  {
+    "name": "FilledDownTriangle",
+    "category": "letterlike",
+    "codepoint": 9660
+  },
+  {
+    "name": "EmptyDownTriangle",
+    "category": "letterlike",
+    "codepoint": 9661
+  },
+  {
+    "name": "DownPointer",
+    "category": "letterlike",
+    "codepoint": 9662
+  },
+  {
+    "name": "FilledLeftTriangle",
+    "category": "letterlike",
+    "codepoint": 9664
+  },
+  {
+    "name": "LeftPointer",
+    "category": "letterlike",
+    "codepoint": 9666
+  },
+  {
+    "name": "FilledDiamond",
+    "category": "letterlike",
+    "codepoint": 9670
+  },
+  {
+    "name": "EmptyDiamond",
+    "category": "letterlike",
+    "codepoint": 9671
+  },
+  {
+    "name": "EmptyCircle",
+    "category": "letterlike",
+    "codepoint": 9675
+  },
+  {
+    "name": "FilledCircle",
+    "category": "letterlike",
+    "codepoint": 9679
+  },
+  {
+    "name": "EmptySmallCircle",
+    "category": "letterlike",
+    "codepoint": 9702
+  },
+  {
+    "name": "EmptySmallSquare",
+    "category": "letterlike",
+    "codepoint": 9723
+  },
+  {
+    "name": "FilledSmallSquare",
+    "category": "letterlike",
+    "codepoint": 9724
+  },
+  {
+    "name": "FivePointedStar",
+    "category": "letterlike",
+    "codepoint": 9733
+  },
+  {
+    "name": "Sun",
+    "category": "letterlike",
+    "codepoint": 9737
+  },
+  {
+    "name": "CheckmarkedBox",
+    "category": "letterlike",
+    "codepoint": 9745
+  },
+  {
+    "name": "CheckedBox",
+    "category": "letterlike",
+    "codepoint": 9746
+  },
+  {
+    "name": "SadSmiley",
+    "category": "letterlike",
+    "codepoint": 9785,
+    "ascii": [
+      ":-("
+    ]
+  },
+  {
+    "name": "HappySmiley",
+    "category": "letterlike",
+    "codepoint": 9786,
+    "ascii": [
+      ":-)"
+    ]
+  },
+  {
+    "name": "Moon",
+    "category": "letterlike",
+    "codepoint": 9790
+  },
+  {
+    "name": "Mercury",
+    "category": "letterlike",
+    "codepoint": 9791
+  },
+  {
+    "name": "Venus",
+    "category": "letterlike",
+    "codepoint": 9792
+  },
+  {
+    "name": "Mars",
+    "category": "letterlike",
+    "codepoint": 9794
+  },
+  {
+    "name": "Jupiter",
+    "category": "letterlike",
+    "codepoint": 9795
+  },
+  {
+    "name": "Saturn",
+    "category": "letterlike",
+    "codepoint": 9796
+  },
+  {
+    "name": "Neptune",
+    "category": "letterlike",
+    "codepoint": 9798
+  },
+  {
+    "name": "Pluto",
+    "category": "letterlike",
+    "codepoint": 9799
+  },
+  {
+    "name": "AriesSign",
+    "category": "letterlike",
+    "codepoint": 9800
+  },
+  {
+    "name": "TaurusSign",
+    "category": "letterlike",
+    "codepoint": 9801
+  },
+  {
+    "name": "GeminiSign",
+    "category": "letterlike",
+    "codepoint": 9802
+  },
+  {
+    "name": "CancerSign",
+    "category": "letterlike",
+    "codepoint": 9803
+  },
+  {
+    "name": "LeoSign",
+    "category": "letterlike",
+    "codepoint": 9804
+  },
+  {
+    "name": "VirgoSign",
+    "category": "letterlike",
+    "codepoint": 9805
+  },
+  {
+    "name": "LibraSign",
+    "category": "letterlike",
+    "codepoint": 9806
+  },
+  {
+    "name": "ScorpioSign",
+    "category": "letterlike",
+    "codepoint": 9807
+  },
+  {
+    "name": "SagittariusSign",
+    "category": "letterlike",
+    "codepoint": 9808
+  },
+  {
+    "name": "CapricornSign",
+    "category": "letterlike",
+    "codepoint": 9809
+  },
+  {
+    "name": "AquariusSign",
+    "category": "letterlike",
+    "codepoint": 9810
+  },
+  {
+    "name": "PiscesSign",
+    "category": "letterlike",
+    "codepoint": 9811
+  },
+  {
+    "name": "WhiteKing",
+    "category": "letterlike",
+    "codepoint": 9812
+  },
+  {
+    "name": "WhiteQueen",
+    "category": "letterlike",
+    "codepoint": 9813
+  },
+  {
+    "name": "WhiteRook",
+    "category": "letterlike",
+    "codepoint": 9814
+  },
+  {
+    "name": "WhiteBishop",
+    "category": "letterlike",
+    "codepoint": 9815
+  },
+  {
+    "name": "WhiteKnight",
+    "category": "letterlike",
+    "codepoint": 9816
+  },
+  {
+    "name": "WhitePawn",
+    "category": "letterlike",
+    "codepoint": 9817
+  },
+  {
+    "name": "BlackKing",
+    "category": "letterlike",
+    "codepoint": 9818
+  },
+  {
+    "name": "BlackQueen",
+    "category": "letterlike",
+    "codepoint": 9819
+  },
+  {
+    "name": "BlackRook",
+    "category": "letterlike",
+    "codepoint": 9820
+  },
+  {
+    "name": "BlackBishop",
+    "category": "letterlike",
+    "codepoint": 9821
+  },
+  {
+    "name": "BlackKnight",
+    "category": "letterlike",
+    "codepoint": 9822
+  },
+  {
+    "name": "BlackPawn",
+    "category": "letterlike",
+    "codepoint": 9823
+  },
+  {
+    "name": "SpadeSuit",
+    "category": "letterlike",
+    "codepoint": 9824
+  },
+  {
+    "name": "HeartSuit",
+    "category": "letterlike",
+    "codepoint": 9825
+  },
+  {
+    "name": "DiamondSuit",
+    "category": "letterlike",
+    "codepoint": 9826
+  },
+  {
+    "name": "ClubSuit",
+    "category": "letterlike",
+    "codepoint": 9827
+  },
+  {
+    "name": "QuarterNote",
+    "category": "letterlike",
+    "codepoint": 9833
+  },
+  {
+    "name": "EighthNote",
+    "category": "letterlike",
+    "codepoint": 9834
+  },
+  {
+    "name": "BeamedEighthNote",
+    "category": "letterlike",
+    "codepoint": 9835
+  },
+  {
+    "name": "BeamedSixteenthNote",
+    "category": "letterlike",
+    "codepoint": 9836
+  },
+  {
+    "name": "Flat",
+    "category": "letterlike",
+    "codepoint": 9837
+  },
+  {
+    "name": "Natural",
+    "category": "letterlike",
+    "codepoint": 9838
+  },
+  {
+    "name": "Sharp",
+    "category": "letterlike",
+    "codepoint": 9839,
+    "ascii": [
+      "#"
+    ]
+  },
+  {
+    "name": "Uranus",
+    "category": "letterlike",
+    "codepoint": 9954
+  },
+  {
+    "name": "Checkmark",
+    "category": "letterlike",
+    "codepoint": 10003
+  },
+  {
+    "name": "SixPointedStar",
+    "category": "letterlike",
+    "codepoint": 10038
+  },
+  {
+    "name": "Perpendicular",
+    "category": "punctuation",
+    "codepoint": 10178
+  },
+  {
+    "name": "LongLeftArrow",
+    "category": "punctuation",
+    "codepoint": 10229,
+    "ascii": [
+      "<--"
+    ]
+  },
+  {
+    "name": "LongRightArrow",
+    "category": "punctuation",
+    "codepoint": 10230,
+    "ascii": [
+      "-->"
+    ]
+  },
+  {
+    "name": "LongLeftRightArrow",
+    "category": "punctuation",
+    "codepoint": 10231,
+    "ascii": [
+      "<-->"
+    ]
+  },
+  {
+    "name": "DoubleLongLeftArrow",
+    "category": "punctuation",
+    "codepoint": 10232,
+    "ascii": [
+      "<=="
+    ]
+  },
+  {
+    "name": "DoubleLongRightArrow",
+    "category": "punctuation",
+    "codepoint": 10233,
+    "ascii": [
+      "==>"
+    ]
+  },
+  {
+    "name": "DoubleLongLeftRightArrow",
+    "category": "punctuation",
+    "codepoint": 10234,
+    "ascii": [
+      "<==>"
+    ]
+  },
+  {
+    "name": "UpArrowBar",
+    "category": "punctuation",
+    "codepoint": 10514
+  },
+  {
+    "name": "DownArrowBar",
+    "category": "punctuation",
+    "codepoint": 10515
+  },
+  {
+    "name": "LeftRightVector",
+    "category": "punctuation",
+    "codepoint": 10574
+  },
+  {
+    "name": "RightUpDownVector",
+    "category": "punctuation",
+    "codepoint": 10575
+  },
+  {
+    "name": "DownLeftRightVector",
+    "category": "punctuation",
+    "codepoint": 10576
+  },
+  {
+    "name": "LeftUpDownVector",
+    "category": "punctuation",
+    "codepoint": 10577
+  },
+  {
+    "name": "LeftVectorBar",
+    "category": "punctuation",
+    "codepoint": 10578
+  },
+  {
+    "name": "RightVectorBar",
+    "category": "punctuation",
+    "codepoint": 10579
+  },
+  {
+    "name": "RightUpVectorBar",
+    "category": "punctuation",
+    "codepoint": 10580
+  },
+  {
+    "name": "RightDownVectorBar",
+    "category": "punctuation",
+    "codepoint": 10581
+  },
+  {
+    "name": "DownLeftVectorBar",
+    "category": "punctuation",
+    "codepoint": 10582
+  },
+  {
+    "name": "DownRightVectorBar",
+    "category": "punctuation",
+    "codepoint": 10583
+  },
+  {
+    "name": "LeftUpVectorBar",
+    "category": "punctuation",
+    "codepoint": 10584
+  },
+  {
+    "name": "LeftDownVectorBar",
+    "category": "punctuation",
+    "codepoint": 10585
+  },
+  {
+    "name": "LeftTeeVector",
+    "category": "punctuation",
+    "codepoint": 10586
+  },
+  {
+    "name": "RightTeeVector",
+    "category": "punctuation",
+    "codepoint": 10587
+  },
+  {
+    "name": "RightUpTeeVector",
+    "category": "punctuation",
+    "codepoint": 10588
+  },
+  {
+    "name": "RightDownTeeVector",
+    "category": "punctuation",
+    "codepoint": 10589
+  },
+  {
+    "name": "DownLeftTeeVector",
+    "category": "punctuation",
+    "codepoint": 10590
+  },
+  {
+    "name": "DownRightTeeVector",
+    "category": "punctuation",
+    "codepoint": 10591
+  },
+  {
+    "name": "LeftUpTeeVector",
+    "category": "punctuation",
+    "codepoint": 10592
+  },
+  {
+    "name": "LeftDownTeeVector",
+    "category": "punctuation",
+    "codepoint": 10593
+  },
+  {
+    "name": "UpEquilibrium",
+    "category": "punctuation",
+    "codepoint": 10606
+  },
+  {
+    "name": "ReverseUpEquilibrium",
+    "category": "punctuation",
+    "codepoint": 10607
+  },
+  {
+    "name": "RoundImplies",
+    "category": "punctuation",
+    "codepoint": 10608
+  },
+  {
+    "name": "LeftTriangleBar",
+    "category": "punctuation",
+    "codepoint": 10703,
+    "ascii": [
+      "<||"
+    ]
+  },
+  {
+    "name": "RightTriangleBar",
+    "category": "punctuation",
+    "codepoint": 10704,
+    "ascii": [
+      "||>"
+    ]
+  },
+  {
+    "name": "Equivalent",
+    "category": "punctuation",
+    "codepoint": 10726,
+    "ascii": [
+      "<=>"
+    ]
+  },
+  {
+    "name": "LessSlantEqual",
+    "category": "punctuation",
+    "codepoint": 10877,
+    "ascii": [
+      "<="
+    ]
+  },
+  {
+    "name": "GreaterSlantEqual",
+    "category": "punctuation",
+    "codepoint": 10878,
+    "ascii": [
+      ">="
+    ]
+  },
+  {
+    "name": "NestedLessLess",
+    "category": "punctuation",
+    "codepoint": 10913,
+    "ascii": [
+      "<<"
+    ]
+  },
+  {
+    "name": "NestedGreaterGreater",
+    "category": "punctuation",
+    "codepoint": 10914,
+    "ascii": [
+      ">>"
+    ]
+  },
+  {
+    "name": "PrecedesEqual",
+    "category": "punctuation",
+    "codepoint": 10927
+  },
+  {
+    "name": "SucceedsEqual",
+    "category": "punctuation",
+    "codepoint": 10928
+  },
+  {
+    "name": "DoubleLeftTee",
+    "category": "punctuation",
+    "codepoint": 10980,
+    "ascii": [
+      "=|"
+    ]
+  },
+  {
+    "name": "COMPATIBILITYKanjiSpace",
+    "category": "unsupported",
+    "codepoint": 12288
+  },
+  {
+    "name": "LeftDoubleBracket",
+    "category": "punctuation",
+    "codepoint": 12314,
+    "ascii": [
+      "[["
+    ],
+    "extra": [
+      "group"
+    ]
+  },
+  {
+    "name": "RightDoubleBracket",
+    "category": "punctuation",
+    "codepoint": 12315,
+    "ascii": [
+      "]]"
+    ],
+    "extra": [
+      "group"
+    ]
+  },
+  {
+    "name": "LeftAssociation",
+    "category": "punctuation",
+    "codepoint": 61715,
+    "ascii": [
+      "<|"
+    ],
+    "extra": [
+      "group"
+    ]
+  },
+  {
+    "name": "RightAssociation",
+    "category": "punctuation",
+    "codepoint": 61716,
+    "ascii": [
+      "|>"
+    ],
+    "extra": [
+      "group"
+    ]
+  },
+  {
+    "name": "Shah",
+    "category": "letterlike",
+    "codepoint": 61725
+  },
+  {
+    "name": "WolframLanguageLogo",
+    "category": "letterlike",
+    "codepoint": 61726
+  },
+  {
+    "name": "WolframLanguageLogoCircle",
+    "category": "letterlike",
+    "codepoint": 61727
+  },
+  {
+    "name": "TwoWayRule",
+    "category": "punctuation",
+    "codepoint": 61728,
+    "ascii": [
+      "<->"
+    ],
+    "added": "11.1"
+  },
+  {
+    "name": "FreeformPrompt",
+    "category": "letterlike",
+    "codepoint": 62289
+  },
+  {
+    "name": "WolframAlphaPrompt",
+    "category": "letterlike",
+    "codepoint": 62290
+  },
+  {
+    "name": "InvisibleSpace",
+    "category": "whitespace",
+    "codepoint": 62304,
+    "ascii": [
+      " ",
+      ""
+    ]
+  },
+  {
+    "name": "Piecewise",
+    "category": "punctuation",
+    "codepoint": 62305
+  },
+  {
+    "name": "NegativeVeryThinSpace",
+    "category": "whitespace",
+    "codepoint": 62336,
+    "ascii": [
+      " "
+    ]
+  },
+  {
+    "name": "NegativeThinSpace",
+    "category": "whitespace",
+    "codepoint": 62338,
+    "ascii": [
+      " "
+    ]
+  },
+  {
+    "name": "NegativeMediumSpace",
+    "category": "whitespace",
+    "codepoint": 62339,
+    "ascii": [
+      " "
+    ]
+  },
+  {
+    "name": "NegativeThickSpace",
+    "category": "whitespace",
+    "codepoint": 62340,
+    "ascii": [
+      " "
+    ]
+  },
+  {
+    "name": "ImplicitPlus",
+    "category": "punctuation",
+    "codepoint": 62366,
+    "ascii": [
+      "+"
+    ],
+    "extra": [
+      "arithmetic"
+    ]
+  },
+  {
+    "name": "Null",
+    "category": "letterlike",
+    "codepoint": 62368,
+    "ascii": [
+      ""
+    ]
+  },
+  {
+    "name": "COMPATIBILITYNoBreak",
+    "category": "unsupported",
+    "codepoint": 62370
+  },
+  {
+    "name": "IndentingNewLine",
+    "category": "newline",
+    "codepoint": 62371,
+    "ascii": [
+      "\\n"
+    ]
+  },
+  {
+    "name": "AutoPlaceholder",
+    "category": "letterlike",
+    "codepoint": 62372
+  },
+  {
+    "name": "AutoLeftMatch",
+    "category": "punctuation",
+    "codepoint": 62376
+  },
+  {
+    "name": "AutoRightMatch",
+    "category": "punctuation",
+    "codepoint": 62377
+  },
+  {
+    "name": "AutoSpace",
+    "category": "whitespace",
+    "codepoint": 62381
+  },
+  {
+    "name": "AutoOperand",
+    "category": "letterlike",
+    "codepoint": 62382
+  },
+  {
+    "name": "SystemsModelDelay",
+    "category": "letterlike",
+    "codepoint": 62383,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "Continuation",
+    "category": "whitespace",
+    "codepoint": 62385,
+    "ascii": [
+      "\\\\"
+    ]
+  },
+  {
+    "name": "RoundSpaceIndicator",
+    "category": "whitespace",
+    "codepoint": 62386,
+    "ascii": [
+      "_"
+    ]
+  },
+  {
+    "name": "InvisiblePrefixScriptBase",
+    "category": "punctuation",
+    "codepoint": 62387,
+    "ascii": [
+      ""
+    ]
+  },
+  {
+    "name": "InvisiblePostfixScriptBase",
+    "category": "punctuation",
+    "codepoint": 62388,
+    "ascii": [
+      ""
+    ]
+  },
+  {
+    "name": "EntityStart",
+    "category": "letterlike",
+    "codepoint": 62392
+  },
+  {
+    "name": "EntityEnd",
+    "category": "letterlike",
+    "codepoint": 62393
+  },
+  {
+    "name": "SpanFromLeft",
+    "category": "letterlike",
+    "codepoint": 62394
+  },
+  {
+    "name": "SpanFromAbove",
+    "category": "letterlike",
+    "codepoint": 62395
+  },
+  {
+    "name": "SpanFromBoth",
+    "category": "letterlike",
+    "codepoint": 62396
+  },
+  {
+    "name": "PageBreakAbove",
+    "category": "whitespace",
+    "codepoint": 62397,
+    "ascii": [
+      "\\n"
+    ]
+  },
+  {
+    "name": "PageBreakBelow",
+    "category": "whitespace",
+    "codepoint": 62398,
+    "ascii": [
+      "\\n"
+    ]
+  },
+  {
+    "name": "DiscretionaryPageBreakAbove",
+    "category": "whitespace",
+    "codepoint": 62399,
+    "ascii": [
+      "\\n"
+    ]
+  },
+  {
+    "name": "DiscretionaryPageBreakBelow",
+    "category": "whitespace",
+    "codepoint": 62406,
+    "ascii": [
+      "\\n"
+    ]
+  },
+  {
+    "name": "Transpose",
+    "category": "punctuation",
+    "codepoint": 62407,
+    "ascii": [
+      "T"
+    ]
+  },
+  {
+    "name": "Conjugate",
+    "category": "punctuation",
+    "codepoint": 62408,
+    "ascii": [
+      "*"
+    ]
+  },
+  {
+    "name": "ConjugateTranspose",
+    "category": "punctuation",
+    "codepoint": 62409,
+    "ascii": [
+      "t"
+    ]
+  },
+  {
+    "name": "StepperRight",
+    "category": "letterlike",
+    "codepoint": 62410
+  },
+  {
+    "name": "StepperLeft",
+    "category": "letterlike",
+    "codepoint": 62411
+  },
+  {
+    "name": "StepperUp",
+    "category": "letterlike",
+    "codepoint": 62412
+  },
+  {
+    "name": "StepperDown",
+    "category": "letterlike",
+    "codepoint": 62413
+  },
+  {
+    "name": "HermitianConjugate",
+    "category": "punctuation",
+    "codepoint": 62414,
+    "ascii": [
+      "H"
+    ]
+  },
+  {
+    "name": "VerticalBar",
+    "category": "punctuation",
+    "codepoint": 62416,
+    "ascii": [
+      "|"
+    ]
+  },
+  {
+    "name": "NotVerticalBar",
+    "category": "punctuation",
+    "codepoint": 62417,
+    "ascii": [
+      "!|"
+    ]
+  },
+  {
+    "name": "Distributed",
+    "category": "punctuation",
+    "codepoint": 62418
+  },
+  {
+    "name": "Conditioned",
+    "category": "punctuation",
+    "codepoint": 62419
+  },
+  {
+    "name": "UndirectedEdge",
+    "category": "punctuation",
+    "codepoint": 62420
+  },
+  {
+    "name": "DirectedEdge",
+    "category": "punctuation",
+    "codepoint": 62421,
+    "ascii": [
+      "->"
+    ]
+  },
+  {
+    "name": "ContinuedFractionK",
+    "category": "punctuation",
+    "codepoint": 62425,
+    "ascii": [
+      "K"
+    ]
+  },
+  {
+    "name": "TensorProduct",
+    "category": "punctuation",
+    "codepoint": 62426
+  },
+  {
+    "name": "TensorWedge",
+    "category": "punctuation",
+    "codepoint": 62427
+  },
+  {
+    "name": "ProbabilityPr",
+    "category": "punctuation",
+    "codepoint": 62428
+  },
+  {
+    "name": "ExpectationE",
+    "category": "punctuation",
+    "codepoint": 62429
+  },
+  {
+    "name": "PermutationProduct",
+    "category": "punctuation",
+    "codepoint": 62430
+  },
+  {
+    "name": "Earth",
+    "category": "letterlike",
+    "codepoint": 62431
+  },
+  {
+    "name": "NotEqualTilde",
+    "category": "punctuation",
+    "codepoint": 62464,
+    "ascii": [
+      "!=~"
+    ]
+  },
+  {
+    "name": "NotHumpEqual",
+    "category": "punctuation",
+    "codepoint": 62465
+  },
+  {
+    "name": "NotHumpDownHump",
+    "category": "punctuation",
+    "codepoint": 62466
+  },
+  {
+    "name": "NotLeftTriangleBar",
+    "category": "punctuation",
+    "codepoint": 62482,
+    "ascii": [
+      "!<||"
+    ]
+  },
+  {
+    "name": "NotRightTriangleBar",
+    "category": "punctuation",
+    "codepoint": 62483,
+    "ascii": [
+      "!||>"
+    ]
+  },
+  {
+    "name": "NotLessLess",
+    "category": "punctuation",
+    "codepoint": 62498,
+    "ascii": [
+      "!<<"
+    ]
+  },
+  {
+    "name": "NotNestedLessLess",
+    "category": "punctuation",
+    "codepoint": 62499,
+    "ascii": [
+      "!<<"
+    ]
+  },
+  {
+    "name": "NotLessSlantEqual",
+    "category": "punctuation",
+    "codepoint": 62500,
+    "ascii": [
+      "!<="
+    ]
+  },
+  {
+    "name": "NotGreaterGreater",
+    "category": "punctuation",
+    "codepoint": 62503,
+    "ascii": [
+      "!>>"
+    ]
+  },
+  {
+    "name": "NotNestedGreaterGreater",
+    "category": "punctuation",
+    "codepoint": 62504,
+    "ascii": [
+      "!>>"
+    ]
+  },
+  {
+    "name": "NotGreaterSlantEqual",
+    "category": "punctuation",
+    "codepoint": 62505,
+    "ascii": [
+      "!>="
+    ]
+  },
+  {
+    "name": "NotPrecedesEqual",
+    "category": "punctuation",
+    "codepoint": 62507
+  },
+  {
+    "name": "NotSucceedsEqual",
+    "category": "punctuation",
+    "codepoint": 62509
+  },
+  {
+    "name": "NotSquareSubset",
+    "category": "punctuation",
+    "codepoint": 62510
+  },
+  {
+    "name": "NotSquareSuperset",
+    "category": "punctuation",
+    "codepoint": 62511
+  },
+  {
+    "name": "Equal",
+    "category": "punctuation",
+    "codepoint": 62513,
+    "ascii": [
+      "=="
+    ],
+    "extra": [
+      "comparison"
+    ]
+  },
+  {
+    "name": "VerticalSeparator",
+    "category": "punctuation",
+    "codepoint": 62514,
+    "ascii": [
+      "|"
+    ]
+  },
+  {
+    "name": "VectorGreater",
+    "category": "punctuation",
+    "codepoint": 62516,
+    "added": "12.0"
+  },
+  {
+    "name": "VectorGreaterEqual",
+    "category": "punctuation",
+    "codepoint": 62517,
+    "added": "12.0"
+  },
+  {
+    "name": "VectorLess",
+    "category": "punctuation",
+    "codepoint": 62518,
+    "added": "12.0"
+  },
+  {
+    "name": "VectorLessEqual",
+    "category": "punctuation",
+    "codepoint": 62519,
+    "added": "12.0"
+  },
+  {
+    "name": "Limit",
+    "category": "punctuation",
+    "codepoint": 62520,
+    "added": "11.2"
+  },
+  {
+    "name": "MaxLimit",
+    "category": "punctuation",
+    "codepoint": 62521,
+    "added": "11.2"
+  },
+  {
+    "name": "MinLimit",
+    "category": "punctuation",
+    "codepoint": 62522,
+    "added": "12.2"
+  },
+  {
+    "name": "Cross",
+    "category": "punctuation",
+    "codepoint": 62624,
+    "ascii": [
+      "x"
+    ]
+  },
+  {
+    "name": "Function",
+    "category": "punctuation",
+    "codepoint": 62625,
+    "ascii": [
+      "|->"
+    ]
+  },
+  {
+    "name": "Xnor",
+    "category": "punctuation",
+    "codepoint": 62626,
+    "extra": [
+      "logical"
+    ]
+  },
+  {
+    "name": "DiscreteShift",
+    "category": "punctuation",
+    "codepoint": 62627
+  },
+  {
+    "name": "DifferenceDelta",
+    "category": "punctuation",
+    "codepoint": 62628
+  },
+  {
+    "name": "DiscreteRatio",
+    "category": "punctuation",
+    "codepoint": 62629
+  },
+  {
+    "name": "InlinePart",
+    "category": "unsupported",
+    "codepoint": 62750,
+    "ascii": [
+      "@>"
+    ]
+  },
+  {
+    "name": "RuleDelayed",
+    "category": "punctuation",
+    "codepoint": 62751,
+    "ascii": [
+      ":>"
+    ]
+  },
+  {
+    "name": "Square",
+    "category": "punctuation",
+    "codepoint": 62752,
+    "ascii": [
+      "[]"
+    ]
+  },
+  {
+    "name": "Rule",
+    "category": "punctuation",
+    "codepoint": 62754,
+    "ascii": [
+      "->"
+    ]
+  },
+  {
+    "name": "Implies",
+    "category": "punctuation",
+    "codepoint": 62755,
+    "ascii": [
+      "=>"
+    ]
+  },
+  {
+    "name": "ShortRightArrow",
+    "category": "punctuation",
+    "codepoint": 62757,
+    "ascii": [
+      "->"
+    ]
+  },
+  {
+    "name": "ShortLeftArrow",
+    "category": "punctuation",
+    "codepoint": 62758,
+    "ascii": [
+      "<-"
+    ]
+  },
+  {
+    "name": "SelectionPlaceholder",
+    "category": "letterlike",
+    "codepoint": 62759,
+    "ascii": [
+      "[*]"
+    ]
+  },
+  {
+    "name": "Placeholder",
+    "category": "letterlike",
+    "codepoint": 62760,
+    "ascii": [
+      "[ ]"
+    ]
+  },
+  {
+    "name": "ShortUpArrow",
+    "category": "punctuation",
+    "codepoint": 62762
+  },
+  {
+    "name": "ShortDownArrow",
+    "category": "punctuation",
+    "codepoint": 62763
+  },
+  {
+    "name": "Application",
+    "category": "punctuation",
+    "codepoint": 62768,
+    "added": "12.2"
+  },
+  {
+    "name": "LeftBracketingBar",
+    "category": "punctuation",
+    "codepoint": 62979,
+    "ascii": [
+      "|"
+    ],
+    "extra": [
+      "group"
+    ]
+  },
+  {
+    "name": "RightBracketingBar",
+    "category": "punctuation",
+    "codepoint": 62980,
+    "ascii": [
+      "|"
+    ],
+    "extra": [
+      "group"
+    ]
+  },
+  {
+    "name": "LeftDoubleBracketingBar",
+    "category": "punctuation",
+    "codepoint": 62981,
+    "ascii": [
+      "||"
+    ],
+    "extra": [
+      "group"
+    ]
+  },
+  {
+    "name": "RightDoubleBracketingBar",
+    "category": "punctuation",
+    "codepoint": 62982,
+    "ascii": [
+      "||"
+    ],
+    "extra": [
+      "group"
+    ]
+  },
+  {
+    "name": "ScriptA",
+    "category": "letterlike",
+    "codepoint": 63154,
+    "ascii": [
+      "a"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptB",
+    "category": "letterlike",
+    "codepoint": 63155,
+    "ascii": [
+      "b"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptC",
+    "category": "letterlike",
+    "codepoint": 63156,
+    "ascii": [
+      "c"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptD",
+    "category": "letterlike",
+    "codepoint": 63157,
+    "ascii": [
+      "d"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptF",
+    "category": "letterlike",
+    "codepoint": 63159,
+    "ascii": [
+      "f"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptH",
+    "category": "letterlike",
+    "codepoint": 63161,
+    "ascii": [
+      "h"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptI",
+    "category": "letterlike",
+    "codepoint": 63162,
+    "ascii": [
+      "i"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptJ",
+    "category": "letterlike",
+    "codepoint": 63163,
+    "ascii": [
+      "j"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptK",
+    "category": "letterlike",
+    "codepoint": 63164,
+    "ascii": [
+      "k"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptM",
+    "category": "letterlike",
+    "codepoint": 63166,
+    "ascii": [
+      "m"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptN",
+    "category": "letterlike",
+    "codepoint": 63167,
+    "ascii": [
+      "n"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptP",
+    "category": "letterlike",
+    "codepoint": 63169,
+    "ascii": [
+      "p"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptQ",
+    "category": "letterlike",
+    "codepoint": 63170,
+    "ascii": [
+      "q"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptR",
+    "category": "letterlike",
+    "codepoint": 63171,
+    "ascii": [
+      "r"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptS",
+    "category": "letterlike",
+    "codepoint": 63172,
+    "ascii": [
+      "s"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptT",
+    "category": "letterlike",
+    "codepoint": 63173,
+    "ascii": [
+      "t"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptU",
+    "category": "letterlike",
+    "codepoint": 63174,
+    "ascii": [
+      "u"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptV",
+    "category": "letterlike",
+    "codepoint": 63175,
+    "ascii": [
+      "v"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptW",
+    "category": "letterlike",
+    "codepoint": 63176,
+    "ascii": [
+      "w"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptX",
+    "category": "letterlike",
+    "codepoint": 63177,
+    "ascii": [
+      "x"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptY",
+    "category": "letterlike",
+    "codepoint": 63178,
+    "ascii": [
+      "y"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptZ",
+    "category": "letterlike",
+    "codepoint": 63179,
+    "ascii": [
+      "z"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "GothicA",
+    "category": "letterlike",
+    "codepoint": 63180,
+    "ascii": [
+      "a"
+    ]
+  },
+  {
+    "name": "GothicB",
+    "category": "letterlike",
+    "codepoint": 63181,
+    "ascii": [
+      "b"
+    ]
+  },
+  {
+    "name": "GothicC",
+    "category": "letterlike",
+    "codepoint": 63182,
+    "ascii": [
+      "c"
+    ]
+  },
+  {
+    "name": "GothicD",
+    "category": "letterlike",
+    "codepoint": 63183,
+    "ascii": [
+      "d"
+    ]
+  },
+  {
+    "name": "GothicE",
+    "category": "letterlike",
+    "codepoint": 63184,
+    "ascii": [
+      "e"
+    ]
+  },
+  {
+    "name": "GothicF",
+    "category": "letterlike",
+    "codepoint": 63185,
+    "ascii": [
+      "f"
+    ]
+  },
+  {
+    "name": "GothicG",
+    "category": "letterlike",
+    "codepoint": 63186,
+    "ascii": [
+      "g"
+    ]
+  },
+  {
+    "name": "GothicH",
+    "category": "letterlike",
+    "codepoint": 63187,
+    "ascii": [
+      "h"
+    ]
+  },
+  {
+    "name": "GothicI",
+    "category": "letterlike",
+    "codepoint": 63188,
+    "ascii": [
+      "i"
+    ]
+  },
+  {
+    "name": "GothicJ",
+    "category": "letterlike",
+    "codepoint": 63189,
+    "ascii": [
+      "j"
+    ]
+  },
+  {
+    "name": "GothicK",
+    "category": "letterlike",
+    "codepoint": 63190,
+    "ascii": [
+      "k"
+    ]
+  },
+  {
+    "name": "GothicL",
+    "category": "letterlike",
+    "codepoint": 63191,
+    "ascii": [
+      "l"
+    ]
+  },
+  {
+    "name": "GothicM",
+    "category": "letterlike",
+    "codepoint": 63192,
+    "ascii": [
+      "m"
+    ]
+  },
+  {
+    "name": "GothicN",
+    "category": "letterlike",
+    "codepoint": 63193,
+    "ascii": [
+      "n"
+    ]
+  },
+  {
+    "name": "GothicO",
+    "category": "letterlike",
+    "codepoint": 63194,
+    "ascii": [
+      "o"
+    ]
+  },
+  {
+    "name": "GothicP",
+    "category": "letterlike",
+    "codepoint": 63195,
+    "ascii": [
+      "p"
+    ]
+  },
+  {
+    "name": "GothicQ",
+    "category": "letterlike",
+    "codepoint": 63196,
+    "ascii": [
+      "q"
+    ]
+  },
+  {
+    "name": "GothicR",
+    "category": "letterlike",
+    "codepoint": 63197,
+    "ascii": [
+      "R"
+    ]
+  },
+  {
+    "name": "GothicS",
+    "category": "letterlike",
+    "codepoint": 63198,
+    "ascii": [
+      "s"
+    ]
+  },
+  {
+    "name": "GothicT",
+    "category": "letterlike",
+    "codepoint": 63199,
+    "ascii": [
+      "t"
+    ]
+  },
+  {
+    "name": "GothicU",
+    "category": "letterlike",
+    "codepoint": 63200,
+    "ascii": [
+      "u"
+    ]
+  },
+  {
+    "name": "GothicV",
+    "category": "letterlike",
+    "codepoint": 63201,
+    "ascii": [
+      "v"
+    ]
+  },
+  {
+    "name": "GothicW",
+    "category": "letterlike",
+    "codepoint": 63202,
+    "ascii": [
+      "w"
+    ]
+  },
+  {
+    "name": "GothicX",
+    "category": "letterlike",
+    "codepoint": 63203,
+    "ascii": [
+      "x"
+    ]
+  },
+  {
+    "name": "GothicY",
+    "category": "letterlike",
+    "codepoint": 63204,
+    "ascii": [
+      "y"
+    ]
+  },
+  {
+    "name": "GothicZ",
+    "category": "letterlike",
+    "codepoint": 63205,
+    "ascii": [
+      "z"
+    ]
+  },
+  {
+    "name": "DoubleStruckA",
+    "category": "letterlike",
+    "codepoint": 63206,
+    "ascii": [
+      "a"
+    ]
+  },
+  {
+    "name": "DoubleStruckB",
+    "category": "letterlike",
+    "codepoint": 63207,
+    "ascii": [
+      "b"
+    ]
+  },
+  {
+    "name": "DoubleStruckC",
+    "category": "letterlike",
+    "codepoint": 63208,
+    "ascii": [
+      "c"
+    ]
+  },
+  {
+    "name": "DoubleStruckD",
+    "category": "letterlike",
+    "codepoint": 63209,
+    "ascii": [
+      "d"
+    ]
+  },
+  {
+    "name": "DoubleStruckE",
+    "category": "letterlike",
+    "codepoint": 63210,
+    "ascii": [
+      "e"
+    ]
+  },
+  {
+    "name": "DoubleStruckF",
+    "category": "letterlike",
+    "codepoint": 63211,
+    "ascii": [
+      "f"
+    ]
+  },
+  {
+    "name": "DoubleStruckG",
+    "category": "letterlike",
+    "codepoint": 63212,
+    "ascii": [
+      "g"
+    ]
+  },
+  {
+    "name": "DoubleStruckH",
+    "category": "letterlike",
+    "codepoint": 63213,
+    "ascii": [
+      "h"
+    ]
+  },
+  {
+    "name": "DoubleStruckI",
+    "category": "letterlike",
+    "codepoint": 63214,
+    "ascii": [
+      "i"
+    ]
+  },
+  {
+    "name": "DoubleStruckJ",
+    "category": "letterlike",
+    "codepoint": 63215,
+    "ascii": [
+      "j"
+    ]
+  },
+  {
+    "name": "DoubleStruckK",
+    "category": "letterlike",
+    "codepoint": 63216,
+    "ascii": [
+      "k"
+    ]
+  },
+  {
+    "name": "DoubleStruckL",
+    "category": "letterlike",
+    "codepoint": 63217,
+    "ascii": [
+      "l"
+    ]
+  },
+  {
+    "name": "DoubleStruckM",
+    "category": "letterlike",
+    "codepoint": 63218,
+    "ascii": [
+      "m"
+    ]
+  },
+  {
+    "name": "DoubleStruckN",
+    "category": "letterlike",
+    "codepoint": 63219,
+    "ascii": [
+      "n"
+    ]
+  },
+  {
+    "name": "DoubleStruckO",
+    "category": "letterlike",
+    "codepoint": 63220,
+    "ascii": [
+      "o"
+    ]
+  },
+  {
+    "name": "DoubleStruckP",
+    "category": "letterlike",
+    "codepoint": 63221,
+    "ascii": [
+      "p"
+    ]
+  },
+  {
+    "name": "DoubleStruckQ",
+    "category": "letterlike",
+    "codepoint": 63222,
+    "ascii": [
+      "q"
+    ]
+  },
+  {
+    "name": "DoubleStruckR",
+    "category": "letterlike",
+    "codepoint": 63223,
+    "ascii": [
+      "r"
+    ]
+  },
+  {
+    "name": "DoubleStruckS",
+    "category": "letterlike",
+    "codepoint": 63224,
+    "ascii": [
+      "s"
+    ]
+  },
+  {
+    "name": "DoubleStruckT",
+    "category": "letterlike",
+    "codepoint": 63225,
+    "ascii": [
+      "t"
+    ]
+  },
+  {
+    "name": "DoubleStruckU",
+    "category": "letterlike",
+    "codepoint": 63226,
+    "ascii": [
+      "u"
+    ]
+  },
+  {
+    "name": "DoubleStruckV",
+    "category": "letterlike",
+    "codepoint": 63227,
+    "ascii": [
+      "v"
+    ]
+  },
+  {
+    "name": "DoubleStruckW",
+    "category": "letterlike",
+    "codepoint": 63228,
+    "ascii": [
+      "w"
+    ]
+  },
+  {
+    "name": "DoubleStruckX",
+    "category": "letterlike",
+    "codepoint": 63229,
+    "ascii": [
+      "x"
+    ]
+  },
+  {
+    "name": "DoubleStruckY",
+    "category": "letterlike",
+    "codepoint": 63230,
+    "ascii": [
+      "y"
+    ]
+  },
+  {
+    "name": "DoubleStruckZ",
+    "category": "letterlike",
+    "codepoint": 63231,
+    "ascii": [
+      "z"
+    ]
+  },
+  {
+    "name": "DotlessJ",
+    "category": "letterlike",
+    "codepoint": 63232,
+    "ascii": [
+      "j"
+    ]
+  },
+  {
+    "name": "Wolf",
+    "category": "letterlike",
+    "codepoint": 63264
+  },
+  {
+    "name": "FreakedSmiley",
+    "category": "letterlike",
+    "codepoint": 63265,
+    "ascii": [
+      ":-@"
+    ]
+  },
+  {
+    "name": "NeutralSmiley",
+    "category": "letterlike",
+    "codepoint": 63266,
+    "ascii": [
+      ":-|"
+    ]
+  },
+  {
+    "name": "LightBulb",
+    "category": "letterlike",
+    "codepoint": 63267
+  },
+  {
+    "name": "NumberSign",
+    "category": "letterlike",
+    "codepoint": 63268,
+    "ascii": [
+      "#"
+    ]
+  },
+  {
+    "name": "WarningSign",
+    "category": "letterlike",
+    "codepoint": 63269
+  },
+  {
+    "name": "Villa",
+    "category": "letterlike",
+    "codepoint": 63271
+  },
+  {
+    "name": "Akuz",
+    "category": "letterlike",
+    "codepoint": 63272
+  },
+  {
+    "name": "Andy",
+    "category": "letterlike",
+    "codepoint": 63273
+  },
+  {
+    "name": "Spooky",
+    "category": "letterlike",
+    "codepoint": 63274
+  },
+  {
+    "name": "ScriptDotlessI",
+    "category": "letterlike",
+    "codepoint": 63280,
+    "ascii": [
+      "i"
+    ]
+  },
+  {
+    "name": "ScriptDotlessJ",
+    "category": "letterlike",
+    "codepoint": 63281,
+    "ascii": [
+      "j"
+    ]
+  },
+  {
+    "name": "DoubledPi",
+    "category": "letterlike",
+    "codepoint": 63305
+  },
+  {
+    "name": "DoubledGamma",
+    "category": "letterlike",
+    "codepoint": 63306
+  },
+  {
+    "name": "CapitalDifferentialD",
+    "category": "punctuation",
+    "codepoint": 63307,
+    "ascii": [
+      "D"
+    ]
+  },
+  {
+    "name": "DifferentialD",
+    "category": "punctuation",
+    "codepoint": 63308,
+    "ascii": [
+      "d"
+    ]
+  },
+  {
+    "name": "ExponentialE",
+    "category": "letterlike",
+    "codepoint": 63309,
+    "ascii": [
+      "e"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "special"
+    ]
+  },
+  {
+    "name": "ImaginaryI",
+    "category": "letterlike",
+    "codepoint": 63310,
+    "ascii": [
+      "i"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "special"
+    ]
+  },
+  {
+    "name": "ImaginaryJ",
+    "category": "letterlike",
+    "codepoint": 63311,
+    "ascii": [
+      "j"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "special"
+    ]
+  },
+  {
+    "name": "FilledSmallCircle",
+    "category": "letterlike",
+    "codepoint": 63312
+  },
+  {
+    "name": "DottedSquare",
+    "category": "letterlike",
+    "codepoint": 63313
+  },
+  {
+    "name": "GraySquare",
+    "category": "letterlike",
+    "codepoint": 63314
+  },
+  {
+    "name": "GrayCircle",
+    "category": "letterlike",
+    "codepoint": 63315
+  },
+  {
+    "name": "LetterSpace",
+    "category": "letterlike",
+    "codepoint": 63316,
+    "ascii": [
+      "_"
+    ]
+  },
+  {
+    "name": "DownBreve",
+    "category": "letterlike",
+    "codepoint": 63317
+  },
+  {
+    "name": "KernelIcon",
+    "category": "letterlike",
+    "codepoint": 63318
+  },
+  {
+    "name": "MathematicaIcon",
+    "category": "letterlike",
+    "codepoint": 63319
+  },
+  {
+    "name": "TripleDot",
+    "category": "letterlike",
+    "codepoint": 63320,
+    "ascii": [
+      "..."
+    ]
+  },
+  {
+    "name": "SystemEnterKey",
+    "category": "letterlike",
+    "codepoint": 63327
+  },
+  {
+    "name": "AlignmentMarker",
+    "category": "whitespace",
+    "codepoint": 63328
+  },
+  {
+    "name": "LeftSkeleton",
+    "category": "uninterpretable",
+    "codepoint": 63329,
+    "ascii": [
+      "<<"
+    ]
+  },
+  {
+    "name": "RightSkeleton",
+    "category": "uninterpretable",
+    "codepoint": 63330,
+    "ascii": [
+      ">>"
+    ]
+  },
+  {
+    "name": "ControlKey",
+    "category": "letterlike",
+    "codepoint": 63331,
+    "ascii": [
+      "CTRL"
+    ]
+  },
+  {
+    "name": "AliasDelimiter",
+    "category": "letterlike",
+    "codepoint": 63332
+  },
+  {
+    "name": "InvisibleComma",
+    "category": "punctuation",
+    "codepoint": 63333,
+    "ascii": [
+      ",",
+      ""
+    ]
+  },
+  {
+    "name": "ReturnKey",
+    "category": "letterlike",
+    "codepoint": 63334,
+    "ascii": [
+      "RET"
+    ]
+  },
+  {
+    "name": "ErrorIndicator",
+    "category": "uninterpretable",
+    "codepoint": 63335,
+    "ascii": [
+      "^^^"
+    ]
+  },
+  {
+    "name": "AliasIndicator",
+    "category": "letterlike",
+    "codepoint": 63336
+  },
+  {
+    "name": "EscapeKey",
+    "category": "letterlike",
+    "codepoint": 63337,
+    "ascii": [
+      "ESC"
+    ]
+  },
+  {
+    "name": "CommandKey",
+    "category": "letterlike",
+    "codepoint": 63338,
+    "ascii": [
+      "CMD"
+    ]
+  },
+  {
+    "name": "LeftModified",
+    "category": "letterlike",
+    "codepoint": 63339,
+    "ascii": [
+      "-["
+    ]
+  },
+  {
+    "name": "RightModified",
+    "category": "letterlike",
+    "codepoint": 63340,
+    "ascii": [
+      "]"
+    ]
+  },
+  {
+    "name": "InvisibleApplication",
+    "category": "punctuation",
+    "codepoint": 63341,
+    "ascii": [
+      "@",
+      ""
+    ]
+  },
+  {
+    "name": "DiscretionaryLineSeparator",
+    "category": "newline",
+    "codepoint": 63342,
+    "ascii": [
+      "\\n"
+    ]
+  },
+  {
+    "name": "DiscretionaryParagraphSeparator",
+    "category": "newline",
+    "codepoint": 63343,
+    "ascii": [
+      "\\n\\n"
+    ]
+  },
+  {
+    "name": "ScriptCapitalA",
+    "category": "letterlike",
+    "codepoint": 63344,
+    "ascii": [
+      "A"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptCapitalC",
+    "category": "letterlike",
+    "codepoint": 63346,
+    "ascii": [
+      "C"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptCapitalD",
+    "category": "letterlike",
+    "codepoint": 63347,
+    "ascii": [
+      "D"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptCapitalG",
+    "category": "letterlike",
+    "codepoint": 63350,
+    "ascii": [
+      "G"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptCapitalJ",
+    "category": "letterlike",
+    "codepoint": 63353,
+    "ascii": [
+      "J"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptCapitalK",
+    "category": "letterlike",
+    "codepoint": 63354,
+    "ascii": [
+      "K"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptCapitalN",
+    "category": "letterlike",
+    "codepoint": 63357,
+    "ascii": [
+      "N"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptCapitalO",
+    "category": "letterlike",
+    "codepoint": 63358,
+    "ascii": [
+      "O"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptCapitalP",
+    "category": "letterlike",
+    "codepoint": 63359,
+    "ascii": [
+      "P"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptCapitalQ",
+    "category": "letterlike",
+    "codepoint": 63360,
+    "ascii": [
+      "Q"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptCapitalS",
+    "category": "letterlike",
+    "codepoint": 63362,
+    "ascii": [
+      "S"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptCapitalT",
+    "category": "letterlike",
+    "codepoint": 63363,
+    "ascii": [
+      "T"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptCapitalU",
+    "category": "letterlike",
+    "codepoint": 63364,
+    "ascii": [
+      "U"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptCapitalV",
+    "category": "letterlike",
+    "codepoint": 63365,
+    "ascii": [
+      "V"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptCapitalW",
+    "category": "letterlike",
+    "codepoint": 63366,
+    "ascii": [
+      "W"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptCapitalX",
+    "category": "letterlike",
+    "codepoint": 63367,
+    "ascii": [
+      "X"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptCapitalY",
+    "category": "letterlike",
+    "codepoint": 63368,
+    "ascii": [
+      "Y"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "ScriptCapitalZ",
+    "category": "letterlike",
+    "codepoint": 63369,
+    "ascii": [
+      "Z"
+    ],
+    "extra": [
+      "not_strange_letterlike"
+    ]
+  },
+  {
+    "name": "GothicCapitalA",
+    "category": "letterlike",
+    "codepoint": 63370,
+    "ascii": [
+      "A"
+    ]
+  },
+  {
+    "name": "GothicCapitalB",
+    "category": "letterlike",
+    "codepoint": 63371,
+    "ascii": [
+      "B"
+    ]
+  },
+  {
+    "name": "GothicCapitalD",
+    "category": "letterlike",
+    "codepoint": 63373,
+    "ascii": [
+      "D"
+    ]
+  },
+  {
+    "name": "GothicCapitalE",
+    "category": "letterlike",
+    "codepoint": 63374,
+    "ascii": [
+      "E"
+    ]
+  },
+  {
+    "name": "GothicCapitalF",
+    "category": "letterlike",
+    "codepoint": 63375,
+    "ascii": [
+      "F"
+    ]
+  },
+  {
+    "name": "GothicCapitalG",
+    "category": "letterlike",
+    "codepoint": 63376,
+    "ascii": [
+      "G"
+    ]
+  },
+  {
+    "name": "GothicCapitalJ",
+    "category": "letterlike",
+    "codepoint": 63379,
+    "ascii": [
+      "J"
+    ]
+  },
+  {
+    "name": "GothicCapitalK",
+    "category": "letterlike",
+    "codepoint": 63380,
+    "ascii": [
+      "K"
+    ]
+  },
+  {
+    "name": "GothicCapitalL",
+    "category": "letterlike",
+    "codepoint": 63381,
+    "ascii": [
+      "L"
+    ]
+  },
+  {
+    "name": "GothicCapitalM",
+    "category": "letterlike",
+    "codepoint": 63382,
+    "ascii": [
+      "M"
+    ]
+  },
+  {
+    "name": "GothicCapitalN",
+    "category": "letterlike",
+    "codepoint": 63383,
+    "ascii": [
+      "N"
+    ]
+  },
+  {
+    "name": "GothicCapitalO",
+    "category": "letterlike",
+    "codepoint": 63384,
+    "ascii": [
+      "O"
+    ]
+  },
+  {
+    "name": "GothicCapitalP",
+    "category": "letterlike",
+    "codepoint": 63385,
+    "ascii": [
+      "P"
+    ]
+  },
+  {
+    "name": "GothicCapitalQ",
+    "category": "letterlike",
+    "codepoint": 63386,
+    "ascii": [
+      "Q"
+    ]
+  },
+  {
+    "name": "GothicCapitalS",
+    "category": "letterlike",
+    "codepoint": 63388,
+    "ascii": [
+      "S"
+    ]
+  },
+  {
+    "name": "GothicCapitalT",
+    "category": "letterlike",
+    "codepoint": 63389,
+    "ascii": [
+      "T"
+    ]
+  },
+  {
+    "name": "GothicCapitalU",
+    "category": "letterlike",
+    "codepoint": 63390,
+    "ascii": [
+      "U"
+    ]
+  },
+  {
+    "name": "GothicCapitalV",
+    "category": "letterlike",
+    "codepoint": 63391,
+    "ascii": [
+      "V"
+    ]
+  },
+  {
+    "name": "GothicCapitalW",
+    "category": "letterlike",
+    "codepoint": 63392,
+    "ascii": [
+      "W"
+    ]
+  },
+  {
+    "name": "GothicCapitalX",
+    "category": "letterlike",
+    "codepoint": 63393,
+    "ascii": [
+      "X"
+    ]
+  },
+  {
+    "name": "GothicCapitalY",
+    "category": "letterlike",
+    "codepoint": 63394,
+    "ascii": [
+      "Y"
+    ]
+  },
+  {
+    "name": "DoubleStruckCapitalA",
+    "category": "letterlike",
+    "codepoint": 63396,
+    "ascii": [
+      "A"
+    ]
+  },
+  {
+    "name": "DoubleStruckCapitalB",
+    "category": "letterlike",
+    "codepoint": 63397,
+    "ascii": [
+      "B"
+    ]
+  },
+  {
+    "name": "DoubleStruckCapitalC",
+    "category": "letterlike",
+    "codepoint": 63398,
+    "ascii": [
+      "C"
+    ]
+  },
+  {
+    "name": "DoubleStruckCapitalD",
+    "category": "letterlike",
+    "codepoint": 63399,
+    "ascii": [
+      "D"
+    ]
+  },
+  {
+    "name": "DoubleStruckCapitalE",
+    "category": "letterlike",
+    "codepoint": 63400,
+    "ascii": [
+      "E"
+    ]
+  },
+  {
+    "name": "DoubleStruckCapitalF",
+    "category": "letterlike",
+    "codepoint": 63401,
+    "ascii": [
+      "F"
+    ]
+  },
+  {
+    "name": "DoubleStruckCapitalG",
+    "category": "letterlike",
+    "codepoint": 63402,
+    "ascii": [
+      "G"
+    ]
+  },
+  {
+    "name": "DoubleStruckCapitalH",
+    "category": "letterlike",
+    "codepoint": 63403,
+    "ascii": [
+      "H"
+    ]
+  },
+  {
+    "name": "DoubleStruckCapitalI",
+    "category": "letterlike",
+    "codepoint": 63404,
+    "ascii": [
+      "I"
+    ]
+  },
+  {
+    "name": "DoubleStruckCapitalJ",
+    "category": "letterlike",
+    "codepoint": 63405,
+    "ascii": [
+      "J"
+    ]
+  },
+  {
+    "name": "DoubleStruckCapitalK",
+    "category": "letterlike",
+    "codepoint": 63406,
+    "ascii": [
+      "K"
+    ]
+  },
+  {
+    "name": "DoubleStruckCapitalL",
+    "category": "letterlike",
+    "codepoint": 63407,
+    "ascii": [
+      "L"
+    ]
+  },
+  {
+    "name": "DoubleStruckCapitalM",
+    "category": "letterlike",
+    "codepoint": 63408,
+    "ascii": [
+      "M"
+    ]
+  },
+  {
+    "name": "DoubleStruckCapitalN",
+    "category": "letterlike",
+    "codepoint": 63409,
+    "ascii": [
+      "N"
+    ]
+  },
+  {
+    "name": "DoubleStruckCapitalO",
+    "category": "letterlike",
+    "codepoint": 63410,
+    "ascii": [
+      "O"
+    ]
+  },
+  {
+    "name": "DoubleStruckCapitalP",
+    "category": "letterlike",
+    "codepoint": 63411,
+    "ascii": [
+      "P"
+    ]
+  },
+  {
+    "name": "DoubleStruckCapitalQ",
+    "category": "letterlike",
+    "codepoint": 63412,
+    "ascii": [
+      "Q"
+    ]
+  },
+  {
+    "name": "DoubleStruckCapitalR",
+    "category": "letterlike",
+    "codepoint": 63413,
+    "ascii": [
+      "R"
+    ]
+  },
+  {
+    "name": "DoubleStruckCapitalS",
+    "category": "letterlike",
+    "codepoint": 63414,
+    "ascii": [
+      "S"
+    ]
+  },
+  {
+    "name": "DoubleStruckCapitalT",
+    "category": "letterlike",
+    "codepoint": 63415,
+    "ascii": [
+      "T"
+    ]
+  },
+  {
+    "name": "DoubleStruckCapitalU",
+    "category": "letterlike",
+    "codepoint": 63416,
+    "ascii": [
+      "U"
+    ]
+  },
+  {
+    "name": "DoubleStruckCapitalV",
+    "category": "letterlike",
+    "codepoint": 63417,
+    "ascii": [
+      "V"
+    ]
+  },
+  {
+    "name": "DoubleStruckCapitalW",
+    "category": "letterlike",
+    "codepoint": 63418,
+    "ascii": [
+      "W"
+    ]
+  },
+  {
+    "name": "DoubleStruckCapitalX",
+    "category": "letterlike",
+    "codepoint": 63419,
+    "ascii": [
+      "X"
+    ]
+  },
+  {
+    "name": "DoubleStruckCapitalY",
+    "category": "letterlike",
+    "codepoint": 63420,
+    "ascii": [
+      "Y"
+    ]
+  },
+  {
+    "name": "DoubleStruckCapitalZ",
+    "category": "letterlike",
+    "codepoint": 63421,
+    "ascii": [
+      "Z"
+    ]
+  },
+  {
+    "name": "TabKey",
+    "category": "letterlike",
+    "codepoint": 63422,
+    "ascii": [
+      "TAB"
+    ]
+  },
+  {
+    "name": "SpaceKey",
+    "category": "letterlike",
+    "codepoint": 63423,
+    "ascii": [
+      "SPC"
+    ]
+  },
+  {
+    "name": "DeleteKey",
+    "category": "letterlike",
+    "codepoint": 63440,
+    "ascii": [
+      "DEL"
+    ]
+  },
+  {
+    "name": "AltKey",
+    "category": "letterlike",
+    "codepoint": 63441,
+    "ascii": [
+      "ALT"
+    ]
+  },
+  {
+    "name": "OptionKey",
+    "category": "letterlike",
+    "codepoint": 63442,
+    "ascii": [
+      "OPT"
+    ]
+  },
+  {
+    "name": "KeyBar",
+    "category": "letterlike",
+    "codepoint": 63443
+  },
+  {
+    "name": "EnterKey",
+    "category": "letterlike",
+    "codepoint": 63444
+  },
+  {
+    "name": "ShiftKey",
+    "category": "letterlike",
+    "codepoint": 63445
+  },
+  {
+    "name": "Mod1Key",
+    "category": "letterlike",
+    "codepoint": 63446
+  },
+  {
+    "name": "Mod2Key",
+    "category": "letterlike",
+    "codepoint": 63447
+  },
+  {
+    "name": "LongEqual",
+    "category": "punctuation",
+    "codepoint": 63449,
+    "ascii": [
+      "=="
+    ]
+  },
+  {
+    "name": "ConstantC",
+    "category": "letterlike",
+    "codepoint": 63450,
+    "ascii": [
+      "c"
+    ]
+  },
+  {
+    "name": "DoubleStruckZero",
+    "category": "letterlike",
+    "codepoint": 63451,
+    "ascii": [
+      "0"
+    ]
+  },
+  {
+    "name": "DoubleStruckOne",
+    "category": "letterlike",
+    "codepoint": 63452,
+    "ascii": [
+      "1"
+    ]
+  },
+  {
+    "name": "DoubleStruckTwo",
+    "category": "letterlike",
+    "codepoint": 63453,
+    "ascii": [
+      "2"
+    ]
+  },
+  {
+    "name": "DoubleStruckThree",
+    "category": "letterlike",
+    "codepoint": 63454,
+    "ascii": [
+      "3"
+    ]
+  },
+  {
+    "name": "DoubleStruckFour",
+    "category": "letterlike",
+    "codepoint": 63455,
+    "ascii": [
+      "4"
+    ]
+  },
+  {
+    "name": "DoubleStruckFive",
+    "category": "letterlike",
+    "codepoint": 63456,
+    "ascii": [
+      "5"
+    ]
+  },
+  {
+    "name": "DoubleStruckSix",
+    "category": "letterlike",
+    "codepoint": 63457,
+    "ascii": [
+      "6"
+    ]
+  },
+  {
+    "name": "DoubleStruckSeven",
+    "category": "letterlike",
+    "codepoint": 63458,
+    "ascii": [
+      "7"
+    ]
+  },
+  {
+    "name": "DoubleStruckEight",
+    "category": "letterlike",
+    "codepoint": 63459,
+    "ascii": [
+      "8"
+    ]
+  },
+  {
+    "name": "DoubleStruckNine",
+    "category": "letterlike",
+    "codepoint": 63460,
+    "ascii": [
+      "9"
+    ]
+  },
+  {
+    "name": "GothicZero",
+    "category": "letterlike",
+    "codepoint": 63461,
+    "ascii": [
+      "0"
+    ]
+  },
+  {
+    "name": "GothicOne",
+    "category": "letterlike",
+    "codepoint": 63462,
+    "ascii": [
+      "1"
+    ]
+  },
+  {
+    "name": "GothicTwo",
+    "category": "letterlike",
+    "codepoint": 63463,
+    "ascii": [
+      "2"
+    ]
+  },
+  {
+    "name": "GothicThree",
+    "category": "letterlike",
+    "codepoint": 63464,
+    "ascii": [
+      "3"
+    ]
+  },
+  {
+    "name": "GothicFour",
+    "category": "letterlike",
+    "codepoint": 63465,
+    "ascii": [
+      "4"
+    ]
+  },
+  {
+    "name": "GothicFive",
+    "category": "letterlike",
+    "codepoint": 63466,
+    "ascii": [
+      "5"
+    ]
+  },
+  {
+    "name": "GothicSix",
+    "category": "letterlike",
+    "codepoint": 63467,
+    "ascii": [
+      "6"
+    ]
+  },
+  {
+    "name": "GothicSeven",
+    "category": "letterlike",
+    "codepoint": 63468,
+    "ascii": [
+      "7"
+    ]
+  },
+  {
+    "name": "GothicEight",
+    "category": "letterlike",
+    "codepoint": 63469,
+    "ascii": [
+      "8"
+    ]
+  },
+  {
+    "name": "GothicNine",
+    "category": "letterlike",
+    "codepoint": 63471,
+    "ascii": [
+      "9"
+    ]
+  },
+  {
+    "name": "ScriptZero",
+    "category": "letterlike",
+    "codepoint": 63472,
+    "ascii": [
+      "0"
+    ]
+  },
+  {
+    "name": "ScriptOne",
+    "category": "letterlike",
+    "codepoint": 63473,
+    "ascii": [
+      "1"
+    ]
+  },
+  {
+    "name": "ScriptTwo",
+    "category": "letterlike",
+    "codepoint": 63474,
+    "ascii": [
+      "2"
+    ]
+  },
+  {
+    "name": "ScriptThree",
+    "category": "letterlike",
+    "codepoint": 63475,
+    "ascii": [
+      "3"
+    ]
+  },
+  {
+    "name": "ScriptFour",
+    "category": "letterlike",
+    "codepoint": 63476,
+    "ascii": [
+      "4"
+    ]
+  },
+  {
+    "name": "ScriptFive",
+    "category": "letterlike",
+    "codepoint": 63477,
+    "ascii": [
+      "5"
+    ]
+  },
+  {
+    "name": "ScriptSix",
+    "category": "letterlike",
+    "codepoint": 63478,
+    "ascii": [
+      "6"
+    ]
+  },
+  {
+    "name": "ScriptSeven",
+    "category": "letterlike",
+    "codepoint": 63479,
+    "ascii": [
+      "7"
+    ]
+  },
+  {
+    "name": "ScriptEight",
+    "category": "letterlike",
+    "codepoint": 63480,
+    "ascii": [
+      "8"
+    ]
+  },
+  {
+    "name": "ScriptNine",
+    "category": "letterlike",
+    "codepoint": 63481,
+    "ascii": [
+      "9"
+    ]
+  },
+  {
+    "name": "FirstPage",
+    "category": "letterlike",
+    "codepoint": 63482
+  },
+  {
+    "name": "LastPage",
+    "category": "letterlike",
+    "codepoint": 63483
+  },
+  {
+    "name": "NumberComma",
+    "category": "letterlike",
+    "codepoint": 63484,
+    "ascii": [
+      ","
+    ]
+  },
+  {
+    "name": "FormalA",
+    "category": "letterlike",
+    "codepoint": 63488,
+    "ascii": [
+      "a"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalB",
+    "category": "letterlike",
+    "codepoint": 63489,
+    "ascii": [
+      "b"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalC",
+    "category": "letterlike",
+    "codepoint": 63490,
+    "ascii": [
+      "c"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalD",
+    "category": "letterlike",
+    "codepoint": 63491,
+    "ascii": [
+      "d"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalE",
+    "category": "letterlike",
+    "codepoint": 63492,
+    "ascii": [
+      "e"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalF",
+    "category": "letterlike",
+    "codepoint": 63493,
+    "ascii": [
+      "f"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalG",
+    "category": "letterlike",
+    "codepoint": 63494,
+    "ascii": [
+      "g"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalH",
+    "category": "letterlike",
+    "codepoint": 63495,
+    "ascii": [
+      "h"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalI",
+    "category": "letterlike",
+    "codepoint": 63496,
+    "ascii": [
+      "i"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalJ",
+    "category": "letterlike",
+    "codepoint": 63497,
+    "ascii": [
+      "j"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalK",
+    "category": "letterlike",
+    "codepoint": 63498,
+    "ascii": [
+      "k"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalL",
+    "category": "letterlike",
+    "codepoint": 63499,
+    "ascii": [
+      "l"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalM",
+    "category": "letterlike",
+    "codepoint": 63500,
+    "ascii": [
+      "m"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalN",
+    "category": "letterlike",
+    "codepoint": 63501,
+    "ascii": [
+      "n"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalO",
+    "category": "letterlike",
+    "codepoint": 63502,
+    "ascii": [
+      "o"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalP",
+    "category": "letterlike",
+    "codepoint": 63503,
+    "ascii": [
+      "p"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalQ",
+    "category": "letterlike",
+    "codepoint": 63504,
+    "ascii": [
+      "q"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalR",
+    "category": "letterlike",
+    "codepoint": 63505,
+    "ascii": [
+      "r"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalS",
+    "category": "letterlike",
+    "codepoint": 63506,
+    "ascii": [
+      "s"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalT",
+    "category": "letterlike",
+    "codepoint": 63507,
+    "ascii": [
+      "t"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalU",
+    "category": "letterlike",
+    "codepoint": 63508,
+    "ascii": [
+      "u"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalV",
+    "category": "letterlike",
+    "codepoint": 63509,
+    "ascii": [
+      "v"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalW",
+    "category": "letterlike",
+    "codepoint": 63510,
+    "ascii": [
+      "w"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalX",
+    "category": "letterlike",
+    "codepoint": 63511,
+    "ascii": [
+      "x"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalY",
+    "category": "letterlike",
+    "codepoint": 63512,
+    "ascii": [
+      "y"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalZ",
+    "category": "letterlike",
+    "codepoint": 63513,
+    "ascii": [
+      "z"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalA",
+    "category": "letterlike",
+    "codepoint": 63514,
+    "ascii": [
+      "A"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalB",
+    "category": "letterlike",
+    "codepoint": 63515,
+    "ascii": [
+      "B"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalC",
+    "category": "letterlike",
+    "codepoint": 63516,
+    "ascii": [
+      "C"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalD",
+    "category": "letterlike",
+    "codepoint": 63517,
+    "ascii": [
+      "D"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalE",
+    "category": "letterlike",
+    "codepoint": 63518,
+    "ascii": [
+      "E"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalF",
+    "category": "letterlike",
+    "codepoint": 63519,
+    "ascii": [
+      "F"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalG",
+    "category": "letterlike",
+    "codepoint": 63520,
+    "ascii": [
+      "G"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalH",
+    "category": "letterlike",
+    "codepoint": 63521,
+    "ascii": [
+      "H"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalI",
+    "category": "letterlike",
+    "codepoint": 63522,
+    "ascii": [
+      "I"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalJ",
+    "category": "letterlike",
+    "codepoint": 63523,
+    "ascii": [
+      "J"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalK",
+    "category": "letterlike",
+    "codepoint": 63524,
+    "ascii": [
+      "K"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalL",
+    "category": "letterlike",
+    "codepoint": 63525,
+    "ascii": [
+      "L"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalM",
+    "category": "letterlike",
+    "codepoint": 63526,
+    "ascii": [
+      "M"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalN",
+    "category": "letterlike",
+    "codepoint": 63527,
+    "ascii": [
+      "N"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalO",
+    "category": "letterlike",
+    "codepoint": 63528,
+    "ascii": [
+      "O"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalP",
+    "category": "letterlike",
+    "codepoint": 63529,
+    "ascii": [
+      "P"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalQ",
+    "category": "letterlike",
+    "codepoint": 63530,
+    "ascii": [
+      "Q"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalR",
+    "category": "letterlike",
+    "codepoint": 63531,
+    "ascii": [
+      "R"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalS",
+    "category": "letterlike",
+    "codepoint": 63532,
+    "ascii": [
+      "S"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalT",
+    "category": "letterlike",
+    "codepoint": 63533,
+    "ascii": [
+      "T"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalU",
+    "category": "letterlike",
+    "codepoint": 63534,
+    "ascii": [
+      "U"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalV",
+    "category": "letterlike",
+    "codepoint": 63535,
+    "ascii": [
+      "V"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalW",
+    "category": "letterlike",
+    "codepoint": 63536,
+    "ascii": [
+      "W"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalX",
+    "category": "letterlike",
+    "codepoint": 63537,
+    "ascii": [
+      "X"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalY",
+    "category": "letterlike",
+    "codepoint": 63538,
+    "ascii": [
+      "Y"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalZ",
+    "category": "letterlike",
+    "codepoint": 63539,
+    "ascii": [
+      "Z"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalAlpha",
+    "category": "letterlike",
+    "codepoint": 63540,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalBeta",
+    "category": "letterlike",
+    "codepoint": 63541,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalGamma",
+    "category": "letterlike",
+    "codepoint": 63542,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalDelta",
+    "category": "letterlike",
+    "codepoint": 63543,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalEpsilon",
+    "category": "letterlike",
+    "codepoint": 63544,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalZeta",
+    "category": "letterlike",
+    "codepoint": 63545,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalEta",
+    "category": "letterlike",
+    "codepoint": 63546,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalTheta",
+    "category": "letterlike",
+    "codepoint": 63547,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalIota",
+    "category": "letterlike",
+    "codepoint": 63548,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalKappa",
+    "category": "letterlike",
+    "codepoint": 63549,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalLambda",
+    "category": "letterlike",
+    "codepoint": 63550,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalMu",
+    "category": "letterlike",
+    "codepoint": 63551,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalNu",
+    "category": "letterlike",
+    "codepoint": 63552,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalXi",
+    "category": "letterlike",
+    "codepoint": 63553,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalOmicron",
+    "category": "letterlike",
+    "codepoint": 63554,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalPi",
+    "category": "letterlike",
+    "codepoint": 63555,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalRho",
+    "category": "letterlike",
+    "codepoint": 63556,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalSigma",
+    "category": "letterlike",
+    "codepoint": 63558,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalTau",
+    "category": "letterlike",
+    "codepoint": 63559,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalUpsilon",
+    "category": "letterlike",
+    "codepoint": 63560,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalPhi",
+    "category": "letterlike",
+    "codepoint": 63561,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalChi",
+    "category": "letterlike",
+    "codepoint": 63562,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalPsi",
+    "category": "letterlike",
+    "codepoint": 63563,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalOmega",
+    "category": "letterlike",
+    "codepoint": 63564,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalAlpha",
+    "category": "letterlike",
+    "codepoint": 63572,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalBeta",
+    "category": "letterlike",
+    "codepoint": 63573,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalGamma",
+    "category": "letterlike",
+    "codepoint": 63574,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalDelta",
+    "category": "letterlike",
+    "codepoint": 63575,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCurlyEpsilon",
+    "category": "letterlike",
+    "codepoint": 63576,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalZeta",
+    "category": "letterlike",
+    "codepoint": 63577,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalEta",
+    "category": "letterlike",
+    "codepoint": 63578,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalTheta",
+    "category": "letterlike",
+    "codepoint": 63579,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalIota",
+    "category": "letterlike",
+    "codepoint": 63580,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalKappa",
+    "category": "letterlike",
+    "codepoint": 63581,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalLambda",
+    "category": "letterlike",
+    "codepoint": 63582,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalMu",
+    "category": "letterlike",
+    "codepoint": 63583,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalNu",
+    "category": "letterlike",
+    "codepoint": 63584,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalXi",
+    "category": "letterlike",
+    "codepoint": 63585,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalOmicron",
+    "category": "letterlike",
+    "codepoint": 63586,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalPi",
+    "category": "letterlike",
+    "codepoint": 63587,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalRho",
+    "category": "letterlike",
+    "codepoint": 63588,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalFinalSigma",
+    "category": "letterlike",
+    "codepoint": 63589,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalSigma",
+    "category": "letterlike",
+    "codepoint": 63590,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalTau",
+    "category": "letterlike",
+    "codepoint": 63591,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalUpsilon",
+    "category": "letterlike",
+    "codepoint": 63592,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCurlyPhi",
+    "category": "letterlike",
+    "codepoint": 63593,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalChi",
+    "category": "letterlike",
+    "codepoint": 63594,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalPsi",
+    "category": "letterlike",
+    "codepoint": 63595,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalOmega",
+    "category": "letterlike",
+    "codepoint": 63596,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCurlyTheta",
+    "category": "letterlike",
+    "codepoint": 63604,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCurlyCapitalUpsilon",
+    "category": "letterlike",
+    "codepoint": 63605,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalPhi",
+    "category": "letterlike",
+    "codepoint": 63608,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCurlyPi",
+    "category": "letterlike",
+    "codepoint": 63609,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalStigma",
+    "category": "letterlike",
+    "codepoint": 63613,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalStigma",
+    "category": "letterlike",
+    "codepoint": 63614,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalDigamma",
+    "category": "letterlike",
+    "codepoint": 63615,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalDigamma",
+    "category": "letterlike",
+    "codepoint": 63616,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalKoppa",
+    "category": "letterlike",
+    "codepoint": 63617,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalKoppa",
+    "category": "letterlike",
+    "codepoint": 63618,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCapitalSampi",
+    "category": "letterlike",
+    "codepoint": 63619,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalSampi",
+    "category": "letterlike",
+    "codepoint": 63620,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCurlyKappa",
+    "category": "letterlike",
+    "codepoint": 63621,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalCurlyRho",
+    "category": "letterlike",
+    "codepoint": 63622,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FormalEpsilon",
+    "category": "letterlike",
+    "codepoint": 63626,
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ]
+  },
+  {
+    "name": "FiLigature",
+    "category": "letterlike",
+    "codepoint": 64257,
+    "ascii": [
+      "fi"
+    ]
+  },
+  {
+    "name": "FlLigature",
+    "category": "letterlike",
+    "codepoint": 64258,
+    "ascii": [
+      "fl"
+    ]
+  },
+  {
+    "name": "OverParenthesis",
+    "category": "letterlike",
+    "codepoint": 65077
+  },
+  {
+    "name": "UnderParenthesis",
+    "category": "letterlike",
+    "codepoint": 65078
+  },
+  {
+    "name": "OverBrace",
+    "category": "letterlike",
+    "codepoint": 65079
+  },
+  {
+    "name": "UnderBrace",
+    "category": "letterlike",
+    "codepoint": 65080
+  },
+  {
+    "name": "UnknownGlyph",
+    "category": "letterlike",
+    "codepoint": 65533,
+    "ascii": [
+      "?"
+    ]
+  },
+  {
+    "name": "FormalScriptA",
+    "category": "letterlike",
+    "codepoint": 1024000,
+    "ascii": [
+      "a"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptB",
+    "category": "letterlike",
+    "codepoint": 1024001,
+    "ascii": [
+      "b"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptC",
+    "category": "letterlike",
+    "codepoint": 1024002,
+    "ascii": [
+      "c"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptD",
+    "category": "letterlike",
+    "codepoint": 1024003,
+    "ascii": [
+      "d"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptE",
+    "category": "letterlike",
+    "codepoint": 1024004,
+    "ascii": [
+      "e"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptF",
+    "category": "letterlike",
+    "codepoint": 1024005,
+    "ascii": [
+      "f"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptG",
+    "category": "letterlike",
+    "codepoint": 1024006,
+    "ascii": [
+      "g"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptH",
+    "category": "letterlike",
+    "codepoint": 1024007,
+    "ascii": [
+      "h"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptI",
+    "category": "letterlike",
+    "codepoint": 1024008,
+    "ascii": [
+      "i"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptJ",
+    "category": "letterlike",
+    "codepoint": 1024009,
+    "ascii": [
+      "j"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptK",
+    "category": "letterlike",
+    "codepoint": 1024010,
+    "ascii": [
+      "k"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptL",
+    "category": "letterlike",
+    "codepoint": 1024011,
+    "ascii": [
+      "l"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptM",
+    "category": "letterlike",
+    "codepoint": 1024012,
+    "ascii": [
+      "m"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptN",
+    "category": "letterlike",
+    "codepoint": 1024013,
+    "ascii": [
+      "n"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptO",
+    "category": "letterlike",
+    "codepoint": 1024014,
+    "ascii": [
+      "o"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptP",
+    "category": "letterlike",
+    "codepoint": 1024015,
+    "ascii": [
+      "p"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptQ",
+    "category": "letterlike",
+    "codepoint": 1024016,
+    "ascii": [
+      "q"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptR",
+    "category": "letterlike",
+    "codepoint": 1024017,
+    "ascii": [
+      "r"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptS",
+    "category": "letterlike",
+    "codepoint": 1024018,
+    "ascii": [
+      "s"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptT",
+    "category": "letterlike",
+    "codepoint": 1024019,
+    "ascii": [
+      "t"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptU",
+    "category": "letterlike",
+    "codepoint": 1024020,
+    "ascii": [
+      "u"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptV",
+    "category": "letterlike",
+    "codepoint": 1024021,
+    "ascii": [
+      "v"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptW",
+    "category": "letterlike",
+    "codepoint": 1024022,
+    "ascii": [
+      "w"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptX",
+    "category": "letterlike",
+    "codepoint": 1024023,
+    "ascii": [
+      "x"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptY",
+    "category": "letterlike",
+    "codepoint": 1024024,
+    "ascii": [
+      "y"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptZ",
+    "category": "letterlike",
+    "codepoint": 1024025,
+    "ascii": [
+      "z"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptCapitalA",
+    "category": "letterlike",
+    "codepoint": 1024026,
+    "ascii": [
+      "A"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptCapitalB",
+    "category": "letterlike",
+    "codepoint": 1024027,
+    "ascii": [
+      "B"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptCapitalC",
+    "category": "letterlike",
+    "codepoint": 1024028,
+    "ascii": [
+      "C"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptCapitalD",
+    "category": "letterlike",
+    "codepoint": 1024029,
+    "ascii": [
+      "D"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptCapitalE",
+    "category": "letterlike",
+    "codepoint": 1024030,
+    "ascii": [
+      "E"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptCapitalF",
+    "category": "letterlike",
+    "codepoint": 1024031,
+    "ascii": [
+      "F"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptCapitalG",
+    "category": "letterlike",
+    "codepoint": 1024032,
+    "ascii": [
+      "G"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptCapitalH",
+    "category": "letterlike",
+    "codepoint": 1024033,
+    "ascii": [
+      "H"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptCapitalI",
+    "category": "letterlike",
+    "codepoint": 1024034,
+    "ascii": [
+      "I"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptCapitalJ",
+    "category": "letterlike",
+    "codepoint": 1024035,
+    "ascii": [
+      "J"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptCapitalK",
+    "category": "letterlike",
+    "codepoint": 1024036,
+    "ascii": [
+      "K"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptCapitalL",
+    "category": "letterlike",
+    "codepoint": 1024037,
+    "ascii": [
+      "L"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptCapitalM",
+    "category": "letterlike",
+    "codepoint": 1024038,
+    "ascii": [
+      "M"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptCapitalN",
+    "category": "letterlike",
+    "codepoint": 1024039,
+    "ascii": [
+      "N"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptCapitalO",
+    "category": "letterlike",
+    "codepoint": 1024040,
+    "ascii": [
+      "O"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptCapitalP",
+    "category": "letterlike",
+    "codepoint": 1024041,
+    "ascii": [
+      "P"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptCapitalQ",
+    "category": "letterlike",
+    "codepoint": 1024042,
+    "ascii": [
+      "Q"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptCapitalR",
+    "category": "letterlike",
+    "codepoint": 1024043,
+    "ascii": [
+      "R"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptCapitalS",
+    "category": "letterlike",
+    "codepoint": 1024044,
+    "ascii": [
+      "S"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptCapitalT",
+    "category": "letterlike",
+    "codepoint": 1024045,
+    "ascii": [
+      "T"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptCapitalU",
+    "category": "letterlike",
+    "codepoint": 1024046,
+    "ascii": [
+      "U"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptCapitalV",
+    "category": "letterlike",
+    "codepoint": 1024047,
+    "ascii": [
+      "V"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptCapitalW",
+    "category": "letterlike",
+    "codepoint": 1024048,
+    "ascii": [
+      "W"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptCapitalX",
+    "category": "letterlike",
+    "codepoint": 1024049,
+    "ascii": [
+      "X"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptCapitalY",
+    "category": "letterlike",
+    "codepoint": 1024050,
+    "ascii": [
+      "Y"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  },
+  {
+    "name": "FormalScriptCapitalZ",
+    "category": "letterlike",
+    "codepoint": 1024051,
+    "ascii": [
+      "Z"
+    ],
+    "extra": [
+      "not_strange_letterlike",
+      "system"
+    ],
+    "added": "13.1"
+  }
+]

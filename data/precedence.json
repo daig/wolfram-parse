@@ -1,0 +1,788 @@
+[
+  {
+    "name": "COMMA",
+    "value": 1,
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_INVISIBLECOMMA",
+    "same_as": "COMMA"
+  },
+  {
+    "name": "SEMI",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "GREATERGREATER",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "GREATERGREATERGREATER",
+    "same_as": "GREATERGREATER"
+  },
+  {
+    "name": "EQUAL",
+    "value": "next",
+    "assoc": "right"
+  },
+  {
+    "name": "COLONEQUAL",
+    "same_as": "EQUAL"
+  },
+  {
+    "name": "CARETEQUAL",
+    "same_as": "EQUAL"
+  },
+  {
+    "name": "CARETCOLONEQUAL",
+    "same_as": "EQUAL"
+  },
+  {
+    "name": "LONGNAME_FUNCTION",
+    "same_as": "EQUAL"
+  },
+  {
+    "name": "FAKE_EQUALDOT",
+    "same_as": "EQUAL"
+  },
+  {
+    "name": "BARMINUSGREATER",
+    "same_as": "EQUAL"
+  },
+  {
+    "name": "SLASHCOLON",
+    "value": "next",
+    "assoc": "right"
+  },
+  {
+    "name": "LONGNAME_BECAUSE",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_THEREFORE",
+    "value": "next",
+    "assoc": "right"
+  },
+  {
+    "name": "LONGNAME_VERTICALSEPARATOR",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "SLASHSLASH",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "SLASHSLASHEQUAL",
+    "value": "next",
+    "assoc": "right"
+  },
+  {
+    "name": "LONGNAME_COLON",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "AMP",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "PLUSEQUAL",
+    "value": "next",
+    "assoc": "right"
+  },
+  {
+    "name": "STAREQUAL",
+    "same_as": "PLUSEQUAL"
+  },
+  {
+    "name": "MINUSEQUAL",
+    "same_as": "PLUSEQUAL"
+  },
+  {
+    "name": "SLASHEQUAL",
+    "same_as": "PLUSEQUAL"
+  },
+  {
+    "name": "SLASHDOT",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "SLASHSLASHDOT",
+    "same_as": "SLASHDOT"
+  },
+  {
+    "name": "MINUSGREATER",
+    "value": "next",
+    "assoc": "right"
+  },
+  {
+    "name": "COLONGREATER",
+    "same_as": "MINUSGREATER"
+  },
+  {
+    "name": "LONGNAME_RULE",
+    "same_as": "MINUSGREATER"
+  },
+  {
+    "name": "LONGNAME_RULEDELAYED",
+    "same_as": "MINUSGREATER"
+  },
+  {
+    "name": "LESSMINUSGREATER",
+    "value": "next",
+    "assoc": "right"
+  },
+  {
+    "name": "LONGNAME_TWOWAYRULE",
+    "same_as": "LESSMINUSGREATER"
+  },
+  {
+    "name": "SLASHSEMI",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "TILDETILDE",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "FAKE_OPTIONALCOLON",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "FAKE_PATTERNCOLON",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "BAR",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "DOTDOT",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "DOTDOTDOT",
+    "same_as": "DOTDOT"
+  },
+  {
+    "name": "LONGNAME_SUCHTHAT",
+    "value": "next",
+    "assoc": "right"
+  },
+  {
+    "name": "LONGNAME_UPTEE",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_DOWNTEE",
+    "same_as": "LONGNAME_UPTEE"
+  },
+  {
+    "name": "LONGNAME_LEFTTEE",
+    "same_as": "LONGNAME_UPTEE"
+  },
+  {
+    "name": "LONGNAME_DOUBLELEFTTEE",
+    "same_as": "LONGNAME_UPTEE"
+  },
+  {
+    "name": "LONGNAME_PERPENDICULAR",
+    "same_as": "LONGNAME_UPTEE"
+  },
+  {
+    "name": "LONGNAME_RIGHTTEE",
+    "value": "next",
+    "assoc": "right"
+  },
+  {
+    "name": "LONGNAME_DOUBLERIGHTTEE",
+    "same_as": "LONGNAME_RIGHTTEE"
+  },
+  {
+    "name": "LONGNAME_CONDITIONED",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_IMPLIES",
+    "value": "next",
+    "assoc": "right"
+  },
+  {
+    "name": "LONGNAME_ROUNDIMPLIES",
+    "same_as": "LONGNAME_IMPLIES"
+  },
+  {
+    "name": "LONGNAME_EQUIVALENT",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "BARBAR",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_OR",
+    "same_as": "BARBAR"
+  },
+  {
+    "name": "LONGNAME_NOR",
+    "same_as": "BARBAR"
+  },
+  {
+    "name": "LONGNAME_XOR",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_XNOR",
+    "same_as": "LONGNAME_XOR"
+  },
+  {
+    "name": "AMPAMP",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_AND",
+    "same_as": "AMPAMP"
+  },
+  {
+    "name": "LONGNAME_NAND",
+    "same_as": "AMPAMP"
+  },
+  {
+    "name": "PREFIX_BANG",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_NOT",
+    "same_as": "PREFIX_BANG"
+  },
+  {
+    "name": "FAKE_PREFIX_BANGBANG",
+    "same_as": "PREFIX_BANG"
+  },
+  {
+    "name": "LONGNAME_FORALL",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_EXISTS",
+    "same_as": "LONGNAME_FORALL"
+  },
+  {
+    "name": "LONGNAME_NOTEXISTS",
+    "same_as": "LONGNAME_FORALL"
+  },
+  {
+    "name": "CLASS_SETRELATIONS",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "EQUALEQUALEQUAL",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "EQUALBANGEQUAL",
+    "same_as": "EQUALEQUALEQUAL"
+  },
+  {
+    "name": "CLASS_HORIZONTALARROWS",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "CLASS_VECTOROPERATORS",
+    "same_as": "CLASS_HORIZONTALARROWS"
+  },
+  {
+    "name": "CLASS_DIAGONALARROWOPERATORS",
+    "same_as": "CLASS_HORIZONTALARROWS"
+  },
+  {
+    "name": "LONGNAME_VERTICALBAR",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_NOTVERTICALBAR",
+    "same_as": "LONGNAME_VERTICALBAR"
+  },
+  {
+    "name": "LONGNAME_DOUBLEVERTICALBAR",
+    "same_as": "LONGNAME_VERTICALBAR"
+  },
+  {
+    "name": "LONGNAME_NOTDOUBLEVERTICALBAR",
+    "same_as": "LONGNAME_VERTICALBAR"
+  },
+  {
+    "name": "CLASS_ORDERINGOPERATORS",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "CLASS_INEQUALITY",
+    "same_as": "CLASS_ORDERINGOPERATORS"
+  },
+  {
+    "name": "LONGNAME_DIRECTEDEDGE",
+    "value": "next",
+    "assoc": "right"
+  },
+  {
+    "name": "LONGNAME_UNDIRECTEDEDGE",
+    "same_as": "LONGNAME_DIRECTEDEDGE"
+  },
+  {
+    "name": "SEMISEMI",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "CLASS_UNIONOPERATORS",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "CLASS_INTERSECTIONOPERATORS",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "INFIX_PLUS",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "INFIX_MINUS",
+    "same_as": "INFIX_PLUS"
+  },
+  {
+    "name": "INFIX_LONGNAME_PLUSMINUS",
+    "same_as": "INFIX_PLUS"
+  },
+  {
+    "name": "INFIX_LONGNAME_MINUSPLUS",
+    "same_as": "INFIX_PLUS"
+  },
+  {
+    "name": "INFIX_LONGNAME_MINUS",
+    "same_as": "INFIX_PLUS"
+  },
+  {
+    "name": "LONGNAME_IMPLICITPLUS",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_SUM",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "CLASS_INTEGRATIONOPERATORS",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_EXPECTATIONE",
+    "same_as": "CLASS_INTEGRATIONOPERATORS"
+  },
+  {
+    "name": "LONGNAME_PROBABILITYPR",
+    "same_as": "CLASS_INTEGRATIONOPERATORS"
+  },
+  {
+    "name": "LONGNAME_CIRCLEPLUS",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_CIRCLEMINUS",
+    "same_as": "LONGNAME_CIRCLEPLUS"
+  },
+  {
+    "name": "LONGNAME_CUP",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_CAP",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "INFIX_LONGNAME_COPRODUCT",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_VERTICALTILDE",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_PRODUCT",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_CONTINUEDFRACTIONK",
+    "same_as": "LONGNAME_PRODUCT"
+  },
+  {
+    "name": "LONGNAME_STAR",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "STAR",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_TIMES",
+    "same_as": "STAR"
+  },
+  {
+    "name": "LONGNAME_INVISIBLETIMES",
+    "same_as": "STAR"
+  },
+  {
+    "name": "FAKE_IMPLICITTIMES",
+    "same_as": "STAR"
+  },
+  {
+    "name": "LONGNAME_CENTERDOT",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "INFIX_LONGNAME_CIRCLETIMES",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_VEE",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_WEDGE",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_DIAMOND",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_BACKSLASH",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "SLASH",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_DIVIDE",
+    "same_as": "SLASH"
+  },
+  {
+    "name": "LONGNAME_DIVIDES",
+    "same_as": "SLASH"
+  },
+  {
+    "name": "LONGNAME_DIVISIONSLASH",
+    "same_as": "SLASH"
+  },
+  {
+    "name": "PREFIX_MINUS",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "PREFIX_PLUS",
+    "same_as": "PREFIX_MINUS"
+  },
+  {
+    "name": "PREFIX_LONGNAME_PLUSMINUS",
+    "same_as": "PREFIX_MINUS"
+  },
+  {
+    "name": "PREFIX_LONGNAME_MINUSPLUS",
+    "same_as": "PREFIX_MINUS"
+  },
+  {
+    "name": "PREFIX_LONGNAME_MINUS",
+    "same_as": "PREFIX_MINUS"
+  },
+  {
+    "name": "PREFIX_LONGNAME_CIRCLETIMES",
+    "same_as": "PREFIX_MINUS"
+  },
+  {
+    "name": "PREFIX_LONGNAME_COPRODUCT",
+    "same_as": "PREFIX_MINUS"
+  },
+  {
+    "name": "DOT",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_TENSORPRODUCT",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_CROSS",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_TENSORWEDGE",
+    "same_as": "LONGNAME_CROSS"
+  },
+  {
+    "name": "STARSTAR",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_CIRCLEDOT",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_PERMUTATIONPRODUCT",
+    "same_as": "LONGNAME_CIRCLEDOT"
+  },
+  {
+    "name": "LONGNAME_SMALLCIRCLE",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_SQUARE",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_DEL",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_PIECEWISE",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_DIFFERENTIALD",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_CAPITALDIFFERENTIALD",
+    "same_as": "LONGNAME_DIFFERENTIALD"
+  },
+  {
+    "name": "LONGNAME_SQRT",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_CUBEROOT",
+    "same_as": "LONGNAME_SQRT"
+  },
+  {
+    "name": "CLASS_VERTICALARROWOPERATORS",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "CLASS_VERTICALVECTOROPERATORS",
+    "same_as": "CLASS_VERTICALARROWOPERATORS"
+  },
+  {
+    "name": "CARET",
+    "value": "next",
+    "assoc": "right"
+  },
+  {
+    "name": "LESSGREATER",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "SINGLEQUOTE",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_TRANSPOSE",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_CONJUGATE",
+    "same_as": "LONGNAME_TRANSPOSE"
+  },
+  {
+    "name": "LONGNAME_CONJUGATETRANSPOSE",
+    "same_as": "LONGNAME_TRANSPOSE"
+  },
+  {
+    "name": "LONGNAME_HERMITIANCONJUGATE",
+    "same_as": "LONGNAME_TRANSPOSE"
+  },
+  {
+    "name": "POSTFIX_BANG",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "POSTFIX_BANGBANG",
+    "same_as": "POSTFIX_BANG"
+  },
+  {
+    "name": "ATAT",
+    "value": "next",
+    "assoc": "right"
+  },
+  {
+    "name": "SLASHAT",
+    "same_as": "ATAT"
+  },
+  {
+    "name": "ATATAT",
+    "same_as": "ATAT"
+  },
+  {
+    "name": "SLASHSLASHAT",
+    "same_as": "ATAT"
+  },
+  {
+    "name": "TILDE",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "AT",
+    "value": "next",
+    "assoc": "right"
+  },
+  {
+    "name": "LONGNAME_INVISIBLEAPPLICATION",
+    "same_as": "AT"
+  },
+  {
+    "name": "LONGNAME_APPLICATION",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "SLASHSTAR",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "ATSTAR",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "PREFIX_PLUSPLUS",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "PREFIX_MINUSMINUS",
+    "same_as": "PREFIX_PLUSPLUS"
+  },
+  {
+    "name": "POSTFIX_PLUSPLUS",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "POSTFIX_MINUSMINUS",
+    "same_as": "POSTFIX_PLUSPLUS"
+  },
+  {
+    "name": "CALL",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "INFIX_QUESTION",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LINEARSYNTAX_BANG",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LESSLESS",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "PREFIX_QUESTION",
+    "same_as": "LESSLESS"
+  },
+  {
+    "name": "COLONCOLON",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_INVISIBLEPREFIXSCRIPTBASE",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "LONGNAME_INVISIBLEPOSTFIXSCRIPTBASE",
+    "same_as": "LONGNAME_INVISIBLEPREFIXSCRIPTBASE"
+  },
+  {
+    "name": "HIGHEST",
+    "value": "next",
+    "assoc": "non_right"
+  },
+  {
+    "name": "SYMBOL",
+    "same_as": "HIGHEST"
+  },
+  {
+    "name": "UNDER",
+    "same_as": "HIGHEST"
+  }
+]
