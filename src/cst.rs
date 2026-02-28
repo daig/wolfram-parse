@@ -9,6 +9,8 @@ use std::fmt::Debug;
 use smallvec::SmallVec;
 use wolfram_expr::{symbol::SymbolRef, Expr};
 
+use std::fmt;
+
 use crate::{
     parse::{
         operators::{
@@ -22,6 +24,27 @@ use crate::{
     tokenize::{Token, TokenInput, TokenKind, TokenSource, TokenString},
     NodeSeq,
 };
+
+//======================================
+// ToInputFormError
+//======================================
+
+/// Error type for [`Cst::to_input_form_string()`].
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ToInputFormError {
+    /// Non-RowBox BoxNode cannot be serialized to input form.
+    BoxNode,
+}
+
+impl fmt::Display for ToInputFormError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            ToInputFormError::BoxNode => {
+                write!(f, "non-RowBox BoxNode cannot be serialized to input form")
+            },
+        }
+    }
+}
 
 /// A sequence of concrete syntax tree nodes.
 ///
@@ -355,6 +378,16 @@ impl<I: TokenInput, S> CstSeq<I, S> {
 
         NodeSeq(nodes)
     }
+
+    /// Serialize this CST sequence to Wolfram Language input form.
+    pub fn to_input_form_string(&self) -> Result<String, ToInputFormError> {
+        let mut buf = String::new();
+        let NodeSeq(nodes) = self;
+        for node in nodes {
+            node.write_input_form(&mut buf)?;
+        }
+        Ok(buf)
+    }
 }
 
 //==========================================================
@@ -428,8 +461,110 @@ impl<I: TokenInput, S> Cst<I, S> {
             Cst::Code(node) => Cst::Code(node),
         }
     }
+
+    /// Serialize this CST node to Wolfram Language input form (readable source).
+    pub fn to_input_form_string(&self) -> Result<String, ToInputFormError> {
+        let mut buf = String::new();
+        self.write_input_form(&mut buf)?;
+        Ok(buf)
+    }
+
+    fn write_input_form(&self, buf: &mut String) -> Result<(), ToInputFormError> {
+        match self {
+            Cst::Token(token) => {
+                match token.tok {
+                    TokenKind::Fake_ImplicitTimes => buf.push(' '),
+                    TokenKind::Fake_ImplicitNull => buf.push(' '),
+                    TokenKind::Plus => buf.push_str(" + "),
+                    TokenKind::Minus => buf.push_str(" - "),
+                    TokenKind::Dot => buf.push_str(" . "),
+                    TokenKind::DotDot => buf.push_str(" .."),
+                    TokenKind::DotDotDot => buf.push_str(" ..."),
+                    TokenKind::SlashDot => buf.push_str(" /. "),
+                    TokenKind::SlashSlashDot => buf.push_str(" //. "),
+                    _ => buf.push_str(token.input.as_str()),
+                }
+                Ok(())
+            },
+
+            // Spaced: " " + concat(children) + " "
+            Cst::Prefix(PrefixNode(op)) => write_children_spaced(&op.children, buf),
+            Cst::Binary(BinaryNode(op)) => write_children_spaced(&op.children, buf),
+            Cst::Infix(InfixNode(op)) => write_children_spaced(&op.children, buf),
+            Cst::Ternary(TernaryNode(op)) => write_children_spaced(&op.children, buf),
+            Cst::Postfix(PostfixNode(op)) => write_children_spaced(&op.children, buf),
+            Cst::SyntaxError(SyntaxErrorNode { children, .. }) => {
+                write_children_spaced(children, buf)
+            },
+
+            // Direct concat
+            Cst::Group(GroupNode(op)) => write_children_concat(&op.children, buf),
+            Cst::PrefixBinary(PrefixBinaryNode(op)) => {
+                write_children_concat(&op.children, buf)
+            },
+            Cst::Compound(CompoundNode(op)) => {
+                write_children_concat(&op.children, buf)
+            },
+            Cst::GroupMissingCloser(GroupMissingCloserNode(op)) => {
+                write_children_concat(&op.children, buf)
+            },
+            Cst::GroupMissingOpener(GroupMissingOpenerNode(op)) => {
+                write_children_concat(&op.children, buf)
+            },
+
+            // CallNode: head + body (direct concat)
+            Cst::Call(CallNode { head, body }) => {
+                match head {
+                    CallHead::Aggregate(h) => h.write_input_form(buf)?,
+                    CallHead::Concrete(seq) => write_children_concat(seq, buf)?,
+                }
+                write_children_concat(&body.as_op().children, buf)
+            },
+
+            // BoxNode: only RowBox supported
+            Cst::Box(BoxNode { kind, children, .. }) => match kind {
+                BoxKind::RowBox => {
+                    let NodeSeq(vec) = children;
+                    for (i, child) in vec.iter().enumerate() {
+                        if i > 0 {
+                            buf.push(' ');
+                        }
+                        child.write_input_form(buf)?;
+                    }
+                    Ok(())
+                },
+                _ => Err(ToInputFormError::BoxNode),
+            },
+
+            // CodeNode — never appears in aggregate CSTs
+            Cst::Code(_) => Ok(()),
+        }
+    }
 }
 
+fn write_children_spaced<I: TokenInput, S>(
+    children: &CstSeq<I, S>,
+    buf: &mut String,
+) -> Result<(), ToInputFormError> {
+    buf.push(' ');
+    let NodeSeq(vec) = children;
+    for child in vec {
+        child.write_input_form(buf)?;
+    }
+    buf.push(' ');
+    Ok(())
+}
+
+fn write_children_concat<I: TokenInput, S>(
+    children: &CstSeq<I, S>,
+    buf: &mut String,
+) -> Result<(), ToInputFormError> {
+    let NodeSeq(vec) = children;
+    for child in vec {
+        child.write_input_form(buf)?;
+    }
+    Ok(())
+}
 
 impl<I, S: TokenSource> Cst<I, S> {
     // TODO(cleanup): Combine with get_source()

@@ -18,6 +18,7 @@ mod test_precedence;
 mod test_box_parse;
 mod test_nb_parsing;
 mod test_full_form_string;
+mod test_input_form_string;
 
 use pretty_assertions::assert_eq;
 
