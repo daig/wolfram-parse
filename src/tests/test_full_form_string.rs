@@ -131,6 +131,154 @@ fn test_negative_literals() {
 }
 
 // ============================================================================
+// Exhaustive sugar → full-form correctness test
+// ============================================================================
+
+/// Verify that every ASCII-syntax operator maps to the correct full-form name,
+/// and that the full-form output itself round-trips (stability).
+#[test]
+fn test_sugar_to_full_form_exhaustive() {
+    let cases: &[(&str, &str)] = &[
+        // === Arithmetic & math ===
+        ("a + b", "Plus[a, b]"),
+        ("a - b", "Plus[a, Times[-1, b]]"),
+        ("a * b", "Times[a, b]"),
+        ("a b", "Times[a, b]"),             // implicit times
+        ("a / b", "Times[a, Power[b, -1]]"),
+        ("a ^ b", "Power[a, b]"),
+        ("a . b", "Dot[a, b]"),
+        ("a ** b", "NonCommutativeMultiply[a, b]"),
+
+        // === Comparison ===
+        ("a == b", "Equal[a, b]"),
+        ("a != b", "Unequal[a, b]"),
+        ("a < b", "Less[a, b]"),
+        ("a > b", "Greater[a, b]"),
+        ("a <= b", "LessEqual[a, b]"),
+        ("a >= b", "GreaterEqual[a, b]"),
+        ("a === b", "SameQ[a, b]"),
+        ("a =!= b", "UnsameQ[a, b]"),
+
+        // === Logic & alternatives ===
+        ("a && b", "And[a, b]"),
+        ("a || b", "Or[a, b]"),
+        ("!a", "Not[a]"),
+        ("a | b", "Alternatives[a, b]"),
+
+        // === String operators ===
+        ("a <> b", "StringJoin[a, b]"),
+        ("a ~~ b", "StringExpression[a, b]"),
+
+        // === Pattern & blank ===
+        ("_", "Blank[]"),
+        ("__", "BlankSequence[]"),
+        ("___", "BlankNullSequence[]"),
+        ("_Integer", "Blank[Integer]"),
+        ("_.", "Optional[Blank[]]"),
+        ("x_", "Pattern[x, Blank[]]"),
+        ("x__", "Pattern[x, BlankSequence[]]"),
+        ("x___", "Pattern[x, BlankNullSequence[]]"),
+        ("x_Integer", "Pattern[x, Blank[Integer]]"),
+        ("x_?f", "PatternTest[Pattern[x, Blank[]], f]"),
+        ("x_:0", "Optional[Pattern[x, Blank[]], 0]"),
+        ("x:f[a]", "Pattern[x, f[a]]"),
+
+        // === Slot, SlotSequence, Out ===
+        ("#", "Slot[1]"),
+        ("#2", "Slot[2]"),
+        ("##", "SlotSequence[1]"),
+        ("##3", "SlotSequence[3]"),
+        ("%", "Out[]"),
+        ("%%", "Out[-2]"),
+
+        // === Assignment & unset ===
+        ("x = 1", "Set[x, 1]"),
+        ("x := a", "SetDelayed[x, a]"),
+        ("x ^= a", "UpSet[x, a]"),
+        ("x ^:= a", "UpSetDelayed[x, a]"),
+        ("x =.", "Unset[x]"),
+        ("x += 1", "AddTo[x, 1]"),
+        ("x -= 1", "SubtractFrom[x, 1]"),
+        ("x *= 2", "TimesBy[x, 2]"),
+        ("x /= 2", "DivideBy[x, 2]"),
+
+        // === Rule ===
+        ("a -> b", "Rule[a, b]"),
+        ("a :> b", "RuleDelayed[a, b]"),
+        ("a <-> b", "TwoWayRule[a, b]"),
+
+        // === Application, map, postfix/prefix call ===
+        ("f @ x", "f[x]"),                  // prefix application
+        ("x // f", "f[x]"),                 // postfix application
+        ("a ~ f ~ b", "f[a, b]"),           // infix application
+        ("f /@ x", "Map[f, x]"),
+        ("f @@ x", "Apply[f, x]"),
+        ("f @@@ x", "MapApply[f, x]"),
+        ("f //@ x", "MapAll[f, x]"),
+
+        // === Replacement & condition ===
+        ("x /. y", "ReplaceAll[x, y]"),
+        ("x //. y", "ReplaceRepeated[x, y]"),
+        ("x /; y", "Condition[x, y]"),
+
+        // === Prefix operators ===
+        ("-x", "Times[-1, x]"),
+        ("++x", "PreIncrement[x]"),
+        ("--x", "PreDecrement[x]"),
+
+        // === Postfix operators ===
+        ("x!", "Factorial[x]"),
+        ("x!!", "Factorial2[x]"),
+        ("x++", "Increment[x]"),
+        ("x--", "Decrement[x]"),
+        ("x &", "Function[x]"),
+        ("f'", "Derivative[1][f]"),
+        ("f''", "Derivative[2][f]"),
+        ("x..", "Repeated[x]"),
+        ("x...", "RepeatedNull[x]"),
+
+        // === Structure ===
+        ("{a, b}", "List[a, b]"),
+        ("<|a -> 1|>", "Association[Rule[a, 1]]"),
+        ("a[[1]]", "Part[a, 1]"),
+        ("a[[1, 2]]", "Part[a, 1, 2]"),
+        ("a[[1;;3]]", "Part[a, Span[1, 3]]"),
+        ("a[[;;]]", "Part[a, Span[1, All]]"),
+        ("a[[2;;]]", "Part[a, Span[2, All]]"),
+        ("a ; b", "CompoundExpression[a, b]"),
+        ("a ;", "CompoundExpression[a, Null]"),
+
+        // === Ternary / tag ===
+        ("a /: b = c", "TagSet[a, b, c]"),
+        ("a /: b := c", "TagSetDelayed[a, b, c]"),
+        ("a /: b =.", "TagUnset[a, b]"),
+
+        // === MessageName ===
+        ("sym::tag", r#"MessageName[sym, "tag"]"#),
+    ];
+
+    for &(input, expected) in cases {
+        // 1. Correctness: sugar produces expected full form
+        let result = crate::parse_ast(input, &ParseOptions::default());
+        let ff = result
+            .syntax
+            .to_full_form_string()
+            .unwrap_or_else(|e| panic!("serialize failed for {input:?}: {e}"));
+        assert_eq!(ff, expected, "sugar={input:?}");
+
+        // 2. Stability: full-form output itself round-trips
+        let result2 = crate::parse_ast(&ff, &ParseOptions::default());
+        let ff2 = result2
+            .syntax
+            .to_full_form_string()
+            .unwrap_or_else(|e| {
+                panic!("re-serialize of {input:?} → {ff:?} failed: {e}")
+            });
+        assert_eq!(ff, ff2, "stability failed for sugar={input:?}");
+    }
+}
+
+// ============================================================================
 // Property-based tests (proptest)
 // ============================================================================
 
@@ -210,6 +358,52 @@ mod proptest_full_form {
             .boxed()
     }
 
+    fn arb_string_with_escapes() -> BoxedStrategy<Ast> {
+        prop::collection::vec(
+            prop_oneof![
+                4 => "[a-zA-Z0-9 ]".prop_map(|s: String| s).boxed(),
+                1 => Just(r"\n".to_string()).boxed(),
+                1 => Just(r"\t".to_string()).boxed(),
+                1 => Just(r"\\".to_string()).boxed(),
+                1 => Just(r#"\""#.to_string()).boxed(),
+            ],
+            0..=6,
+        )
+        .prop_map(|parts| {
+            let content = parts.join("");
+            Ast::Leaf {
+                kind: TokenKind::String,
+                input: TokenString::from_string(format!("\"{content}\"")),
+                data: AstMetadata::empty(),
+            }
+        })
+        .boxed()
+    }
+
+    fn arb_base_integer() -> BoxedStrategy<Ast> {
+        prop_oneof![
+            "[01]{1,8}".prop_map(|d| format!("2^^{d}")).boxed(),
+            "[0-7]{1,6}".prop_map(|d| format!("8^^{d}")).boxed(),
+            "[0-9a-f]{1,4}".prop_map(|d| format!("16^^{d}")).boxed(),
+        ]
+        .prop_map(|s| Ast::Leaf {
+            kind: TokenKind::Integer,
+            input: TokenString::from_string(s),
+            data: AstMetadata::empty(),
+        })
+        .boxed()
+    }
+
+    fn arb_positive_sci_integer() -> BoxedStrategy<Ast> {
+        (1u32..1000, 1u32..10)
+            .prop_map(|(mantissa, exp)| Ast::Leaf {
+                kind: TokenKind::Integer,
+                input: TokenString::from_string(format!("{mantissa}*^{exp}")),
+                data: AstMetadata::empty(),
+            })
+            .boxed()
+    }
+
     fn arb_fake_implicit_null() -> BoxedStrategy<Ast> {
         Just(Ast::Leaf {
             kind: TokenKind::Fake_ImplicitNull,
@@ -245,7 +439,10 @@ mod proptest_full_form {
             1 => arb_real(),
             1 => arb_negative_real(),
             1 => arb_rational(),
+            1 => arb_base_integer(),
+            1 => arb_positive_sci_integer(),
             1 => arb_string_literal(),
+            1 => arb_string_with_escapes(),
             1 => arb_fake_implicit_null(),
             1 => arb_fake_implicit_one(),
             1 => arb_fake_implicit_all(),
@@ -312,6 +509,36 @@ mod proptest_full_form {
             .boxed()
     }
 
+    fn arb_string_with_escapes_str() -> BoxedStrategy<String> {
+        prop::collection::vec(
+            prop_oneof![
+                4 => "[a-zA-Z0-9 ]".prop_map(|s: String| s).boxed(),
+                1 => Just(r"\n".to_string()).boxed(),
+                1 => Just(r"\t".to_string()).boxed(),
+                1 => Just(r"\\".to_string()).boxed(),
+                1 => Just(r#"\""#.to_string()).boxed(),
+            ],
+            0..=6,
+        )
+        .prop_map(|parts| format!("\"{}\"", parts.join("")))
+        .boxed()
+    }
+
+    fn arb_base_integer_str() -> BoxedStrategy<String> {
+        prop_oneof![
+            "[01]{1,8}".prop_map(|d| format!("2^^{d}")).boxed(),
+            "[0-7]{1,6}".prop_map(|d| format!("8^^{d}")).boxed(),
+            "[0-9a-f]{1,4}".prop_map(|d| format!("16^^{d}")).boxed(),
+        ]
+        .boxed()
+    }
+
+    fn arb_positive_sci_str() -> BoxedStrategy<String> {
+        (1u32..1000, 1u32..10)
+            .prop_map(|(m, e)| format!("{m}*^{e}"))
+            .boxed()
+    }
+
     fn arb_atom_str() -> BoxedStrategy<String> {
         prop_oneof![
             3 => arb_symbol_str(),
@@ -320,7 +547,10 @@ mod proptest_full_form {
             1 => arb_real_str(),
             1 => arb_negative_real_str(),
             1 => arb_rational_str(),
+            1 => arb_base_integer_str(),
+            1 => arb_positive_sci_str(),
             1 => arb_string_literal_str(),
+            1 => arb_string_with_escapes_str(),
         ]
         .boxed()
     }
