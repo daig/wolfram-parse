@@ -388,6 +388,16 @@ impl<I: TokenInput, S> CstSeq<I, S> {
         }
         Ok(buf)
     }
+
+    /// Serialize this concrete CST sequence to exact source characters.
+    pub fn to_source_character_string(&self) -> Result<String, ToInputFormError> {
+        let mut buf = String::new();
+        let NodeSeq(nodes) = self;
+        for node in nodes {
+            node.write_source_character(&mut buf)?;
+        }
+        Ok(buf)
+    }
 }
 
 //==========================================================
@@ -540,6 +550,80 @@ impl<I: TokenInput, S> Cst<I, S> {
             Cst::Code(_) => Ok(()),
         }
     }
+
+    /// Serialize this concrete CST node to exact source characters.
+    pub fn to_source_character_string(&self) -> Result<String, ToInputFormError> {
+        let mut buf = String::new();
+        self.write_source_character(&mut buf)?;
+        Ok(buf)
+    }
+
+    fn write_source_character(
+        &self,
+        buf: &mut String,
+    ) -> Result<(), ToInputFormError> {
+        match self {
+            Cst::Token(token) => {
+                buf.push_str(token.input.as_str());
+                Ok(())
+            },
+
+            // All operator nodes: recursively concatenate children
+            Cst::Prefix(PrefixNode(op)) => {
+                write_children_source(&op.children, buf)
+            },
+            Cst::Binary(BinaryNode(op)) => {
+                write_children_source(&op.children, buf)
+            },
+            Cst::Infix(InfixNode(op)) => {
+                write_children_source(&op.children, buf)
+            },
+            Cst::Ternary(TernaryNode(op)) => {
+                write_children_source(&op.children, buf)
+            },
+            Cst::Postfix(PostfixNode(op)) => {
+                write_children_source(&op.children, buf)
+            },
+            Cst::PrefixBinary(PrefixBinaryNode(op)) => {
+                write_children_source(&op.children, buf)
+            },
+            Cst::Compound(CompoundNode(op)) => {
+                write_children_source(&op.children, buf)
+            },
+            Cst::Group(GroupNode(op)) => {
+                write_children_source(&op.children, buf)
+            },
+            Cst::GroupMissingCloser(GroupMissingCloserNode(op)) => {
+                write_children_source(&op.children, buf)
+            },
+            Cst::GroupMissingOpener(GroupMissingOpenerNode(op)) => {
+                write_children_source(&op.children, buf)
+            },
+
+            Cst::SyntaxError(SyntaxErrorNode { children, .. }) => {
+                write_children_source(children, buf)
+            },
+
+            Cst::Call(CallNode { head, body }) => {
+                match head {
+                    CallHead::Concrete(seq) => {
+                        write_children_source(seq, buf)?
+                    },
+                    CallHead::Aggregate(h) => {
+                        h.write_source_character(buf)?
+                    },
+                }
+                write_children_source(&body.as_op().children, buf)
+            },
+
+            Cst::Box(BoxNode { kind, children, .. }) => match kind {
+                BoxKind::RowBox => write_children_source(children, buf),
+                _ => Err(ToInputFormError::BoxNode),
+            },
+
+            Cst::Code(_) => Ok(()),
+        }
+    }
 }
 
 fn write_children_spaced<I: TokenInput, S>(
@@ -562,6 +646,17 @@ fn write_children_concat<I: TokenInput, S>(
     let NodeSeq(vec) = children;
     for child in vec {
         child.write_input_form(buf)?;
+    }
+    Ok(())
+}
+
+fn write_children_source<I: TokenInput, S>(
+    children: &CstSeq<I, S>,
+    buf: &mut String,
+) -> Result<(), ToInputFormError> {
+    let NodeSeq(vec) = children;
+    for child in vec {
+        child.write_source_character(buf)?;
     }
     Ok(())
 }
