@@ -12,6 +12,23 @@ fn aggregate(input: &str) -> Vec<Cst<TokenStr>> {
 }
 
 // ============================================================================
+// Error-path tests
+// ============================================================================
+
+#[test]
+fn test_input_form_error_tokens_pass_through() {
+    // Error tokens (e.g. unterminated strings) serialize without error —
+    // to_input_form_string is permissive and only errors on non-RowBox BoxNodes.
+    let nodes = aggregate("\"\n");
+    for node in &nodes {
+        assert!(
+            node.to_input_form_string().is_ok(),
+            "to_input_form_string should succeed on error tokens"
+        );
+    }
+}
+
+// ============================================================================
 // Property-based tests (proptest)
 // ============================================================================
 

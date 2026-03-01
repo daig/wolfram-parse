@@ -28,8 +28,9 @@ fn test_error_node() {
 
 #[test]
 fn test_negative_literal_head() {
-    // a // -1 means (-1)[a]
+    // a // -1 means (-1)[a]; negative literals need parens as call heads
     assert_eq!(full_form("a // -1"), "(-1)[a]");
+    assert_eq!(full_form("a // -1.5"), "(-1.5)[a]");
 }
 
 #[test]
@@ -169,6 +170,13 @@ fn test_sugar_to_full_form_exhaustive() {
 
         // === MessageName ===
         ("sym::tag", r#"MessageName[sym, "tag"]"#),
+
+        // === File I/O & introspection ===
+        ("?z", "Information[z]"),
+        (r#"<<"file""#, r#"Get["file"]"#),
+        (r#"x >> "file""#, r#"Put[x, "file"]"#),
+        (r#"x >>> "file""#, r#"PutAppend[x, "file"]"#),
+        ("+x", "Plus[x]"),
     ];
 
     for &(input, expected) in cases {

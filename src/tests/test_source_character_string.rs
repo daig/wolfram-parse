@@ -10,6 +10,21 @@ fn parse_concrete(input: &str) -> CstSeq<TokenStr> {
 }
 
 // ============================================================================
+// Error-path tests
+// ============================================================================
+
+#[test]
+fn test_source_character_error_tokens_pass_through() {
+    // Error tokens (e.g. unterminated strings) serialize without error —
+    // to_source_character_string is permissive and only errors on non-RowBox BoxNodes.
+    let cst = parse_concrete("\"\n");
+    assert!(
+        cst.to_source_character_string().is_ok(),
+        "to_source_character_string should succeed on error tokens"
+    );
+}
+
+// ============================================================================
 // Property-based tests (proptest)
 // ============================================================================
 

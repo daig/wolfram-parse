@@ -70,6 +70,48 @@ pub fn arb_positive_sci_str() -> BoxedStrategy<String> {
         .boxed()
 }
 
+pub fn arb_long_name_symbol_str() -> BoxedStrategy<String> {
+    // Letterlike long names that round-trip through parse_ast unchanged.
+    // Excludes \[Pi], \[Degree], \[Infinity] — those get normalized to
+    // bare symbol names (Pi, Degree, Infinity) during abstracting.
+    prop_oneof![
+        Just(r"\[Alpha]".to_string()),
+        Just(r"\[Beta]".to_string()),
+        Just(r"\[Gamma]".to_string()),
+        Just(r"\[Delta]".to_string()),
+        Just(r"\[Theta]".to_string()),
+        Just(r"\[Sigma]".to_string()),
+        Just(r"\[Omega]".to_string()),
+        Just(r"\[Lambda]".to_string()),
+        Just(r"\[Phi]".to_string()),
+        Just(r"\[Epsilon]".to_string()),
+        Just(r"\[Mu]".to_string()),
+        Just(r"\[Rho]".to_string()),
+        Just(r"\[Tau]".to_string()),
+        Just(r"\[Psi]".to_string()),
+        Just(r"\[Chi]".to_string()),
+    ]
+    .boxed()
+}
+
+pub fn arb_context_symbol_str() -> BoxedStrategy<String> {
+    ("[A-Z][a-z]{1,4}", "[a-z][a-zA-Z0-9]{0,4}")
+        .prop_map(|(ctx, name)| format!("{ctx}`{name}"))
+        .boxed()
+}
+
+pub fn arb_precision_real_str() -> BoxedStrategy<String> {
+    (0u32..100, 1u32..100, 1u32..50)
+        .prop_map(|(int, frac, prec)| format!("{int}.{frac}`{prec}"))
+        .boxed()
+}
+
+pub fn arb_accuracy_real_str() -> BoxedStrategy<String> {
+    (0u32..100, 1u32..100, 1u32..50)
+        .prop_map(|(int, frac, acc)| format!("{int}.{frac}``{acc}"))
+        .boxed()
+}
+
 pub fn arb_atom_str() -> BoxedStrategy<String> {
     prop_oneof![
         3 => arb_symbol_str(),
@@ -82,6 +124,10 @@ pub fn arb_atom_str() -> BoxedStrategy<String> {
         1 => arb_positive_sci_str(),
         1 => arb_string_literal_str(),
         1 => arb_string_with_escapes_str(),
+        1 => arb_long_name_symbol_str(),
+        1 => arb_context_symbol_str(),
+        1 => arb_precision_real_str(),
+        1 => arb_accuracy_real_str(),
     ]
     .boxed()
 }
