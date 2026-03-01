@@ -12,95 +12,9 @@ fn full_form(input: &str) -> String {
         .unwrap_or_else(|e| panic!("to_full_form_string failed for {input:?}: {e}"))
 }
 
-#[test]
-fn test_addition() {
-    assert_eq!(full_form("1+1"), "Plus[1, 1]");
-}
-
-#[test]
-fn test_multiplication() {
-    assert_eq!(full_form("a*b"), "Times[a, b]");
-}
-
-#[test]
-fn test_already_full_form() {
-    assert_eq!(full_form("f[x, y]"), "f[x, y]");
-}
-
-#[test]
-fn test_nested_call() {
-    assert_eq!(full_form("f[g[x]]"), "f[g[x]]");
-}
-
-#[test]
-fn test_negation() {
-    // -x parses as Times[-1, x]
-    assert_eq!(full_form("-x"), "Times[-1, x]");
-}
-
-#[test]
-fn test_factorial() {
-    assert_eq!(full_form("x!"), "Factorial[x]");
-}
-
-#[test]
-fn test_string_literal() {
-    assert_eq!(full_form(r#"{"a", "b"}"#), r#"List["a", "b"]"#);
-}
-
-#[test]
-fn test_power() {
-    assert_eq!(full_form("x^2"), "Power[x, 2]");
-}
-
-#[test]
-fn test_compound_expression() {
-    // a;b parses as CompoundExpression[a, b]
-    assert_eq!(full_form("a;b"), "CompoundExpression[a, b]");
-}
-
-#[test]
-fn test_compound_expression_trailing() {
-    // a; parses as CompoundExpression[a, Null]
-    assert_eq!(full_form("a;"), "CompoundExpression[a, Null]");
-}
-
-#[test]
-fn test_negative_literal_head() {
-    // a // -1 means (-1)[a]
-    assert_eq!(full_form("a // -1"), "(-1)[a]");
-}
-
-#[test]
-fn test_list() {
-    assert_eq!(full_form("{1, 2, 3}"), "List[1, 2, 3]");
-}
-
-#[test]
-fn test_rule() {
-    assert_eq!(full_form("a -> b"), "Rule[a, b]");
-}
-
-#[test]
-fn test_set() {
-    assert_eq!(full_form("x = 1"), "Set[x, 1]");
-}
-
-#[test]
-fn test_part() {
-    assert_eq!(full_form("a[[1]]"), "Part[a, 1]");
-}
-
-#[test]
-fn test_slot() {
-    // # is syntactic sugar for Slot[1] (implicit one)
-    assert_eq!(full_form("#"), "Slot[1]");
-}
-
-#[test]
-fn test_no_args_call() {
-    assert_eq!(full_form("f[]"), "f[]");
-}
+// ============================================================================
+// Edge-case tests not covered by exhaustive or proptest suites
+// ============================================================================
 
 #[test]
 fn test_error_node() {
@@ -113,9 +27,9 @@ fn test_error_node() {
 }
 
 #[test]
-fn test_implicit_times() {
-    // "a b" parses as Times[a, b] with implicit multiplication
-    assert_eq!(full_form("a b"), "Times[a, b]");
+fn test_negative_literal_head() {
+    // a // -1 means (-1)[a]
+    assert_eq!(full_form("a // -1"), "(-1)[a]");
 }
 
 #[test]
@@ -284,9 +198,10 @@ fn test_sugar_to_full_form_exhaustive() {
 
 mod proptest_full_form {
     use super::*;
+    use crate::tests::test_strategies::*;
     use proptest::prelude::*;
 
-    // --- Leaf strategies ---
+    // --- AST-level leaf strategies (specific to full-form tests) ---
 
     fn arb_symbol() -> BoxedStrategy<Ast> {
         "[a-zA-Z][a-zA-Z0-9]{0,5}"
@@ -464,111 +379,6 @@ mod proptest_full_form {
                             head: Box::new(head),
                             args,
                             data: AstMetadata::empty(),
-                        },
-                    )
-                },
-            )
-            .boxed()
-    }
-
-    // --- String-level strategies (for Property 2) ---
-
-    fn arb_symbol_str() -> BoxedStrategy<String> {
-        "[a-zA-Z][a-zA-Z0-9]{0,5}".prop_map(|s| s).boxed()
-    }
-
-    fn arb_integer_str() -> BoxedStrategy<String> {
-        (0u32..1000).prop_map(|n| n.to_string()).boxed()
-    }
-
-    fn arb_real_str() -> BoxedStrategy<String> {
-        (0u32..1000, 1u32..1000)
-            .prop_map(|(int, frac)| format!("{int}.{frac}"))
-            .boxed()
-    }
-
-    fn arb_negative_integer_str() -> BoxedStrategy<String> {
-        (1u32..1000).prop_map(|n| format!("-{n}")).boxed()
-    }
-
-    fn arb_negative_real_str() -> BoxedStrategy<String> {
-        (0u32..1000, 1u32..1000)
-            .prop_map(|(int, frac)| format!("-{int}.{frac}"))
-            .boxed()
-    }
-
-    fn arb_rational_str() -> BoxedStrategy<String> {
-        (1u32..100, 1u32..10)
-            .prop_map(|(m, e)| format!("{m}*^-{e}"))
-            .boxed()
-    }
-
-    fn arb_string_literal_str() -> BoxedStrategy<String> {
-        "[a-zA-Z0-9 ]{0,10}"
-            .prop_map(|s| format!("\"{s}\""))
-            .boxed()
-    }
-
-    fn arb_string_with_escapes_str() -> BoxedStrategy<String> {
-        prop::collection::vec(
-            prop_oneof![
-                4 => "[a-zA-Z0-9 ]".prop_map(|s: String| s).boxed(),
-                1 => Just(r"\n".to_string()).boxed(),
-                1 => Just(r"\t".to_string()).boxed(),
-                1 => Just(r"\\".to_string()).boxed(),
-                1 => Just(r#"\""#.to_string()).boxed(),
-            ],
-            0..=6,
-        )
-        .prop_map(|parts| format!("\"{}\"", parts.join("")))
-        .boxed()
-    }
-
-    fn arb_base_integer_str() -> BoxedStrategy<String> {
-        prop_oneof![
-            "[01]{1,8}".prop_map(|d| format!("2^^{d}")).boxed(),
-            "[0-7]{1,6}".prop_map(|d| format!("8^^{d}")).boxed(),
-            "[0-9a-f]{1,4}".prop_map(|d| format!("16^^{d}")).boxed(),
-        ]
-        .boxed()
-    }
-
-    fn arb_positive_sci_str() -> BoxedStrategy<String> {
-        (1u32..1000, 1u32..10)
-            .prop_map(|(m, e)| format!("{m}*^{e}"))
-            .boxed()
-    }
-
-    fn arb_atom_str() -> BoxedStrategy<String> {
-        prop_oneof![
-            3 => arb_symbol_str(),
-            2 => arb_integer_str(),
-            1 => arb_negative_integer_str(),
-            1 => arb_real_str(),
-            1 => arb_negative_real_str(),
-            1 => arb_rational_str(),
-            1 => arb_base_integer_str(),
-            1 => arb_positive_sci_str(),
-            1 => arb_string_literal_str(),
-            1 => arb_string_with_escapes_str(),
-        ]
-        .boxed()
-    }
-
-    fn arb_full_form_expr() -> BoxedStrategy<String> {
-        arb_atom_str()
-            .prop_recursive(
-                4,  // max depth
-                64, // desired node count
-                8,  // expected items per collection
-                |inner| {
-                    (arb_symbol_str(), prop::collection::vec(inner, 0..=4)).prop_map(
-                        |(head, args)| {
-                            if args.is_empty() {
-                                format!("{head}[]")
-                            } else {
-                                format!("{head}[{}]", args.join(", "))
-                            }
                         },
                     )
                 },
