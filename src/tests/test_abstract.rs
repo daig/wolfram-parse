@@ -1734,3 +1734,26 @@ fn test_abstract_call() {
         }
     );
 }
+
+/// Every token the Times parselet accepts as a separator (`*`, implicit
+/// juxtaposition, `\[Times]`, `\[InvisibleTimes]`) must also be accepted
+/// when a negated or flattened Times node is abstracted, and all of them
+/// mean the same product.
+#[test]
+fn test_negated_times_accepts_every_times_separator() {
+    let full_form = |input: &str| {
+        crate::parse_ast(input, &crate::ParseOptions::default())
+            .syntax
+            .to_full_form_string()
+            .unwrap_or_else(|err| panic!("full form failed for {input:?}: {err}"))
+    };
+
+    let expected = full_form("a - 2*x");
+    for input in [
+        "a - 2 x",
+        r"a - 2\[Times]x",
+        r"a - 2\[InvisibleTimes]x",
+    ] {
+        assert_eq!(full_form(input), expected, "{input}");
+    }
+}
