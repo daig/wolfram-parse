@@ -3323,10 +3323,17 @@ fn is_expected_separator<I, S>(
     if let Some(sep) = debug_expected_separator {
         match child {
             Cst::Token(Token { tok, .. }) if *tok == sep => true,
-            // Fake_ImplicitTimes is a synthetic separator for implicit multiplication
+            // The Times parselet accepts every multiplication separator:
+            // Fake_ImplicitTimes is synthesized for juxtaposition, and
+            // \[Times] and \[InvisibleTimes] are explicit long names.
             Cst::Token(Token { tok, .. })
-                if *tok == TokenKind::Fake_ImplicitTimes
-                    && sep == TokenKind::Star =>
+                if sep == TokenKind::Star
+                    && matches!(
+                        tok,
+                        TokenKind::Fake_ImplicitTimes
+                            | TokenKind::LongName_Times
+                            | TokenKind::LongName_InvisibleTimes
+                    ) =>
             {
                 true
             },
